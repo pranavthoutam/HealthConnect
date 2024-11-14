@@ -8,12 +8,14 @@ namespace HealthConnect.ViewModels
         public string UserName { get; set; }
 
         [Required]
-        [StringLength(10)]
-        [DataType(DataType.EmailAddress)]
+        [EmailAddress]
         public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+
+        [Required]
+        public bool Role {  get; set; } = false;
     }
 }
