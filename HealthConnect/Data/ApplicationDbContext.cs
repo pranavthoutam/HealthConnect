@@ -39,6 +39,9 @@ namespace HealthConnect.Data
             {
                 entity.ToTable("UserTokens");
             });
+            builder.Entity<User>(entity => entity.Property(u => u.DateofBirth).IsRequired(false));
+            builder.Entity<User>(entity => entity.Property(u => u.ProfilePhoto).IsRequired(false));
         }
+        DbSet<Address> Addresses { get; set; }
     }
 }

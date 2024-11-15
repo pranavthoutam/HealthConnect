@@ -1,0 +1,46 @@
+﻿body {
+    margin:0
+}
+.header {
+    background-color: #60DAEB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+}
+
+    .header h1 {
+        margin: 0;
+        font-size: 24px;
+        text-align: left;
+    }
+
+    .header nav {
+        margin-left: auto;
+        font-weight: bold;
+    }
+
+        .header nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: black;
+            font-size: 16px;
+        }
+
+    .header .auth-links {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 10px;
+    }
+
+        .header .auth-links a {
+            display: inline-block;
+            padding: 5px 15px;
+            background-color: #60DAEB;
+            border: 1px solid black;
+            border-radius: 5px;
+            text-decoration: none;
+            color: black;
+            font-weight: normal;
+            margin-left: 5px;
+        }

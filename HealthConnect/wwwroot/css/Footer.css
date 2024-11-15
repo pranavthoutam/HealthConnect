@@ -1,0 +1,57 @@
+﻿/* Footer Styling */
+.footer {
+    background-color: #60DAEB;
+    padding: 20px 0;
+    bottom: 0px;
+    width: 100%;
+}
+
+    .footer .footer-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px;
+        font-weight: bold;
+        margin: 40px 0
+    }
+
+    .footer h1 {
+        margin: 0;
+        font-size: 24px;
+        text-align: left;
+    }
+
+    .footer nav {
+        text-align: center;
+    }
+
+        .footer nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: black;
+            font-size: 16px;
+        }
+
+    .footer .social-icons {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+
+        .footer .social-icons a {
+            margin: 0 10px;
+            color: black;
+            font-size: 20px;
+        }
+
+    .footer p {
+        margin: 10px 0 0px;
+        font-size: 18px;
+        text-align: center;
+        font-weight: lighter
+    }
+
+    .footer .divider {
+        margin-top: 10px 10px;
+        border-top: 1px solid black;
+    }

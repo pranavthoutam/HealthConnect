@@ -1,0 +1,54 @@
+﻿@model HealthConnect.ViewModels.LoginViewModel
+<head>
+    <style>
+        .auth-links {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+            .auth-links a {
+                margin: 0px 5px;
+                text-decoration: none;
+                color: #00BFFF;
+                font-size: 16px;
+                justify-content: space-between;
+                color: black
+            }
+    </style>
+</head>
+
+<div class="auth-links">
+    <a href="#">
+        Login
+    </a>
+    <a href="#">
+        Signup
+    </a>
+</div>
+<div class="main-content">
+
+    <img alt="Healthcare illustration" src="https://placehold.co/300x300" />
+
+    <div class="form-container">
+        <h2>Welcome Back to Health Connect</h2>
+
+        <form asp-action="Login" method="post">
+            <input asp-for="Email" placeholder="Email Address" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+
+            <input asp-for="Password" type="password" placeholder="Enter Password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+
+            <div>
+                <input asp-for="RememberMe" type="checkbox" /> Remember Me
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p>
+            Don't have an account?
+            <a class="register-link" asp-action="Register">Sign Up Here</a>
+        </p>
+    </div>
+</div>
