@@ -1,46 +1,35 @@
-﻿<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="~/css/header.css"/>
-    <link rel="stylesheet" href="~/css/Footer.css" />
-
-    <style>
-        body {
-            margin: 0;
-        }
-
-        .header + .auth-links {
-            margin-top: 20px; /* Adds 20px space after the header */
-        }
-
-        .auth-links {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-            .auth-links a {
-                margin: 0px 5px;
-                text-decoration:none;
-                color: #00BFFF;
-                font-size: 16px;
-                justify-content:space-between;
-                color:black
-            }
-    </style>
-</head>
-<body>
-    <!-- Header Section -->
-    <div class="header">
-        <h1>HEALTH CONNECT</h1>
+    <link rel="stylesheet" href="~/css/header.css">
+    <link rel="stylesheet" href="~/css/footer.css">
+    <link href="https://fonts.googleapis.com/css2?family=Gelasio:wght@400;700&display=swap" rel="stylesheet">
+    <title>Health Connect</title>
+    <header class="header">
+        <h1 style="font-family: 'Gelasio', serif;">HEALTH CONNECT</h1>
         <nav>
             <a href="#">Find Doctors</a>
             <a href="#">Video Consult</a>
             <a href="#">Medicines</a>
-            <div class="auth-links">
-                <a href="#">Login/Signup</a>
-            </div>
         </nav>
-    </div>
+        <div class="auth-links">
+            @if (User.Identity.IsAuthenticated)
+            {
+                    <a href="/profile" class="profile-circle">
+                        <img src="~/images/profile-placeholder.png" alt="Profile" class="profile-img">
+                    </a>
+            }
+            else
+            {
+                    <a href="/Account/Login">Login/Signup</a>
+            }
+        </div>
+    </header>
+</head>
+<body>
 
     <!-- Main Content -->
     <main role="main" class="container">
@@ -48,16 +37,15 @@
     </main>
 
     <!-- Footer Section -->
-    <div class="footer">
+    <footer class="footer">
         <!-- Footer Top Section -->
         <div class="footer-top">
             <h1>HEALTH CONNECT</h1>
-            <!-- Footer Links Section -->
             <nav>
-                    <a href="#">Find Doctors</a>
-                    <a href="#">Online Video Consultation</a>
-                    <a href="#">Medicines</a>
-             </nav>
+                <a href="#">Find Doctors</a>
+                <a href="#">Online Video Consultation</a>
+                <a href="#">Medicines</a>
+            </nav>
             <div class="social-icons">
                 <a href="#"><i class="fab fa-instagram"></i></a>
                 <a href="#"><i class="fab fa-facebook"></i></a>
@@ -66,13 +54,11 @@
             </div>
         </div>
 
-       
-
         <!-- Divider Line -->
         <div class="divider"></div>
 
         <!-- Copyright Section -->
         <p>Copyright © 2024, Health Connect. All rights reserved.</p>
-    </div>
+    </footer>
 </body>
 </html>

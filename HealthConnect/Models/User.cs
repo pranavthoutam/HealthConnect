@@ -17,6 +17,8 @@ namespace HealthConnect.Models
 
         [ForeignKey("Address")]
         public int Address { get; set; }
+        public string OTP { get; set; }
+        public DateTime? OTPExpiryTime { get; set; }
     }
 
     public enum Gender
