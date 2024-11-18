@@ -14,7 +14,7 @@ namespace HealthConnect.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly EmailService _emailService;
 
-
+        private static string Otp;
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager,EmailService emailService)
         {
             _userManager = userManager;
@@ -23,6 +23,7 @@ namespace HealthConnect.Controllers
             _emailService = emailService;
         }
 
+       
         // Create roles if they don't exist
         public async Task<IActionResult> CreateRoles()
         {
@@ -126,6 +127,11 @@ namespace HealthConnect.Controllers
 
             return View(loginViewModel);
         }
+        [HttpGet]
+        public IActionResult DoctorRegister()
+        {
+            return View();
+        }
 
         // Logout
         public async Task<IActionResult> Logout()
@@ -146,7 +152,7 @@ namespace HealthConnect.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.Users.FirstOrDefaultAsync(u=>u.Email== model.Email);
+                var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user == null)
                 {
                     ModelState.AddModelError("", "Email not found.");
@@ -154,14 +160,10 @@ namespace HealthConnect.Controllers
                 }
 
                 // Generate OTP
-                var otp = new Random().Next(100000, 999999).ToString();
-                user.OTP = otp;
-                user.OTPExpiryTime = DateTime.UtcNow.AddMinutes(10);
-
-                await _userManager.UpdateAsync(user);
-
+                Otp = new Random().Next(100000, 999999).ToString();
+                
                 // Send OTP via email
-                await _emailService.SendEmailAsync(user.Email, "Password Reset OTP", $"Your OTP is {otp}");
+                await _emailService.SendEmailAsync(user.Email, "Password Reset OTP", $"Your OTP is {Otp}");
 
                 // Store email temporarily
                 TempData["Email"] = model.Email;
@@ -184,24 +186,20 @@ namespace HealthConnect.Controllers
 
         // Verify OTP (POST)
         [HttpPost]
-        public async Task<IActionResult> VerifyOtp(String otp)
+        public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
         {
             if (TempData["Email"] == null)
                 return RedirectToAction("ForgotPassword");
 
             string email = TempData["Email"].ToString();
             TempData.Keep("Email");
-            var user = await _userManager.Users.FirstOrDefaultAsync(u=>u.Email==email);
-            if (user == null || user.OTP != otp || user.OTPExpiryTime < DateTime.UtcNow)
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null || Otp != model.OTP || user.OTPExpiryTime < DateTime.UtcNow)
             {
                 ModelState.AddModelError("", "Invalid or expired OTP.");
                 return View();
             }
             if (ModelState.IsValid) { 
-                // Clear OTP after successful verification
-                user.OTP = otp;
-                user.OTPExpiryTime = DateTime.MinValue;
-                await _userManager.UpdateAsync(user);
 
                 return RedirectToAction("ResetPassword");
             }
