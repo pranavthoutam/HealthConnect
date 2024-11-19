@@ -1,44 +1,52 @@
-﻿<html>
+﻿@model HealthConnect.ViewModels.LoginViewModel
+
+<!DOCTYPE html>
+<html>
 <head>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
 </head>
-<body >
+<body>
     <div class="bg-white flex items-center justify-center h-screen">
         <div class="absolute top-0 w-full flex justify-center mt-5">
-            <a class="text-blue-400 mr-4" href="#">
+            <a class="text-blue-400 mr-4" asp-controller="Account" asp-action="Login">
                 Login
             </a>
-            <a class="text-black" href="#">
+            <a class="text-black" asp-controller="Account" asp-action="Register">
                 Signup
             </a>
         </div>
-        <div class="flex items-center justify-center w-full max-w-4xl mt-12">
+        <div class="flex items-center justify-center w-full max-w-4xl mt-0">
             <div class="w-1/2 flex justify-center">
-                <img alt="Illustration of a planet with various icons around it" class="w-3/4" height="300" src="https://storage.googleapis.com/a1aa/image/tNgxKubkJfwFFKslRFS0A7YhMxuCjU4EXwYkBqQrIpqlsJ5JA.jpg" width="300" />
+                <img alt="Health Connect" class="w-3/4" height="300" src="~/Images/HealthConnect.jpg" width="300" />
             </div>
             <div class="w-1/2 bg-gray-100 p-8 rounded-lg shadow-lg">
-                <form>
+                <form asp-action="Login" asp-controller="Account" method="post">
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm mb-2" for="email">
+                        <label class="block text-gray-700 text-sm mb-2" asp-for="Email">
                             Mobile Number / Email ID
                         </label>
-                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" placeholder="Mobile Number / Email ID" type="text" />
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" asp-for="Email" />
+                        <span class="text-red-500 text-xs italic" asp-validation-for="Email"></span>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm mb-2" for="password">
+                        <label class="block text-gray-700 text-sm mb-2" asp-for="Password">
                             Password
                         </label>
-                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" placeholder="Password" type="password" />
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" asp-for="Password" type="password" />
+                        <span class="text-red-500 text-xs italic" asp-validation-for="Password"></span>
                     </div>
-                    <div class="flex items-center justify-end mb-4">
-                        <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="#">
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="inline-flex items-center">
+                            <input asp-for="RememberMe" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
+                            <span class="ml-2 text-gray-700 text-sm">Remember Me</span>
+                        </label>
+                        <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" asp-action="ForgotPassword" asp-controller="Account">
                             Forgot Password?
                         </a>
                     </div>
                     <div class="flex items-center justify-center">
-                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
                             Login
                         </button>
                     </div>
@@ -46,5 +54,6 @@
             </div>
         </div>
     </div>
+
 </body>
 </html>

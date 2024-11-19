@@ -4,6 +4,7 @@ using HealthConnect.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace HealthConnect.Controllers
 {
@@ -14,7 +15,7 @@ namespace HealthConnect.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly EmailService _emailService;
 
-        private static string Otp;
+        private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otps = new();
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager,EmailService emailService)
         {
             _userManager = userManager;
@@ -146,67 +147,68 @@ namespace HealthConnect.Controllers
             return View();
         }
 
-        // Forgot Password (POST)
         [HttpPost]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model, string otp = null)
         {
-            if (ModelState.IsValid)
+            // If no TempData Email exists, we are in the first step (sending OTP)
+            if (TempData["Email"] == null)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null)
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("", "Email not found.");
-                    return View(model);
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError("", "Email not found.");
+                        return View();
+                    }
+
+                    // Generate OTP
+                    string generatedOtp = new Random().Next(100000, 999999).ToString();
+                    DateTime expiration = DateTime.UtcNow.AddMinutes(3);
+
+                    // Store OTP with expiration
+                    _otps[model.Email] = (generatedOtp, expiration);
+
+                    // Send OTP via email
+                    await _emailService.SendEmailAsync(model.Email, "Password Reset OTP", $"Your OTP is {generatedOtp}. It will expire in 3 minutes.");
+
+                    TempData["Email"] = model.Email;
+                    TempData.Keep("Email");
+                    return View();
+                }
+            }
+            else
+            {
+                // Email already provided, validate OTP
+                string email = TempData["Email"].ToString();
+                TempData.Keep("Email");
+
+                if (string.IsNullOrEmpty(otp))
+                {
+                    ModelState.AddModelError("", "Please enter the OTP.");
+                    return View();
                 }
 
-                // Generate OTP
-                Otp = new Random().Next(100000, 999999).ToString();
-                
-                // Send OTP via email
-                await _emailService.SendEmailAsync(user.Email, "Password Reset OTP", $"Your OTP is {Otp}");
+                // Check if OTP is valid and not expired
+                if (_otps.TryGetValue(email, out var otpDetails))
+                {
+                    if (otpDetails.Otp == otp && otpDetails.Expiration > DateTime.UtcNow)
+                    {
+                        // OTP verified, remove from store
+                        _otps.TryRemove(email, out _);
 
-                // Store email temporarily
-                TempData["Email"] = model.Email;
+                        // Redirect to reset password
+                        TempData["Email"] = email;
+                        return RedirectToAction("ResetPassword");
+                    }
+                }
 
-                return RedirectToAction("VerifyOtp");
-            }
-            return View(model);
-        }
-
-        // Verify OTP (GET)
-        [HttpGet]
-        public IActionResult VerifyOtp()
-        {
-            if (TempData["Email"] == null)
-                return RedirectToAction("ForgotPassword");
-
-            TempData.Keep("Email");
-            return View();
-        }
-
-        // Verify OTP (POST)
-        [HttpPost]
-        public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
-        {
-            if (TempData["Email"] == null)
-                return RedirectToAction("ForgotPassword");
-
-            string email = TempData["Email"].ToString();
-            TempData.Keep("Email");
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null || Otp != model.OTP || user.OTPExpiryTime < DateTime.UtcNow)
-            {
                 ModelState.AddModelError("", "Invalid or expired OTP.");
-                return View();
             }
-            if (ModelState.IsValid) { 
 
-                return RedirectToAction("ResetPassword");
-            }
             return View();
         }
 
-        // Reset Password (GET)
         [HttpGet]
         public IActionResult ResetPassword()
         {
@@ -217,17 +219,15 @@ namespace HealthConnect.Controllers
             return View();
         }
 
-        // Reset Password (POST)
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (TempData["Email"] == null)
                 return RedirectToAction("ForgotPassword");
 
-            string email = TempData["Email"].ToString();
-            model.Email = email;
+            var email = TempData["Email"].ToString();
 
-            if (model.NewPassword!=null && model.ConfirmPassword!=null && model.NewPassword==model.ConfirmPassword)
+            if (ModelState.IsValid && model.NewPassword == model.ConfirmPassword)
             {
                 var user = await _userManager.FindByEmailAsync(email);
                 if (user == null)
@@ -236,29 +236,27 @@ namespace HealthConnect.Controllers
                     return View(model);
                 }
 
-                // Reset password
+                // Reset the password
                 var resetResult = await _userManager.RemovePasswordAsync(user);
                 if (resetResult.Succeeded)
                 {
                     await _userManager.AddPasswordAsync(user, model.NewPassword);
                     return RedirectToAction("Login");
                 }
-                else
+
+                foreach (var error in resetResult.Errors)
                 {
-                    foreach (var error in resetResult.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
+                    ModelState.AddModelError("", error.Description);
                 }
             }
+
             return View(model);
         }
 
-
         public IActionResult Profile()
-        {
-            // Add logic to display user profile details
-            return View();
-        }
+            {
+                // Add logic to display user profile details
+                return View();
+            }
     }
 }
