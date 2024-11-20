@@ -16,4 +16,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Uploads\clinicimages\" />
+    <Folder Include="wwwroot\Uploads\certificates\" />
+    <Folder Include="wwwroot\Uploads\profilepictures\" />
+  </ItemGroup>
+
 </Project>

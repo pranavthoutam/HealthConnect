@@ -1,0 +1,112 @@
+﻿<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <style>
+        .dropdown:hover .dropdown-menu {
+          display: block;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <!-- Search Bar -->
+        <div class="d-flex justify-content-center mb-4">
+            <div class="d-flex border border-secondary rounded overflow-hidden w-100" style="max-width: 600px;">
+                <div class="d-flex align-items-center bg-secondary px-3">
+                    <i class="fas fa-map-marker-alt text-purple"></i>
+                </div>
+                <input type="text" class="form-control border-0" placeholder="Warangal" style="max-width: 120px;" />
+                <div class="d-flex align-items-center bg-secondary px-3">
+                    <i class="fas fa-search text-muted"></i>
+                </div>
+                <input type="text" class="form-control border-0" placeholder="Fever" />
+            </div>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class=" py-2 mb-4 text-center" style="background-color:#8A45E6">
+            <div class="d-flex justify-content-center gap-2">
+                <div class="dropdown">
+                    <button class="btn btn-purple text-white dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Gender
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Male</a></li>
+                        <li><a class="dropdown-item" href="#">Female</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-purple text-white dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Experience
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">0-5 years</a></li>
+                        <li><a class="dropdown-item" href="#">5-10 years</a></li>
+                        <li><a class="dropdown-item" href="#">10+ years</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-purple text-white dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Sort By
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Rating</a></li>
+                        <li><a class="dropdown-item" href="#">Experience</a></li>
+                        <li><a class="dropdown-item" href="#">Fees</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-purple text-white dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Relevance
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Most Relevant</a></li>
+                        <li><a class="dropdown-item" href="#">Least Relevant</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <h2 class="text-center fw-semibold mb-4">
+            26 Best Doctors for Fever Treatment in Warangal
+        </h2>
+
+        <!-- Doctor List -->
+        <div class="d-grid gap-3">
+            <!-- Doctor 1 -->
+            <div class="card shadow-sm p-3 d-flex flex-row align-items-center">
+                <img src="https://storage.googleapis.com/a1aa/image/EuJkOECe3PyfepPfuK6nsLL4DFBMCAZzv82cTkYCHVyjAkLPB.jpg" alt="Portrait of Dr. Manideep Vemula" class="rounded-circle me-3" height="100" width="100" />
+                <div class="flex-fill">
+                    <h3 class="h5 text-teal mb-1">Dr. Manideep Vemula</h3>
+                    <p class="mb-0 text-muted">General Physician</p>
+                    <p class="mb-0 text-muted">9 years experience overall</p>
+                    <p class="mb-0 text-muted">Hanamkonda, Warangal</p>
+                    <p class="mb-0 text-muted">₹500 Consultation fee at clinic</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn text-white" style="background-color:#8A45E6">Book Video Consult</button>
+                    <button class="btn btn-primary text-white">Book Clinic Visit</button>
+                </div>
+            </div>
+
+            <!-- Doctor 2 -->
+            <div class="card shadow-sm p-3 d-flex flex-row align-items-center">
+                <img src="https://storage.googleapis.com/a1aa/image/TeRG7cnc9enTdkX9DkOTirf4BVA2oiXv96y6pbhQfROqAkLPB.jpg" alt="Portrait of Dr. Bhaskara Cheruku" class="rounded-circle me-3" height="100" width="100" />
+                <div class="flex-fill">
+                    <h3 class="h5 text-teal mb-1">Dr. Bhaskara Cheruku</h3>
+                    <p class="mb-0 text-muted">General Physician</p>
+                    <p class="mb-0 text-muted">3 years experience overall</p>
+                    <p class="mb-0 text-muted">Hanamkonda, Warangal</p>
+                    <p class="mb-0 text-muted">₹500 Consultation fee at clinic</p>
+                </div>
+                <div>
+                    <button class="btn text-white" style="background-color:#8A45E6">Book Video Consult</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

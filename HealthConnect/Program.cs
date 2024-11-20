@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HealthConnect.Models;
 using HealthConnect.Services;
+using HealthConnect.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,8 @@ builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddTransient<EmailService>();
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
+
 
 var app = builder.Build();
 

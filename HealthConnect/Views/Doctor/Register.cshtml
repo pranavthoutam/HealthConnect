@@ -1,0 +1,86 @@
+﻿@model HealthConnect.ViewModels.DoctorRegistrationViewModel
+@{
+    ViewData["Title"] = "Doctor Registration";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card p-4 w-100" style="max-width: 600px;">
+            <h2 class="text-center">Doctor Registration</h2>
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="MciRegistrationNumber" class="form-label">MCI Registration Number</label>
+                    <input type="text" class="form-control" id="MciRegistrationNumber" name="MciRegistrationNumber" value="@Model.MciRegistrationNumber" required />
+                </div>
+                <div class="mb-3 form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="ClinicAppoinment" name="ClinicAppoinment" value="true" @if (Model.ClinicAppoinment)
+                    {
+                        <text>checked</text>
+                    } />
+                    <label class="form-check-label" for="ClinicAppoinment">Clinic Visit</label>
+                </div>
+                <div class="mb-3 form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="OnlineConsultation" name="OnlineConsultation" value="true" @if (Model.OnlineConsultation)
+                    {
+                        <text>checked</text>
+                    } />
+                    <label class="form-check-label" for="OnlineConsultation">Online Consultation</label>
+                </div>
+                <div class="mb-3">
+                    <label for="FullName" class="form-label">Full Name as per Document</label>
+                    <input type="text" class="form-control" id="FullName" name="FullName" value="@Model.FullName" required />
+                </div>
+                <div class="mb-3">
+                    <label for="HnoAndStreetName" class="form-label">H.No & Street Name</label>
+                    <input type="text" class="form-control" id="HnoAndStreetName" name="HnoAndStreetName" value="@Model.HnoAndStreetName" required />
+                </div>
+                <div class="mb-3">
+                    <label for="Specialization" class="form-label">Specialization</label>
+                    <input type="text" class="form-control" id="Specialization" name="Specialization" value="@Model.Specialization" required />
+                </div>
+                <div class="mb-3">
+                    <label for="Place" class="form-label">Place</label>
+                    <input type="text" class="form-control" id="Place" name="Place" value="@Model.Place" required />
+                </div>
+                <div class="mb-3">
+                    <label for="Experience" class="form-label">Experience</label>
+                    <input type="number" class="form-control" id="Experience" name="Experience" value="@Model.Experience" required />
+                </div>
+                <div class="mb-3">
+                    <label for="District" class="form-label">District</label>
+                    <input type="text" class="form-control" id="District" name="District" value="@Model.District" required />
+                </div>
+                <div class="mb-3">
+                    <label for="ConsultationFee" class="form-label">Consultation Fee</label>
+                    <input type="number" class="form-control" id="ConsultationFee" name="ConsultationFee" value="@Model.ConsultationFee" required />
+                </div>
+                <div class="mb-3">
+                    <label  class="form-label">Clinic Name</label>
+                    <input type="text" class="form-control" name="ClinicName" value="@Model.ClinicName" required />
+                </div>
+                <div class="mb-3">
+                    <label for="Certificate" class="form-label">Upload Certificate</label>
+                    <input type="file" class="form-control" id="Certificate" name="Certificate" required />
+                </div>
+                <div class="mb-3">
+                    <label for="ClinicImage" class="form-label">Upload Clinic Image</label>
+                    <input type="file" class="form-control" id="ClinicImage" name="ClinicImage" required />
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
