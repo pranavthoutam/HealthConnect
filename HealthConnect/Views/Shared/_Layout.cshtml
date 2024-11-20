@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Gelasio:wght@400;700&display=swap" rel="stylesheet">
     <title>Health Connect</title>
     <header class="header">
-        <a class="HealthConnectLogo" href="#">
+        <a class="HealthConnectLogo" style="text-decoration:none;color:black" asp-action="Index" asp-controller="Home">
             <h1 style="font-family: 'Gelasio', serif;">HEALTH CONNECT</h1>
         </a>
         <nav>
@@ -23,8 +23,8 @@
             @if (User.Identity.IsAuthenticated)
             {
                 <div class="profile-dropdown">
-                    <a href="javascript:void(0)" class="profile-circle">
-                        <img src="~/images/download.png" width="40" height="40" alt="Profile" class="profile-img">
+                    <a href="javascript:void(0)" class="rounded">
+                        <img src="~/images/download.png" alt="Profile" class="profile-img">
                     </a>
                     <div class="dropdown-menu">
                         <a href="/Profile">Profile</a>

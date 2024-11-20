@@ -1,59 +1,65 @@
 ﻿@model HealthConnect.ViewModels.LoginViewModel
-
-<!DOCTYPE html>
 <html>
 <head>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .dim-hr {
+            border-color: #8c8c8c; /* Light gray color for the HR */
+            width: 75%; /* Reduces the width of the hr */
+            margin-left: 12.5%;
+        }
+
+        .link-container {
+            margin-top: -190px; /* Moves the links upward */
+        }
+
+        .actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
-    <div class="bg-white flex items-center justify-center h-screen">
-        <div class="absolute top-0 w-full flex justify-center mt-5">
-            <a class="text-blue-400 mr-4" asp-controller="Account" asp-action="Login">
-                Login
-            </a>
-            <a class="text-black" asp-controller="Account" asp-action="Register">
-                Signup
-            </a>
-        </div>
-        <div class="flex items-center justify-center w-full max-w-4xl mt-0">
-            <div class="w-1/2 flex justify-center">
-                <img alt="Health Connect" class="w-3/4" height="300" src="~/Images/HealthConnect.jpg" width="300" />
+    <div class="d-flex align-items-center justify-content-center min-vh-100 bg-white">
+        <div class="container">
+            <!-- Login and Signup Links -->
+            <div class="d-flex justify-content-center p-0 link-container">
+                <a asp-action="Login" class="text-primary mx-3 text-decoration-none">Login</a>
+                <a asp-action="Register" class="text-secondary mx-3 text-decoration-none">SignUp</a>
             </div>
-            <div class="w-1/2 bg-gray-100 p-8 rounded-lg shadow-lg">
-                <form asp-action="Login" asp-controller="Account" method="post">
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm mb-2" asp-for="Email">
-                            Mobile Number / Email ID
-                        </label>
-                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" asp-for="Email" />
-                        <span class="text-red-500 text-xs italic" asp-validation-for="Email"></span>
+            <hr class="dim-hr" />
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <img src="/Images/HealthConnect.jpg" alt="Health Connect" class="rounded" height="417" width="450">
+                </div>
+                <div class="col-md-6">
+                    <div class="bg-white p-4 rounded shadow w-100" style="max-width: 400px;">
+                        <form asp-action="Register" method="post">
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label">Email</label>
+                                <input asp-for="Email" class="form-control" placeholder="Enter your email">
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label">Password</label>
+                                <input asp-for="Password" class="form-control" placeholder="Create a password">
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="actions-row mb-3">
+                                <div class="form-check">
+                                    <input asp-for="RememberMe" class="form-check-input" type="checkbox">
+                                    <label asp-for="RememberMe" class="form-check-label">Remember Me</label>
+                                </div>
+                                <a asp-action="ForgotPassword" class="text-decoration-none text-primary">Forgot Password?</a>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                        </form>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm mb-2" asp-for="Password">
-                            Password
-                        </label>
-                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" asp-for="Password" type="password" />
-                        <span class="text-red-500 text-xs italic" asp-validation-for="Password"></span>
-                    </div>
-                    <div class="flex items-center justify-between mb-4">
-                        <label class="inline-flex items-center">
-                            <input asp-for="RememberMe" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700 text-sm">Remember Me</span>
-                        </label>
-                        <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" asp-action="ForgotPassword" asp-controller="Account">
-                            Forgot Password?
-                        </a>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                            Login
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
