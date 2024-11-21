@@ -22,15 +22,15 @@
     </style>
 </head>
 
-<body class="background-image d-flex flex-column">
-    <div class="d-flex flex-column justify-content-center align-items-center flex-grow-1">
-        <div class="text-center mb-4">
+<body >
+    <div class="background-image d-flex flex-colum d-flex flex-column justify-content-center align-items-center flex-grow-1 mt-3 mb-3">
+        <div class="text-center mb-6">
             <h1 class="h4 fw-bold text-dark">Your trusted partner in personalized healthcare</h1>
             <p class="text-muted">Search and schedule</p>
         </div>
 
         <div class="container">
-            <form method="post" asp-action="FindDoctors" class="mb-4">
+            <form method="post" asp-action="DoctorsNearYou" class="mb-4">
                 <div class="input-group w-75 mx-auto">
                     <div class="input-group-prepend">
                         <span class="input-group-text bg-light">
@@ -49,24 +49,27 @@
 
             @if (Model != null && Model.Any())
             {
-                <div class="row">
+                <div class="d-grid gap-3">
                     @foreach (var doctor in Model)
                     {
-                        <div class="col-md-4">
-                            <div class="card mb-3 shadow">
-                                <img src="@doctor.ClinicImagePath" class="card-img-top" alt="@doctor.FullName" />
-                                <div class="card-body">
-                                    <h5 class="card-title">@doctor.FullName</h5>
-                                    <p class="card-text">Specialization: @doctor.Specialization</p>
-                                    <p class="card-text">Experience: @doctor.Experience years</p>
-                                    <p class="card-text">Consultation Fee: @doctor.ConsultationFee.ToString("C")</p>
-                                    <p class="card-text">Rating: @doctor.Rating</p>
-                                </div>
+                        <div class="card shadow-sm p-3 d-flex flex-row align-items-center">
+                            <img src="@doctor.ClinicImagePath" alt="Portrait of @doctor.FullName" class="rounded-circle me-3" height="100" width="100" />
+                            <div class="flex-fill">
+                                <h3 class="h5 text-teal mb-1">@doctor.FullName</h3>
+                                <p class="mb-0 text-muted">@doctor.Specialization</p>
+                                <p class="mb-0 text-muted">@doctor.Experience years experience overall</p>
+@*                                 <p class="mb-0 text-muted">@doctor.ClinicLocation</p>
+ *@                                <p class="mb-0 text-muted">@doctor.ConsultationFee.ToString("C") Consultation fee at clinic</p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn text-white" style="background-color:#8A45E6">Book Video Consult</button>
+                                <button class="btn text-white" style="background-color:#199FD9;padding-left:10px;padding-right:10px">Book Clinic Visit</button>
                             </div>
                         </div>
                     }
                 </div>
             }
+
         </div>
     </div>
 </body>

@@ -41,13 +41,11 @@ namespace HealthConnect.Data
             });
             builder.Entity<User>(entity => entity.Property(u => u.DateofBirth).IsRequired(false));
             builder.Entity<User>(entity => entity.Property(u => u.ProfilePhoto).IsRequired(false));
-
             builder.Entity<Doctor>()
                 .HasOne(d => d.User)
                 .WithOne()
                 .HasForeignKey<Doctor>(d => d.UserId);
         }
-        public DbSet<Address> Addresses { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
 
     }

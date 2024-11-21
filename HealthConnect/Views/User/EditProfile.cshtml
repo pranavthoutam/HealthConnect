@@ -1,0 +1,152 @@
+﻿@* @model HealthConnect.Models.User
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+
+<html>
+  <head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  </head>
+  <body class="bg-gray-100">
+    <div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-md">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">
+          Accounts
+        </h1>
+        <button class="bg-blue-500 text-white px-4 py-2 rounded-md">
+          Save changes
+        </button>
+      </div>
+
+      <form asp-controller="User" asp-action="EditProfile" method="post" enctype="multipart/form-data">
+        <div class="flex items-center mb-6">
+          <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden" >
+            <img alt="Profile photo placeholder" class="w-full h-full object-cover" height="100" src="https://storage.googleapis.com/a1aa/image/7gO4ePqEPqzWM6zbOmyJ0SqhvHoIKSFkKGP8tqhDvfbDmMzTA.jpg" width="100"/>
+          </div>
+          <div class="ml-4">
+            <p class="text-gray-600">
+              Pick a photo from your computer
+            </p>
+            <div class="flex space-x-2">
+              <input type="file" asp-for="ProfilePhoto" class="text-blue-500"/>
+              <a class="text-blue-500">Remove</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-gray-700">
+              Name*
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" asp-for="UserName" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-gray-700">
+              Phone number
+            </label>
+            <div class="flex items-center mt-1">
+              <input class="w-full p-2 border border-gray-300 rounded-md" type="text" value="@Model.PhoneNumber" asp-for="PhoneNumber"/>
+              <a class="ml-2 text-blue-500" href="#">Edit</a>
+            </div>
+          </div>
+          <div>
+            <label class="block text-gray-700">
+              Email Address
+            </label>
+            <div class="flex items-center mt-1">
+              <input class="w-full p-2 border border-gray-300 rounded-md" type="text" value="@Model.Email" asp-for="Email"/>
+              <a class="ml-2 text-blue-500" href="#">Edit</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-gray-700">
+              Date of birth
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="date" asp-for="DateofBirth"/>
+          </div>
+          <div>
+            <label class="block text-gray-700">
+              Blood group
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" asp-for="BloodGroup"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-gray-700">
+              Gender
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" asp-for="Gender"/>
+          </div>
+          <div>
+            <label class="block text-gray-700">
+              Timezone
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" value="(UTC+05:30) Asia/Kolkata"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-gray-700">
+              House No./ Street Name/ Area
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" asp-for="HouseNumber"/>
+          </div>
+          <div>
+            <label class="block text-gray-700">
+              Colony / Street / Locality
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" asp-for="Street"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-gray-700">
+              City
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" asp-for="City"/>
+          </div>
+          <div>
+            <label class="block text-gray-700">
+              State
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" asp-for="State"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-gray-700">
+              Country*
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" asp-for="Country"/>
+          </div>
+          <div>
+            <label class="block text-gray-700">
+              Pincode
+            </label>
+            <input class="w-full mt-1 p-2 border border-gray-300 rounded-md" type="text" asp-for="PostalCode"/>
+          </div>
+        </div>
+
+        <button class="bg-blue-500 text-white px-4 py-2 rounded-md" type="submit">
+          Save changes
+        </button>
+      </form>
+    </div>
+  </body>
+</html>
+ *@

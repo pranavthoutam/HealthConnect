@@ -10,70 +10,17 @@
     <link rel="stylesheet" href="~/css/footer.css">
     <link href="https://fonts.googleapis.com/css2?family=Gelasio:wght@400;700&display=swap" rel="stylesheet">
     <title>Health Connect</title>
-    <header class="header">
-        <a class="HealthConnectLogo" style="text-decoration:none;color:black" asp-action="Index" asp-controller="Home">
-            <h1 style="font-family: 'Gelasio', serif;">HEALTH CONNECT</h1>
-        </a>
-        <nav>
-            <a href="#">Find Doctors</a>
-            <a href="#">Video Consult</a>
-            <a href="#">Medicines</a>
-        </nav>
-        <div class="auth-links">
-            @if (User.Identity.IsAuthenticated)
-            {
-                <div class="profile-dropdown">
-                    <a href="javascript:void(0)" class="rounded">
-                        <img src="~/images/download.png" alt="Profile" class="profile-img">
-                    </a>
-                    <div class="dropdown-menu">
-                        <a href="/Profile">Profile</a>
-                        <a href="javascript:void(0)" onclick="document.getElementById('logoutForm').submit();">Logout</a>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <a href="/Account/Login">Login/Signup</a>
-            }
-        </div>
-    </header>
-
-    <!-- Logout Form -->
-    <form id="logoutForm" asp-area="" asp-controller="Account" asp-action="Logout" method="post" style="display: none;"></form>
 
 </head>
 <body>
-
+    @Html.Partial("_Header")
     <!-- Main Content -->
     <main role="main" class="container">
         @RenderBody()
     </main>
 
-    <!-- Footer Section -->
-    <footer class="footer">
-        <!-- Footer Top Section -->
-        <div class="footer-top">
-            <h1>HEALTH CONNECT</h1>
-            <nav>
-                <a href="#">Find Doctors</a>
-                <a href="#">Online Video Consultation</a>
-                <a href="#">Medicines</a>
-            </nav>
-            <div class="social-icons">
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-facebook"></i></a>
-                <a href="#"><i class="fab fa-youtube"></i></a>
-                <a href="#"><i class="fab fa-linkedin"></i></a>
-            </div>
-        </div>
+    @Html.Partial("_Footer")
 
-        <!-- Divider Line -->
-        <div class="divider"></div>
-
-        <!-- Copyright Section -->
-        <p>Copyright © 2024, Health Connect. All rights reserved.</p>
-    </footer>
     <script>
         document.addEventListener('click', function (event) {
             const dropdown = document.querySelector('.profile-dropdown');
@@ -85,7 +32,23 @@
                 menu.style.display = 'none';
             }
         });
-    </script>
 
+    </script>
+    @* @RenderSection("Scripts", required: false) *@
 </body>
+@* @section Scripts {
+    <script>
+        document.addEventListener('click', function (event) {
+            const dropdown = document.querySelector('.profile-dropdown');
+            const menu = document.querySelector('.dropdown-menu');
+
+            if (dropdown.contains(event.target)) {
+                menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            } else {
+                menu.style.display = 'none';
+            }
+        });
+
+    </script>
+} *@
 </html>

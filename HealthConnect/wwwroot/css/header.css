@@ -34,13 +34,13 @@ body{
             font-weight: bold;
         }
 
-.auth-links {
+#auth-links {
     display: flex;
     align-items: center;
     margin-left: 10px;
 }
 
-    .auth-links a {
+#auth-links >.without_login{
         padding: 5px 15px;
         background-color: #60DAEB;
         border: 1px solid black;
@@ -48,52 +48,7 @@ body{
         text-decoration: none;
         color: black;
         font-weight: normal;
-    }
-
-/* Profile Dropdown */
-.profile-dropdown {
-    position: relative;
-    display: inline-block;
 }
 
-.profile-circle {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-    cursor: pointer;
-}
 
-.profile-img {
-    width: 100%;
-    height: auto;
-}
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 50px;
-    right: 0;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    width: 150px;
-}
-
-    .dropdown-menu a {
-        text-decoration: none;
-        font-size: 14px;
-    }
-
-        .dropdown-menu a:hover {
-            background-color: #f0f0f0;
-        }
-
-/* Show dropdown on hover or click */
-.profile-dropdown:hover .dropdown-menu,
-.profile-dropdown:focus-within .dropdown-menu {
-    display: block;
-}
+    

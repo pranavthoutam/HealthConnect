@@ -255,7 +255,6 @@ namespace HealthConnect.Controllers
 
         public IActionResult Profile()
             {
-                // Add logic to display user profile details
                 return View();
             }
     }

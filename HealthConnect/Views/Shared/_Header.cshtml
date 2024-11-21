@@ -1,0 +1,52 @@
+﻿<link rel="stylesheet" href="~/css/header.css" />
+<header class="header">
+    <a class="HealthConnectLogo" style="text-decoration:none;color:black" asp-action="Index" asp-controller="Home">
+        <h1 style="font-family: 'Gelasio', serif;">HEALTH CONNECT</h1>
+    </a>
+    <nav>
+        <a asp-controller="User" asp-action="FindDoctors">Find Doctors</a>
+        <a href="#">Video Consult</a>
+        <a href="#">Medicines</a>
+    </nav>
+    <div id="auth-links">
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-decoration-none " data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="~/images/download.png" alt="Profile" class="rounded-circle" width="40" height="40">
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" asp-controller="User" asp-action="EditProfile ">
+                            <div class="ms-3">
+                                <strong>@User.Identity.Name</strong>
+                                <small class="text-muted d-block">+91XXXXXXXXXX</small> <!-- Replace with user's phone number -->
+                            </div>
+                        </a>
+                    </li>
+                    <li><a class="dropdown-item" href="/Appointments">My Appointments</a></li>
+                    <li><a class="dropdown-item" href="/MedicalRecords">My Medical Records</a></li>
+                    <li><a class="dropdown-item" href="/OnlineConsultations">My Online Consultations</a></li>
+                    <li><a class="dropdown-item" href="/Feedback">My Feedback</a></li>
+                    <li><a class="dropdown-item" href="/Profile">View / Update Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="document.getElementById('logoutForm').submit();">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="without_login">
+                <a href="/Account/Login" style="text-decoration:none;color:black">Login/Signup</a>
+            </div>
+
+        }
+    </div>
+    
+    <!-- Logout form-->
+    <form id="logoutForm" asp-area="" asp-controller="Account" asp-action="Logout" method="post" style="display: none;"></form>
+
+
+</header>
