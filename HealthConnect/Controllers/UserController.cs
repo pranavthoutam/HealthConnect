@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using HealthConnect.Models;
 using HealthConnect.Repositories;
+using System.Text.Json;
 
 namespace HealthConnect.Controllers
 {
@@ -10,10 +11,14 @@ namespace HealthConnect.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IDoctorRepository _doctorRepository;
-        public UserController(UserManager<User> userManager,IDoctorRepository doctorRepository)
+        private readonly IConfiguration _configuration;
+        private const string apiKey = "AIzaSyDoQ2jdmGKmKALVj977-JCYZ7jUT6J6OHA";  // Use your Google API key
+        private const string apiUrl = "https://maps.googleapis.com/maps/api/geocode/json";
+        public UserController(UserManager<User> userManager,IDoctorRepository doctorRepository, IConfiguration configuration)
         {
             _userManager = userManager;
             _doctorRepository= doctorRepository;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
@@ -22,8 +27,11 @@ namespace HealthConnect.Controllers
         }
 
         [HttpGet]
-        public IActionResult FindDoctors()
+        public async Task<IActionResult> FindDoctors()
         {
+            ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
+            //(double x,double y) = await GetCoordinatesAsync("India");
+            //ViewBag.x = x; ViewBag.y = y;
             return View();
         }
 
@@ -47,6 +55,40 @@ namespace HealthConnect.Controllers
 
             return View(doctors); // Pass results to the view
         }
+
+
+
+
+
+        //public async Task<(double latitude, double longitude)> GetCoordinatesAsync(string address)
+        //{
+        //    using (HttpClient client = new HttpClient())
+        //    {
+        //        string requestUrl = $"{apiUrl}?address={Uri.EscapeDataString(address)}&key={apiKey}";
+        //        HttpResponseMessage response = await client.GetAsync(requestUrl);
+        //        string content = await response.Content.ReadAsStringAsync();
+
+        //        // Parse JSON response using System.Text.Json
+        //        using (JsonDocument doc = JsonDocument.Parse(content))
+        //        {
+        //            // Check if "results" array is empty or not
+        //            if (doc.RootElement.TryGetProperty("results", out JsonElement results) && results.GetArrayLength() > 0)
+        //            {
+        //                // Access the first element of the "results" array
+        //                var location = results[0].GetProperty("geometry").GetProperty("location");
+
+        //                double latitude = location.GetProperty("lat").GetDouble();
+        //                double longitude = location.GetProperty("lng").GetDouble();
+        //                return (latitude, longitude);
+        //            }
+        //            else
+        //            {
+        //                // Handle the case where no results were found
+        //                throw new Exception("No results found for the address.");
+        //            }
+        //        }
+        //    }
+        //}
 
         public IActionResult DoctorsNearYou()
         {
