@@ -1,0 +1,211 @@
+﻿@* <!DOCTYPE html>
+<html>
+<head>
+    <title>Product Page</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <style>
+        .category-item {
+            cursor: pointer;
+        }
+        .category-item:hover {
+            background-color: #f0f0f0;
+        }
+        .category-item.active {
+            background-color: #d3d3d3;
+        }
+    </style>
+    <script>
+        function setActiveCategory(element) {
+            const items = document.querySelectorAll('.category-item');
+            items.forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+    </script>
+</head>
+<body class="bg-white text-dark">
+    <div class="container py-4">
+        <div class="row">
+            <!-- Categories Section -->
+            <div class="col-md-3">
+                <h2 class="h4 fw-bold mb-4">CATEGORIES</h2>
+                <hr />
+                <ul class="list-unstyled">
+                    <li class="category-item p-2" onclick="setActiveCategory(this)">
+                        <a class="text-dark text-decoration-none" href="#">Family Care</a>
+                    </li>
+                    <li class="category-item p-2" onclick="setActiveCategory(this)">
+                        <a class="text-dark text-decoration-none" href="#">Fitness &amp; Wellness</a>
+                    </li>
+                    <li class="category-item p-2" onclick="setActiveCategory(this)">
+                        <a class="text-dark text-decoration-none" href="#">Skin Care</a>
+                    </li>
+                    <li class="category-item p-2" onclick="setActiveCategory(this)">
+                        <a class="text-dark text-decoration-none" href="#">Hair Care</a>
+                    </li>
+                    <li class="category-item p-2" onclick="setActiveCategory(this)">
+                        <a class="text-dark text-decoration-none" href="#">Lip Care</a>
+                    </li>
+                    <li class="category-item p-2" onclick="setActiveCategory(this)">
+                        <a class="text-dark text-decoration-none" href="#">Sexual Wellness</a>
+                    </li>
+                    <li class="category-item p-2" onclick="setActiveCategory(this)">
+                        <a class="text-dark text-decoration-none" href="#">Women's Care</a>
+                    </li>
+                    <li class="category-item p-2" onclick="setActiveCategory(this)">
+                        <a class="text-dark text-decoration-none" href="#">Baby Care</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Products Section -->
+            <div class="col-md-9">
+                <!-- Search Bar -->
+                <div class="mb-4">
+                    <input class="form-control" placeholder="Search for products..." type="text" />
+                </div>
+                <div class="row g-3">
+                    <!-- Product 1 -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-75 w-75 text-center">
+                            <img src="https://storage.googleapis.com/a1aa/image/ntaaxd6XMex5eEVN16xTYwGfdGT2a16zGvGDexVf9c1QXhbeE.jpg" class="card-img-top mx-auto" style="width: 100px; height: 150px;" alt="Figaro Olive Oil 500 ml">
+                            <div class="card-body">
+                                <h5 class="card-title">Figaro Olive Oil 500 ml</h5>
+                                <p class="card-text text-primary fw-bold">₹1139.00</p>
+                                <button class="btn btn-outline-primary">Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Repeat Product Cards -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 text-center">
+                            <img src="https://storage.googleapis.com/a1aa/image/ntaaxd6XMex5eEVN16xTYwGfdGT2a16zGvGDexVf9c1QXhbeE.jpg" class="card-img-top mx-auto" style="width: 150px; height: 200px;" alt="Figaro Olive Oil 500 ml">
+                            <div class="card-body">
+                                <h5 class="card-title">Figaro Olive Oil 500 ml</h5>
+                                <p class="card-text text-primary fw-bold">₹1139.00</p>
+                                <button class="btn btn-outline-primary">Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 text-center">
+                            <img src="https://storage.googleapis.com/a1aa/image/ntaaxd6XMex5eEVN16xTYwGfdGT2a16zGvGDexVf9c1QXhbeE.jpg" class="card-img-top mx-auto" style="width: 150px; height: 200px;" alt="Figaro Olive Oil 500 ml">
+                            <div class="card-body">
+                                <h5 class="card-title">Figaro Olive Oil 500 ml</h5>
+                                <p class="card-text text-primary fw-bold">₹1139.00</p>
+                                <button class="btn btn-outline-primary">Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+ *@
+ @model IEnumerable<HealthConnect.Models.Medicine>
+
+
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>Product Page</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        .category-item {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .category-item:hover {
+            background-color: #f0f0f0;
+        }
+        .category-item.active {
+            background-color: #d3d3d3;
+        }
+    </style>
+    <script>
+        function setActiveCategory(element) {
+            const items = document.querySelectorAll('.category-item');
+            items.forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
+</head>
+<body class="bg-light text-dark">
+    <div class="container py-4">
+        <div class="row">
+            <!-- Categories Section -->
+            <div class="col-md-3">
+                <h5 class="text-xl fw-bold mb-4">CATEGORIES</h5>
+                <hr class="mb-4">
+                <ul class="list-unstyled">
+                    <li class="category-item" onclick="setActiveCategory(this)">
+                        <a href="#" class="text-dark text-decoration-none">Family Care</a>
+                    </li>
+                    <li class="category-item" onclick="setActiveCategory(this)">
+                        <a href="#" class="text-dark text-decoration-none">Fitness & Wellness</a>
+                    </li>
+                    <li class="category-item" onclick="setActiveCategory(this)">
+                        <a href="#" class="text-dark text-decoration-none">Skin Care</a>
+                    </li>
+                    <li class="category-item" onclick="setActiveCategory(this)">
+                        <a href="#" class="text-dark text-decoration-none">Hair Care</a>
+                    </li>
+                    <li class="category-item" onclick="setActiveCategory(this)">
+                        <a href="#" class="text-dark text-decoration-none">Lip Care</a>
+                    </li>
+                    <li class="category-item" onclick="setActiveCategory(this)">
+                        <a href="#" class="text-dark text-decoration-none">Sexual Wellness</a>
+                    </li>
+                    <li class="category-item" onclick="setActiveCategory(this)">
+                        <a href="#" class="text-dark text-decoration-none">Women's Care</a>
+                    </li>
+                    <li class="category-item" onclick="setActiveCategory(this)">
+                        <a href="#" class="text-dark text-decoration-none">Baby Care</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Products Section -->
+            <div class="col-md-9">
+                <!-- Search Bar -->
+                <div class="mb-4">
+                    <input type="text" class="form-control" placeholder="Search for products...">
+                </div>
+                <!-- Product Grid -->
+                <div class="row g-4">
+                    @foreach (var medicine in Model)
+                    {
+                        <div class="col-md-4">
+                            <div class="card shadow-sm h-100">
+                                <!-- Replace src with a fallback logic if no image is provided -->
+                                <img src="@Url.Action("GetMedicineImage", "User", new { id = medicine.Id })" class="card-img-top" alt="@medicine.Name packaging">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-gray-700">@medicine.Name</h5>
+                                    <p class="card-text text-primary fw-bold">₹100</p>
+                                    <form asp-controller="User" asp-action="MedicineInfo" method="get">
+                                        <input type="hidden" name="id" value="@medicine.Id" />
+                                        <button type="submit" class="btn btn-outline-primary">DETAILS</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

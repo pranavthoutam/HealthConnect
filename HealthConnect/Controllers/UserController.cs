@@ -14,11 +14,13 @@ namespace HealthConnect.Controllers
         private readonly IConfiguration _configuration;
         private const string apiKey = "AIzaSyDoQ2jdmGKmKALVj977-JCYZ7jUT6J6OHA";  // Use your Google API key
         private const string apiUrl = "https://maps.googleapis.com/maps/api/geocode/json";
-        public UserController(UserManager<User> userManager,IDoctorRepository doctorRepository, IConfiguration configuration)
+        private readonly MedicineRepository _medicine;
+        public UserController(UserManager<User> userManager,IDoctorRepository doctorRepository, IConfiguration configuration, MedicineRepository medicine)
         {
             _userManager = userManager;
-            _doctorRepository= doctorRepository;
+            _doctorRepository = doctorRepository;
             _configuration = configuration;
+            _medicine = medicine;
         }
 
         public IActionResult Index()
@@ -176,6 +178,37 @@ namespace HealthConnect.Controllers
         //    // Return a default profile photo if none is set
         //    return File("~/images/download.png", "image/jpeg");
         //}
+        [HttpGet]
+        public IActionResult SearchMedicines()
+        {
+            return View();
+        }
+        //[HttpPost]
+        //public IActionResult SearchMedicines(int categoryId)
 
+        //{
+        //    var model = _medicine.getMedicines(categoryId);
+
+        //    return View("DisplayMedicines", model);
+        //}
+        public IActionResult DisplayMedicines(int categoryId)
+        {
+            var model = _medicine.getMedicines(categoryId);
+            return View(model);
+        }
+        [HttpGet]
+        public IActionResult MedicineInfo(int id)
+        {
+            // Fetch medicine details by id
+            var medicine = _medicine.GetMedicineById(id);
+
+            // If medicine is not found, return a "Not Found" page or handle appropriately
+            if (medicine == null)
+            {
+                return NotFound();
+            }
+
+            return View(medicine);
+        }
     }
 }

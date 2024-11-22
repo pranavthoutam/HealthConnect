@@ -6,7 +6,7 @@
     <nav>
         <a asp-controller="User" asp-action="FindDoctors">Find Doctors</a>
         <a href="#">Video Consult</a>
-        <a href="#">Medicines</a>
+        <a asp-controller="User" asp-action="SearchMedicines">Medicines</a>
     </nav>
     <div id="auth-links">
         @if (User.Identity.IsAuthenticated)

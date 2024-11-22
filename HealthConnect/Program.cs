@@ -21,7 +21,7 @@ builder.Services.AddIdentity<User, IdentityRole>()
 
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
-
+builder.Services.AddScoped<MedicineRepository>();
 
 var app = builder.Build();
 
@@ -36,9 +36,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
-app.UseAuthentication(); // Ensure authentication is enabled
-app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

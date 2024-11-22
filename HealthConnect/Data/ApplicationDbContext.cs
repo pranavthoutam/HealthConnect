@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using HealthConnect.Models;
+using System.Reflection.Emit;
 
 namespace HealthConnect.Data
 {
@@ -45,8 +46,28 @@ namespace HealthConnect.Data
                 .HasOne(d => d.User)
                 .WithOne()
                 .HasForeignKey<Doctor>(d => d.UserId);
+            builder.Entity<Medicine>()
+        .HasOne(m => m.MedicineCategory)
+        .WithMany(mc => mc.Medicines)
+        .HasForeignKey(m => m.CategoryId);
+
+            // Configure MedicineAlternatives relationships
+            builder.Entity<MedicineAlternatives>()
+                .HasOne(ma => ma.Medicine)
+                .WithMany(m => m.Alternatives)
+                .HasForeignKey(ma => ma.MedicineId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
+
+            builder.Entity<MedicineAlternatives>()
+                .HasOne(ma => ma.Alternative)
+                .WithMany() // No reverse navigation property
+                .HasForeignKey(ma => ma.AlternativeId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
         }
         public DbSet<Doctor> Doctors { get; set; }
 
+        public DbSet<MedicineCategory> MedicineCategories { get; set; }
+        public DbSet<Medicine> Medicines { get; set; }
+        public DbSet<MedicineAlternatives> MedicinesAlternatives { get;set; }
     }
 }

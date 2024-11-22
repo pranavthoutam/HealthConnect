@@ -1,0 +1,102 @@
+﻿<html>
+<head>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <style>
+        .fixed-card img {
+            width: 283px;
+            height: 202px;
+            object-fit: cover;
+        }
+
+        .fixed-card {
+            width: 283px;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <div class="container py-4">
+        <!-- Search Bar -->
+        <div class="d-flex justify-content-center mb-4">
+            <div class="position-relative w-50">
+                <input class="form-control rounded-pill ps-5" placeholder="Search for medicines, health products and more" type="text" />
+                <i class="fas fa-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+            </div>
+        </div>
+        <!-- Title -->
+        <h1 class="fs-4 fw-bold " style="margin-left:40px">Browse medicines &amp; health products</h1>
+        <!-- Categories Section -->
+        <p class="fs-5 fw-light " style=" margin-left:40px;">Categories</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <div class="fixed-card position-relative">
+                <a asp-action="DisplayMedicines" asp-route-categoryId="1">
+                    <img alt="A family smiling" class="rounded-3" src="https://storage.googleapis.com/a1aa/image/WprAbPgUrdaULhIF6rUPHWr8SLiJJbFKOfpbW6KGLgJHqt5JA.jpg" />
+                </a>
+                <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-50 text-white p-2 rounded-bottom">
+                    FAMILY CARE
+                </div>
+            </div>
+            <div class="fixed-card position-relative">
+                <a asp-action="DisplayMedicines" asp-route-categoryId="2">
+                    <img alt="A person holding a dumbbell" class="rounded-3" src="https://storage.googleapis.com/a1aa/image/URGkehU634UQTCDbOeCfTl8pD3rwBteAsi9NoBijMWGQRtNPB.jpg" />
+                </a>
+                <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-50 text-white p-2 rounded-bottom">
+                    FITNESS &amp; WELLNESS
+                </div>
+            </div>
+            <div class="fixed-card position-relative">
+                <a asp-action="DisplayMedicines" asp-route-categoryId="3">
+                    <img alt="A person holding a flower" class="rounded-3" src="https://storage.googleapis.com/a1aa/image/4bqmrTsIKs7SOZoopQv2LQDoM5gu9woCnGRQFlmh06qE128E.jpg" />
+                </a>
+                <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-50 text-white p-2 rounded-bottom">
+                    SKIN CARE
+                </div>
+            </div>
+            <div class="fixed-card position-relative">
+                <a asp-action="DisplayMedicines" asp-route-categoryId="4">
+                    <img alt="Hair care products" class="rounded-3" src="https://storage.googleapis.com/a1aa/image/6RfyyjCItOyvNafpQPaVNwQQIPTo8RSF0uICoUet1nSio2mnA.jpg" />
+                </a>
+                <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-50 text-white p-2 rounded-bottom">
+                    HAIR CARE
+                </div>
+            </div>
+            <div class="fixed-card position-relative">
+                <a asp-action="DisplayMedicines" asp-route-categoryId="5">
+                    <img alt="Lip care products" class="rounded-3" src="https://storage.googleapis.com/a1aa/image/6RfyyjCItOyvNafpQPaVNwQQIPTo8RSF0uICoUet1nSio2mnA.jpg" />
+                </a>
+                <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-50 text-white p-2 rounded-bottom">
+                    LIP CARE
+                </div>
+            </div>
+            <div class="fixed-card position-relative">
+                <a asp-action="DisplayMedicines" asp-route-categoryId="6">
+                    <img alt="Sexual wellness products" class="rounded-3" src="https://storage.googleapis.com/a1aa/image/6RfyyjCItOyvNafpQPaVNwQQIPTo8RSF0uICoUet1nSio2mnA.jpg" />
+                </a>
+                <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-50 text-white p-2 rounded-bottom">
+                    SEXUAL WELLNESS
+                </div>
+            </div>
+            <div class="fixed-card position-relative">
+                <a asp-action="DisplayMedicines" asp-route-categoryId="7">
+                    <img alt="Women's care products" class="rounded-3" src="https://storage.googleapis.com/a1aa/image/6RfyyjCItOyvNafpQPaVNwQQIPTo8RSF0uICoUet1nSio2mnA.jpg" />
+                </a>
+                <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-50 text-white p-2 rounded-bottom">
+                    WOMEN'S CARE
+                </div>
+            </div>
+            <div class="fixed-card position-relative">
+                <a asp-action="DisplayMedicines" asp-route-categoryId="8">
+                    <img alt="A baby wearing a pink hat" class="rounded-3" src="https://storage.googleapis.com/a1aa/image/hMhBwittE3IaIhJr15Qffl0Us0OlQPvvvG9VQYFlfIzfQtNPB.jpg" />
+                </a>
+                <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-50 text-white p-2 rounded-bottom">
+                    BABY CARE
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
