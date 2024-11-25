@@ -253,9 +253,27 @@ namespace HealthConnect.Controllers
             return View(model);
         }
 
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile()
+        {
+            var userId = _userManager.GetUserId(User); // Get the logged-in user's ID
+            if (userId == null)
             {
-                return View();
+                return RedirectToAction("Login"); // Redirect to login if not authenticated
             }
+
+            var user = await _userManager.FindByIdAsync(userId); // Fetch the user details
+            if (user == null)
+            {
+                return NotFound(); // Handle case if user is not found
+            }
+
+            return View(user); // Pass the user object to the view
+        }
+
+        public IActionResult ProfileDashboard()
+        {
+            return View();
+        }
+
     }
 }

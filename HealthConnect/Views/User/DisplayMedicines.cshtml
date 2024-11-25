@@ -35,49 +35,54 @@
             <div class="col-md-3">
                 <h5 class="text-xl fw-bold mb-4">CATEGORIES</h5>
                 <hr class="mb-4">
-                <ul class="list-unstyled">
+                <ul class="list-unstyled" >
                     <li class="category-item" onclick="setActiveCategory(this)">
-                        <a href="#" class="text-dark text-decoration-none">Family Care</a>
+                        <a asp-action="DisplayMedicines" asp-route-categoryId="1" class="text-dark text-decoration-none">Family Care</a>
                     </li>
                     <li class="category-item" onclick="setActiveCategory(this)">
-                        <a href="#" class="text-dark text-decoration-none">Fitness & Wellness</a>
+                        <a asp-action="DisplayMedicines" asp-route-categoryId="2" class="text-dark text-decoration-none">Fitness & Wellness</a>
                     </li>
                     <li class="category-item" onclick="setActiveCategory(this)">
-                        <a href="#" class="text-dark text-decoration-none">Skin Care</a>
+                        <a asp-action="DisplayMedicines" asp-route-categoryId="3" class="text-dark text-decoration-none">Skin Care</a>
                     </li>
                     <li class="category-item" onclick="setActiveCategory(this)">
-                        <a href="#" class="text-dark text-decoration-none">Hair Care</a>
+                        <a asp-action="DisplayMedicines" asp-route-categoryId="4" class="text-dark text-decoration-none">Hair Care</a>
                     </li>
                     <li class="category-item" onclick="setActiveCategory(this)">
-                        <a href="#" class="text-dark text-decoration-none">Lip Care</a>
+                        <a asp-action="DisplayMedicines" asp-route-categoryId="5" class="text-dark text-decoration-none">Lip Care</a>
                     </li>
                     <li class="category-item" onclick="setActiveCategory(this)">
-                        <a href="#" class="text-dark text-decoration-none">Sexual Wellness</a>
+                        <a asp-action="DisplayMedicines" asp-route-categoryId="6" class="text-dark text-decoration-none">Sexual Wellness</a>
                     </li>
                     <li class="category-item" onclick="setActiveCategory(this)">
-                        <a href="#" class="text-dark text-decoration-none">Women's Care</a>
+                        <a asp-action="DisplayMedicines" asp-route-categoryId="7" class="text-dark text-decoration-none">Women's Care</a>
                     </li>
                     <li class="category-item" onclick="setActiveCategory(this)">
-                        <a href="#" class="text-dark text-decoration-none">Baby Care</a>
+                        <a asp-action="DisplayMedicines" asp-route-categoryId="8" class="text-dark text-decoration-none">Baby Care</a>
                     </li>
                 </ul>
             </div>
             <!-- Products Section -->
             <div class="col-md-9">
                 <!-- Search Bar -->
-                <div class="mb-4">
-                    <input type="text" class="form-control" placeholder="Search for products...">
+                <div class="mb-4 w-75">
+                    <form asp-action="SearchByProduct" asp-controller="User" method="get">
+                        <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
+                        <input type="text" name="medicineName" class="form-control" placeholder="Search for products..." />
+                    </form>
                 </div>
+
                 <!-- Product Grid -->
                 <div class="row g-4">
                     @foreach (var medicine in Model)
                     {
                         <div class="col-md-4">
-                            <div class="card shadow-sm h-100">
+                            <div class="card shadow-sm ">
                                 <!-- Replace src with a fallback logic if no image is provided -->
-                                <img src="@Url.Action("GetMedicineImage", "User", new { id = medicine.Id })" class="card-img-top" alt="@medicine.Name packaging">
+                                <img src="@Url.Action("GetImage", "User", new { id = medicine.Id })" class="card-img-top" height="170px" width="150px" alt="@medicine.Name packaging">
+                                <hr class="my-1">
                                 <div class="card-body text-center">
-                                    <h5 class="card-title text-gray-700">@medicine.Name</h5>
+                                    <p class="card-title text-gray-700">@medicine.Name</p>
                                     <p class="card-text text-primary fw-bold">₹100</p>
                                     <form asp-controller="User" asp-action="MedicineInfo" method="get">
                                         <input type="hidden" name="id" value="@medicine.Id" />

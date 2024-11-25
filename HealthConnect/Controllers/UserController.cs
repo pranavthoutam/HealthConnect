@@ -85,6 +85,10 @@ namespace HealthConnect.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login");
+            }
             if (string.IsNullOrEmpty(selectedSlot))
             {
                 TempData["Message"] = "Please select a valid time slot.";
@@ -166,7 +170,7 @@ namespace HealthConnect.Controllers
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Profile", "User");  // Redirect to profile page on success
+                return RedirectToAction("Profile", "Account");  // Redirect to profile page on success
             }
 
             // Handle errors (e.g., validation errors)
@@ -190,22 +194,28 @@ namespace HealthConnect.Controllers
             // Return a default profile photo if none is set
             return File("~/images/download.png", "image/jpeg");
         }
+
+        [HttpGet]
+        public IActionResult SearchSuggestions(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return Json(new List<string>()); // Return an empty list if no query
+            }
+
+            var suggestions = _medicine.GetMedicinesByPartialName(query); // Call the repository to fetch suggestions
+            return Json(suggestions.Take(4)); // Limit the results to 4
+        }
+
         [HttpGet]
         public IActionResult SearchMedicines()
         {
             return View();
         }
-        //[HttpPost]
-        //public IActionResult SearchMedicines(int categoryId)
-
-        //{
-        //    var model = _medicine.getMedicines(categoryId);
-
-        //    return View("DisplayMedicines", model);
-        //}
         public IActionResult DisplayMedicines(int categoryId)
         {
             var model = _medicine.getMedicines(categoryId);
+            ViewBag.CategoryId = categoryId;
             return View(model);
         }
         [HttpGet]
@@ -221,6 +231,48 @@ namespace HealthConnect.Controllers
             }
 
             return View(medicine);
+        }
+        [HttpGet]
+        public IActionResult MedicineInfoByName(string medicineName)
+        {
+            if (string.IsNullOrWhiteSpace(medicineName))
+            {
+                return NotFound("Invalid medicine name.");
+            }
+
+            // Decode friendly URL (replace hyphens back to spaces)
+            var decodedName = medicineName.Replace('-', ' ');
+
+            // Fetch medicine details
+            var medicine = _medicine.GetMedicineByName(decodedName).FirstOrDefault();
+
+            if (medicine == null)
+            {
+                return NotFound("Medicine not found.");
+            }
+
+            return View("MedicineInfo",medicine);
+        }
+
+        [HttpGet]
+        public IActionResult SearchbyProduct(string medicineName,int categoryId)
+        {
+            var medicines = _medicine.GetMedicineByName(medicineName,categoryId);
+            ViewBag.CategoryId = categoryId;
+            return View("DisplayMedicines",medicines);
+        }
+
+        [HttpGet("GetImage/{id}")]
+        public IActionResult GetImage(int id)
+        {
+            var medicine = _medicine.GetMedicineById(id);
+
+            if (medicine == null || medicine.Image == null)
+            {
+                return NotFound(); // Return 404 if the medicine or image is not found
+            }
+
+            return File(medicine.Image, "image/jpeg"); // Return the image as a file
         }
     }
 }

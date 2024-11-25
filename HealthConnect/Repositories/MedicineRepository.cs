@@ -25,7 +25,27 @@ namespace HealthConnect.Repositories
                            .FirstOrDefault(m => m.Id == id);
         }
 
+        public IEnumerable<string> GetMedicinesByPartialName(string partialName)
+        {
+            return _context.Medicines
+                           .Where(m => m.Name.Contains(partialName))
+                           .Select(m => m.Name)
+                           .ToList();
+        }
+
+        public List<Medicine> GetMedicineByName(string? name,int? categoryId)
+        {
+            return _context.Medicines
+                .Where(m=> m.Name.Contains(name) && m.CategoryId==categoryId)
+                .ToList();
+        }
+
+        public IEnumerable<Medicine> GetMedicineByName(string name)
+        {
+            return _context.Medicines.
+                Where(m => m.Name.Contains(name));
+        }
 
 
-    }
+}
 }

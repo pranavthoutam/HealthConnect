@@ -1,0 +1,65 @@
+﻿<!-- Search Bar -->
+<div class="d-flex justify-content-center mb-4">
+    <div class="position-relative w-50">
+        <!-- Input field -->
+        <input id="search-input"
+               class="form-control rounded-pill ps-5"
+               placeholder="Search for medicines, health products and more"
+               type="text"
+               autocomplete="off" />
+        <!-- Search icon -->
+        <i class="fas fa-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+
+        <!-- Suggestion dropdown -->
+        <div id="suggestion-box" class="list-group position-absolute w-100 mt-2" style="z-index: 100;"></div>
+    </div>
+</div>
+<script>
+            document.getElementById('search-input').addEventListener('input', function () {
+        const query = this.value.trim();
+        const suggestionBox = document.getElementById('suggestion-box');
+
+        // Clear suggestions if input is empty
+        if (query.length === 0) {
+            suggestionBox.innerHTML = '';
+            return;
+        }
+
+        // Fetch suggestions from the server
+        fetch(`/User/SearchSuggestions?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                suggestionBox.innerHTML = ''; // Clear previous suggestions
+
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        // Create a clickable suggestion
+                        const suggestion = document.createElement('div');
+                        suggestion.className = 'list-group-item list-group-item-action';
+                        suggestion.textContent = item;
+
+                        // Add click event to navigate to MedicineInfo
+                        suggestion.addEventListener('click', () => {
+                            window.location.href = `/User/MedicineInfoByName?medicineName=${encodeURIComponent(item)}`;
+                        });
+
+                        // Add suggestion to the dropdown
+                        suggestionBox.appendChild(suggestion);
+                    });
+                } else {
+                    // Show "No results found" if no matches
+                    const noResult = document.createElement('div');
+                    noResult.className = 'list-group-item text-muted';
+                    noResult.textContent = 'No results found';
+                    suggestionBox.appendChild(noResult);
+                }
+            })
+            .catch(error => console.error('Error fetching suggestions:', error));
+    });
+                  suggestion.addEventListener('click', () => {
+        const friendlyName = item.replace(/\s+/g, '-');
+        window.location.href = `/User/MedicineInfoByName?medicineName=${encodeURIComponent(friendlyName)}`;
+    });
+
+
+</script>

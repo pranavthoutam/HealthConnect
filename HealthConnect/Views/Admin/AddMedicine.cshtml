@@ -1,0 +1,84 @@
+﻿@model HealthConnect.Models.Medicine
+@{
+    ViewData["Title"] = "Add Medicine";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <div class="bg-white p-4 shadow-sm rounded">
+            <h1 class="h4 fw-bold mb-4">Add Medicine</h1>
+
+            <form asp-action="AddMedicine" asp-controller="Admin" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Medicine Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter medicine name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter medicine description"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryId" class="form-label">Category</label>
+                    <select asp-for="CategoryId" class="form-select">
+                        <option value="">Select Category</option>
+                        @foreach (var category in ViewBag.Categories as List<HealthConnect.Models.MedicineCategory>)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Manufacturer" class="form-label">Manufacturer</label>
+                    <input asp-for="Manufacturer" class="form-control" placeholder="Enter manufacturer name" />
+                    <span asp-validation-for="Manufacturer" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SideEffects" class="form-label">Side Effects</label>
+                    <textarea asp-for="SideEffects" class="form-control" rows="2" placeholder="Enter side effects, separated by commas"></textarea>
+                    <span asp-validation-for="SideEffects" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Usage" class="form-label">Usage</label>
+                    <textarea asp-for="Usage" class="form-control" rows="4" placeholder="Enter usage details in the specified format"></textarea>
+                    <span asp-validation-for="Usage" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Precautions" class="form-label">When Not to Use</label>
+                    <textarea asp-for="Precautions" class="form-control" rows="3" placeholder="Enter precautions in the specified format"></textarea>
+                    <span asp-validation-for="Precautions" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Dosage" class="form-label">Dosage</label>
+                    <textarea asp-for="Dosage" class="form-control" rows="2" placeholder="Enter dosage details"></textarea>
+                    <span asp-validation-for="Dosage" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Image" class="form-label">Medicine Image</label>
+                    <input asp-for="Image" type="file" class="form-control" />
+                    <span asp-validation-for="Image" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Medicine</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

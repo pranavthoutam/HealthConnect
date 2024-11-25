@@ -48,13 +48,12 @@ namespace HealthConnect.Models
 
         public virtual User User { get; set; }
 
-        // **New Fields for Slot Management**
+        //Slot Management
 
-        // Available slots for this doctor (e.g., "10:00 AM, 10:15 AM")
-        [NotMapped] // Not stored in the database but used for runtime logic
+        
+        [NotMapped]
         public List<string> AvailableSlots => GenerateAvailableSlots();
 
-        // Generate slots dynamically for a doctor (10:00 AM to 1:00 PM, etc.)
         private List<string> GenerateAvailableSlots()
         {
             var slots = new List<string>();

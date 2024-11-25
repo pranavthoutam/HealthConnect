@@ -3,10 +3,12 @@ using HealthConnect.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using HealthConnect.Repositories;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace HealthConnect.Controllers
 {
+    [Authorize(Roles ="Doctor")]
     public class DoctorController : Controller
     {
         private readonly IDoctorRepository _doctorRepository;

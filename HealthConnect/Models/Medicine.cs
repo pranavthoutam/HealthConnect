@@ -23,6 +23,8 @@ namespace HealthConnect.Models
 
         public string Dosage { get; set; }
 
+        public byte[]? Image { get; set; }
+
         // Navigation property for MedicineCategory
         public virtual MedicineCategory MedicineCategory { get; set; }
 
