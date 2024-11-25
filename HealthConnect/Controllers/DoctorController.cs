@@ -67,7 +67,7 @@ namespace HealthConnect.Controllers
                     Experience = model.Experience,
                     ConsultationFee = model.ConsultationFee,
                     OnlineConsultation = model.OnlineConsultation,
-                    ClinicAppoinment = model.ClinicAppoinment,
+                    ClinicAppointment = model.ClinicAppoinment,
                     ClinicName = model.ClinicName,
                     ClinicImagePath = "/uploads/clinicimages/" + model.ClinicImage.FileName,
                     CertificatePath = "/uploads/certificates/" + model.Certificate.FileName,
@@ -87,6 +87,11 @@ namespace HealthConnect.Controllers
 
             // If the model is invalid, return the same view with validation errors
             return View(model);
+        }
+
+        public IActionResult Feedback()
+        {
+            return View();
         }
     }
 }

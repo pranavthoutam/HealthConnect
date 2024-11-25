@@ -48,8 +48,14 @@
                 </div>
                 <div class="mb-3">
                     <label for="Place" class="form-label">Place</label>
-                    <input type="text" class="form-control" id="Place" name="Place" value="@Model.Place" required />
+                    @Html.DropDownListFor(
+                             model => model.Place,
+                             new SelectList(Model.Places, Model.Place),
+                             "Select a place",
+                             new { @class = "form-select", id = "Place" }
+                             )
                 </div>
+
                 <div class="mb-3">
                     <label for="Experience" class="form-label">Experience</label>
                     <input type="number" class="form-control" id="Experience" name="Experience" value="@Model.Experience" required />

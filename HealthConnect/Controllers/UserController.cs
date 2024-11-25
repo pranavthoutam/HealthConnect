@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using HealthConnect.Models;
 using HealthConnect.Repositories;
-using System.Text.Json;
+using System.Security.Claims;
+using HealthConnect.ViewModels;
 
 namespace HealthConnect.Controllers
 {
@@ -15,7 +16,7 @@ namespace HealthConnect.Controllers
         private const string apiKey = "AIzaSyDoQ2jdmGKmKALVj977-JCYZ7jUT6J6OHA";  // Use your Google API key
         private const string apiUrl = "https://maps.googleapis.com/maps/api/geocode/json";
         private readonly MedicineRepository _medicine;
-        public UserController(UserManager<User> userManager,IDoctorRepository doctorRepository, IConfiguration configuration, MedicineRepository medicine)
+        public UserController(UserManager<User> userManager, IDoctorRepository doctorRepository, IConfiguration configuration, MedicineRepository medicine)
         {
             _userManager = userManager;
             _doctorRepository = doctorRepository;
@@ -32,152 +33,163 @@ namespace HealthConnect.Controllers
         public async Task<IActionResult> FindDoctors()
         {
             ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
-            //(double x,double y) = await GetCoordinatesAsync("India");
-            //ViewBag.x = x; ViewBag.y = y;
             return View();
+        }
+
+        public IActionResult FindDoctors(DoctorFilterViewModel filter)
+        {
+            // Fetch doctors based on location and search term
+            var doctors = _doctorRepository.GetDoctorsByLocationAndSpecialization(filter.Location, filter.SearchString);
+
+            // Initialize the filter view model with the fetched doctors
+            filter.Doctors = doctors.ToList();
+
+            // Return the doctors list with an empty filter model
+            return RedirectToAction("DoctorsNearYou", new { location = filter.Location, searchString = filter.SearchString });
+        }
+
+
+        // Display doctors with filters applied (gender, experience, etc.)
+        public IActionResult DoctorsNearYou(string location, string searchString, DoctorFilterViewModel filter)
+        {
+            // Fetch doctors based on location and search string
+            var doctors = _doctorRepository.GetDoctorsByLocationAndSpecialization(location, searchString);
+
+            // Apply filters if provided
+            var filteredDoctors = _doctorRepository.ApplyFilters(doctors, filter);
+
+            // Update the filter model with the filtered doctor list
+            filter.Doctors = filteredDoctors.ToList();
+
+            // Return the filtered list of doctors to the view
+            return View(filter);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BookAppointment(int doctorId, DateTime date)
+        {
+            var doctor = await _doctorRepository.SearchDoctorAsync(doctorId);
+            if (doctor == null)
+            {
+                TempData["Message"] = "Doctor not found.";
+                return RedirectToAction("FindDoctors");
+            }
+
+            var availableSlots = await _doctorRepository.GetAvailableSlotsAsync(doctorId, date);
+            ViewBag.AvailableSlots = availableSlots;
+            ViewBag.SelectedDate = date;
+            ViewData["Title"] = "Book Appointment";
+            return View(doctor);
         }
 
         [HttpPost]
-        public async Task<IActionResult> FindDoctors(string searchString)
+        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date)
         {
-            if (string.IsNullOrEmpty(searchString))
+            if (string.IsNullOrEmpty(selectedSlot))
             {
-                ViewBag.Message = "Please enter a valid search term.";
-                return View(); // No results to display if search string is empty
+                TempData["Message"] = "Please select a valid time slot.";
+                return RedirectToAction("BookAppointment", new { doctorId, date });
             }
 
-            // Fetch matching doctors based on name or specialization
-            var doctors = await _doctorRepository.SearchDoctorsAsync(searchString);
-
-            if (doctors == null || !doctors.Any())
+            var appointment = new Appointment
             {
-                ViewBag.Message = "No doctors found matching the search criteria.";
-                return View();
-            }
+                DoctorId = doctorId,
+                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier), // Assuming logged-in user
+                Slot = selectedSlot,
+                AppointmentDate = date
+            };
 
-            return View(doctors); // Pass results to the view
-        }
+            await _doctorRepository.AddAppointmentAsync(appointment);
+            TempData["Message"] = "Appointment booked successfully!";
+            ViewBag.AppointmentDate = date;
+            ViewBag.TimeSlot = selectedSlot;
 
-
-
-
-
-        //public async Task<(double latitude, double longitude)> GetCoordinatesAsync(string address)
-        //{
-        //    using (HttpClient client = new HttpClient())
-        //    {
-        //        string requestUrl = $"{apiUrl}?address={Uri.EscapeDataString(address)}&key={apiKey}";
-        //        HttpResponseMessage response = await client.GetAsync(requestUrl);
-        //        string content = await response.Content.ReadAsStringAsync();
-
-        //        // Parse JSON response using System.Text.Json
-        //        using (JsonDocument doc = JsonDocument.Parse(content))
-        //        {
-        //            // Check if "results" array is empty or not
-        //            if (doc.RootElement.TryGetProperty("results", out JsonElement results) && results.GetArrayLength() > 0)
-        //            {
-        //                // Access the first element of the "results" array
-        //                var location = results[0].GetProperty("geometry").GetProperty("location");
-
-        //                double latitude = location.GetProperty("lat").GetDouble();
-        //                double longitude = location.GetProperty("lng").GetDouble();
-        //                return (latitude, longitude);
-        //            }
-        //            else
-        //            {
-        //                // Handle the case where no results were found
-        //                throw new Exception("No results found for the address.");
-        //            }
-        //        }
-        //    }
-        //}
-
-        public IActionResult DoctorsNearYou()
-        {
             return View();
         }
 
-        //// GET: Edit Profile
-        //[HttpGet]
-        //public async Task<IActionResult> EditProfile()
-        //{
-        //    var user = await _userManager.GetUserAsync(User);  // Get logged-in user
-        //    if (user == null)
-        //    {
-        //        return RedirectToAction("Login", "Account");  // Redirect to login if user not found
-        //    }
 
-        //    return View(user);  // Return the profile data to the view
-        //}
 
-        //// POST: Edit Profile
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> EditProfile(User updatedUser, IFormFile profilePhoto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        // Return the view with validation errors
-        //        return View(updatedUser);
-        //    }
+        // GET: Edit Profile
+        [HttpGet]
+        public async Task<IActionResult> EditProfile()
+        {
+            var user = await _userManager.GetUserAsync(User);  // Get logged-in user
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");  // Redirect to login if user not found
+            }
 
-        //    var user = await _userManager.GetUserAsync(User);  // Get logged-in user
-        //    if (user == null)
-        //    {
-        //        return RedirectToAction("Login", "Account");  // Redirect to login if user not found
-        //    }
+            return View(user);  // Return the profile data to the view
+        }
 
-        //    // Update the user properties
-        //    user.UserName = updatedUser.UserName;
-        //    user.DateofBirth = updatedUser.DateofBirth;
-        //    user.Gender = updatedUser.Gender;
-        //    user.BloodGroup = updatedUser.BloodGroup;
-        //    user.HouseNumber = updatedUser.HouseNumber;
-        //    user.Street = updatedUser.Street;
-        //    user.City = updatedUser.City;
-        //    user.State = updatedUser.State;
-        //    user.Country = updatedUser.Country;
-        //    user.PostalCode = updatedUser.PostalCode;
+        // POST: Edit Profile
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(User updatedUser, IFormFile profilePhoto)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Return the view with validation errors
+                return View(updatedUser);
+            }
 
-        //    // Handle profile photo upload
-        //    if (profilePhoto != null && profilePhoto.Length > 0)
-        //    {
-        //        using (var memoryStream = new MemoryStream())
-        //        {
-        //            await profilePhoto.CopyToAsync(memoryStream);
-        //            user.ProfilePhoto = memoryStream.ToArray();  // Store the profile photo as byte array
-        //        }
-        //    }
+            var user = await _userManager.GetUserAsync(User);  // Get logged-in user
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");  // Redirect to login if user not found
+            }
 
-        //    // Save the changes to the database
-        //    var result = await _userManager.UpdateAsync(user);
+            // Update the user properties
+            user.UserName = updatedUser.UserName;
+            user.DateofBirth = updatedUser.DateofBirth;
+            user.Gender = updatedUser.Gender;
+            user.BloodGroup = updatedUser.BloodGroup;
+            user.HouseNumber = updatedUser.HouseNumber;
+            user.Street = updatedUser.Street;
+            user.City = updatedUser.City;
+            user.State = updatedUser.State;
+            user.Country = updatedUser.Country;
+            user.PostalCode = updatedUser.PostalCode;
 
-        //    if (result.Succeeded)
-        //    {
-        //        return RedirectToAction("Profile", "User");  // Redirect to profile page on success
-        //    }
+            // Handle profile photo upload
+            if (profilePhoto != null && profilePhoto.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await profilePhoto.CopyToAsync(memoryStream);
+                    user.ProfilePhoto = memoryStream.ToArray();  // Store the profile photo as byte array
+                }
+            }
 
-        //    // Handle errors (e.g., validation errors)
-        //    foreach (var error in result.Errors)
-        //    {
-        //        ModelState.AddModelError("", error.Description);
-        //    }
+            // Save the changes to the database
+            var result = await _userManager.UpdateAsync(user);
 
-        //    // Return the view with validation errors
-        //    return Ok("Unsuucessful");
-        //}
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Profile", "User");  // Redirect to profile page on success
+            }
 
-        //public async Task<IActionResult> GetProfilePhoto(string userId)
-        //{
-        //    var user = await _userManager.FindByIdAsync(userId);
-        //    if (user?.ProfilePhoto != null)
-        //    {
-        //        return File(user.ProfilePhoto, "image/jpeg");
-        //    }
+            // Handle errors (e.g., validation errors)
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
 
-        //    // Return a default profile photo if none is set
-        //    return File("~/images/download.png", "image/jpeg");
-        //}
+            // Return the view with validation errors
+            return Ok("Unsuucessful");
+        }
+
+        public async Task<IActionResult> GetProfilePhoto(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user?.ProfilePhoto != null)
+            {
+                return File(user.ProfilePhoto, "image/jpeg");
+            }
+
+            // Return a default profile photo if none is set
+            return File("~/images/download.png", "image/jpeg");
+        }
         [HttpGet]
         public IActionResult SearchMedicines()
         {

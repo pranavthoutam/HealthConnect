@@ -37,7 +37,7 @@
             </div>
             <div class="mt-4">
                 <h2 class="h5 fw-bold mb-2">Description</h2>
-                <p class="text-secondary mb-4">@Model.Description</p>
+                <p class="text-secondary mb-4 text-justify">@Model.Description</p>
             </div>
             <hr class="my-4">
             <div class="mt-4">
@@ -68,7 +68,22 @@
             <div class="mt-4">
                 <h2 class="h5 fw-bold mb-2">Side effects</h2>
                 <p class="text-secondary mb-2">Major & minor side effects for @Model.Name</p>
-                @Model.SideEffects
+                @if (!string.IsNullOrEmpty(Model.SideEffects))
+                {
+                    var effects = Model.SideEffects.Split(',');
+
+                    <ul>
+                        @foreach (var effect in effects)
+                        {
+                            <li>@effect.Trim()</li> <!-- Trim to remove extra spaces -->
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No known side effects listed.</p>
+                }
+
             </div>
             <hr class="my-4">
             <div class="mt-4">

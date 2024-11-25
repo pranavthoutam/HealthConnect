@@ -31,16 +31,50 @@ namespace HealthConnect.Models
 
         public bool OnlineConsultation { get; set; }
 
-        public bool ClinicAppoinment { get; set; }
+        public bool ClinicAppointment { get; set; }
+
         public string ClinicName { get; set; }
+
         public string HnoAndStreetName { get; set; }
+
         public string District { get; set; }
+
         public string Place { get; set; }
+
         // Store file paths instead of byte arrays
         public string ClinicImagePath { get; set; }
 
         public string CertificatePath { get; set; }
 
         public virtual User User { get; set; }
+
+        // **New Fields for Slot Management**
+
+        // Available slots for this doctor (e.g., "10:00 AM, 10:15 AM")
+        [NotMapped] // Not stored in the database but used for runtime logic
+        public List<string> AvailableSlots => GenerateAvailableSlots();
+
+        // Generate slots dynamically for a doctor (10:00 AM to 1:00 PM, etc.)
+        private List<string> GenerateAvailableSlots()
+        {
+            var slots = new List<string>();
+            var timeRanges = new[]
+            {
+                (Start: TimeSpan.Parse("10:00"), End: TimeSpan.Parse("13:00")),
+                (Start: TimeSpan.Parse("14:00"), End: TimeSpan.Parse("16:00")),
+                (Start: TimeSpan.Parse("18:00"), End: TimeSpan.Parse("20:00"))
+            };
+
+            foreach (var range in timeRanges)
+            {
+                var current = range.Start;
+                while (current < range.End)
+                {
+                    slots.Add(current.ToString(@"hh\:mm"));
+                    current = current.Add(TimeSpan.FromMinutes(15));
+                }
+            }
+            return slots;
+        }
     }
 }

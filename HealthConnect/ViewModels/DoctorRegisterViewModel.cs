@@ -34,6 +34,11 @@ namespace HealthConnect.ViewModels
 
         public string Place { get; set; }
 
+        public List<string> Places { get; set; } = new List<string>
+{
+    "Madhapur", "Gachibowli", "Uppal", "LB Nagar", "Kukatpally"
+};
+
         [Display(Name = "Upload Clinic Image")]
         public IFormFile ClinicImage { get; set; }
 

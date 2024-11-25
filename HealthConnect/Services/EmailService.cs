@@ -14,10 +14,6 @@ namespace HealthConnect.Services
 
         public  Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            //var fromEmail = _configuration["EmailSettings:From"];
-            //var fromPassword = _configuration["EmailSettings:Password"];
-            //var smtpHost = _configuration["EmailSettings:Host"];
-            //var smtpPort = int.Parse(_configuration["EmailSettings:Port"]);
             var smtpclient = new SmtpClient(_configuration["EmailSettings:Host"])
             {
                 Port = int.Parse(_configuration["EmailSettings:Port"]),

@@ -1,0 +1,96 @@
+﻿<html>
+<head>
+    <title>Doctor Appointment Feedback</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white font-roboto">
+    <div class="max-w-2xl mx-auto p-8">
+        <h1 class="text-2xl font-bold mb-4">How was your appointment experience with Dr. Kavitha Reddy?</h1>
+        <p class="text-gray-600 mb-6">Your experience will help us! Let people choose the right doctor, daily.</p>
+
+        <form>
+            <div class="mb-6">
+                <label class="block text-orange-600 font-bold mb-2">01. Would you like to recommend the doctor?*</label>
+                <div class="flex items-center mb-2">
+                    <input type="radio" id="yes" name="recommend" value="yes" class="mr-2">
+                    <label for="yes" class="text-gray-700">Yes</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="radio" id="no" name="recommend" value="no" class="mr-2">
+                    <label for="no" class="text-gray-700">No</label>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-orange-600 font-bold mb-2">02. For which health problem/treatment did you visit?*</label>
+                <input type="text" placeholder="e.g. Stomach Ache, body pain" class="w-full border border-gray-300 p-2 rounded">
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-orange-600 font-bold mb-2">03. How long did you wait to be seen by the doctor?*</label>
+                <div class="flex items-center mb-2">
+                    <input type="radio" id="less15" name="wait_time" value="less15" class="mr-2">
+                    <label for="less15" class="text-gray-700">Less than 15 min</label>
+                </div>
+                <div class="flex items-center mb-2">
+                    <input type="radio" id="15to30" name="wait_time" value="15to30" class="mr-2">
+                    <label for="15to30" class="text-gray-700">15 min to 30 min</label>
+                </div>
+                <div class="flex items-center mb-2">
+                    <input type="radio" id="30to1hr" name="wait_time" value="30to1hr" class="mr-2">
+                    <label for="30to1hr" class="text-gray-700">30 min to 1 hour</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="radio" id="more1hr" name="wait_time" value="more1hr" class="mr-2">
+                    <label for="more1hr" class="text-gray-700">More than 1 hour</label>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-orange-600 font-bold mb-2">04. What do you think can be improved?*</label>
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" id="friendliness" name="improvement" value="friendliness" class="mr-2">
+                    <label for="friendliness" class="text-gray-700">Doctor friendliness</label>
+                </div>
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" id="explanation" name="improvement" value="explanation" class="mr-2">
+                    <label for="explanation" class="text-gray-700">Explanation of the health issue</label>
+                </div>
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" id="treatment" name="improvement" value="treatment" class="mr-2">
+                    <label for="treatment" class="text-gray-700">Treatment satisfaction</label>
+                </div>
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" id="value" name="improvement" value="value" class="mr-2">
+                    <label for="value" class="text-gray-700">Value for money</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="wait_time" name="improvement" value="wait_time" class="mr-2">
+                    <label for="wait_time" class="text-gray-700">Wait time</label>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-orange-600 font-bold mb-2">05. Tell us about your experience with the doctor.*</label>
+                <p class="text-gray-600 mb-2">Share your review to help others know your experience. Doctor friendliness? Read more</p>
+                <textarea placeholder="Start typing here..." class="w-full border border-gray-300 p-2 rounded h-32"></textarea>
+            </div>
+
+            <div class="mb-6 bg-yellow-100 p-4 rounded">
+                <p class="text-gray-600 text-sm">Note: All your reviews are private and monitored for accuracy before publishing. Do not include any personal information, e.g. contact details, email address, or medical conditions and so on. Read more</p>
+            </div>
+
+            <div class="mb-6">
+                <input type="text" placeholder="Name" class="w-full border border-gray-300 p-2 rounded mb-4">
+                <input type="text" placeholder="+912233334123" class="w-full border border-gray-300 p-2 rounded">
+            </div>
+
+            <div>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

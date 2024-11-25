@@ -1,5 +1,4 @@
-﻿@model IEnumerable<HealthConnect.Models.Doctor>
-@{
+﻿@{
     ViewBag.Title = "Find Doctors";
 }
 
@@ -10,13 +9,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Doctors</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=@ViewData["GoogleMapsApiKey"]"></script>
+    @* <script src="https://maps.googleapis.com/maps/api/js?key=@ViewData["GoogleMapsApiKey"]"></script>
     <style>
         #map {
             height: 500px; /* Adjust as needed */
             width: 100%;
         }
-    </style>
+    </style> *@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
@@ -31,56 +30,42 @@
 
 <body >
     <div class="background-image d-flex flex-colum d-flex flex-column justify-content-center align-items-center flex-grow-1 mt-3 mb-3">
-        <div class="text-center mb-6">
-            <h1 class="h4 fw-bold text-dark">Your trusted partner in personalized healthcare</h1>
-            <p class="text-muted">Search and schedule</p>
+        <div class="text-center mb-6" style="color:white">
+            <h1 class="h4 fw-bold">Your trusted partner in personalized healthcare</h1>
+            <p class="text-white">Search and schedule Appointments in Hyderabad</p>
         </div>
         @ViewBag.x
         @ViewBag.y
         <div class="container">
-            <form method="post" asp-action="DoctorsNearYou" class="mb-4">
+            <form method="post" asp-for="FindDoctors" class="mb-4">
                 <div class="input-group w-75 mx-auto">
-                    @* <div class="input-group-prepend">
-                        <span class="input-group-text bg-light">
-                            <i class="fas fa-map-marker-alt text-primary"></i>
-                        </span>
-                    </div> *@
-                    <input type="text" name="searchString" class="form-control" placeholder="Search by name or specialization">
+                    <!-- Dropdown for Places -->
+                    <select name="Location" class="form-select w-25">
+                        <option value="" selected>Select a place</option>
+                        <option value="Madhapur">Madhapur</option>
+                        <option value="Gachibowli">Gachibowli</option>
+                        <option value="Uppal">Uppal</option>
+                        <option value="LB Nagar">LB Nagar</option>
+                        <option value="Kukatpally">Kukatpally</option>
+                    </select>
+
+                    <!-- Search Input -->
+                    <input type="text" name="searchString" class="form-control w-50 required" placeholder="Search by name or specialization">
+
+                    <!-- Submit Button -->
                     <button class="btn btn-primary" type="submit">Search</button>
                 </div>
             </form>
-            <div id="map"></div>
-            @if (ViewBag.Message != null)
+
+@*             <div id="map"></div>
+ *@            @if (ViewBag.Message != null)
             {
                 <div class="alert alert-info text-center">@ViewBag.Message</div>
             }
 
-            @if (Model != null && Model.Any())
-            {
-                <div class="d-grid gap-3">
-                    @foreach (var doctor in Model)
-                    {
-                        <div class="card shadow-sm p-3 d-flex flex-row align-items-center">
-                            <img src="@doctor.ClinicImagePath" alt="Portrait of @doctor.FullName" class="rounded-circle me-3" height="100" width="100" />
-                            <div class="flex-fill">
-                                <h3 class="h5 text-teal mb-1">@doctor.FullName</h3>
-                                <p class="mb-0 text-muted">@doctor.Specialization</p>
-                                <p class="mb-0 text-muted">@doctor.Experience years experience overall</p>
-@*                                 <p class="mb-0 text-muted">@doctor.ClinicLocation</p>
- *@                                <p class="mb-0 text-muted">@doctor.ConsultationFee.ToString("C") Consultation fee at clinic</p>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button class="btn text-white" style="background-color:#8A45E6">Book Video Consult</button>
-                                <button class="btn text-white" style="background-color:#199FD9;padding-left:10px;padding-right:10px">Book Clinic Visit</button>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-
         </div>
     </div>
-    <script>
+    @* <script>
         function initMap() {
             // Map options
             var options = {
@@ -100,7 +85,7 @@
 
         // Initialize the map
         window.onload = initMap;
-    </script>
+    </script> *@
 </body>
 
 </html>
