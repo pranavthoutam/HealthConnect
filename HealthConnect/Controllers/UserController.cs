@@ -170,7 +170,7 @@ namespace HealthConnect.Controllers
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Profile", "Account");  // Redirect to profile page on success
+                return RedirectToAction("Index","Home");  // Redirect to profile page on success
             }
 
             // Handle errors (e.g., validation errors)
