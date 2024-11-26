@@ -52,10 +52,20 @@
                 </div>
             </div>
 
+            
+
             <!-- Time Slot Container (Right side) -->
             <div class="col-md-4 mt-4 mt-md-0">
                 <div class="bg-white p-4 rounded shadow-sm mt-5">
                     <h5 class="font-weight-bold">Pick a time slot</h5>
+
+                    <div class="mt-4">
+                            <div class="mt-4">
+                                <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@Model.Id" asp-route-date="@DateTime.Today.ToString("yyyy-MM-dd")" class="btn btn-outline-primary btn-sm" >Today</a>
+                                <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@Model.Id" asp-route-date="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"class="btn btn-outline-primary btn-sm" >Tomorrow</a>
+                            </div>
+
+                        </div>
 
                     <!-- Date Selection -->
                     <form method="post" action="@Url.Action("ConfirmAppointment", "User")">
@@ -68,41 +78,32 @@
                         </div>
 
                         <!-- Date Selection Buttons (Today, Tomorrow, etc.) -->
-                        <div class="mt-4">
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="updateDate('today')">Today</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="updateDate('tomorrow')">Tomorrow</button>
-                        </div>
 
                         <!-- Available Slots (Buttons) -->
                         <div class="mt-4">
                             <h6 class="text-muted">Available Slots </h6>
                             <div class="row">
-                                @if (ViewBag.AvailableSlots != null && ViewBag.AvailableSlots is IEnumerable<string>)
+                                @if (ViewBag.AvailableSlots != null && ViewBag.AvailableSlots.Count > 0)
+{
+    foreach (var slot in ViewBag.AvailableSlots)
+    {
+        <div class="col-6">
+            <!-- Slot button triggers form submission -->
+            <button type="submit" name="selectedSlot" value="@slot" class="btn btn-outline-primary btn-sm w-100">@slot</button>
+        </div>
+    }
+}
+else
+{
+    <div class="col-12">
+        <p class="text-danger">No available slots for the selected date.</p>
+    </div>
+}
 
-                                {
 
-                                    foreach (var slot in ViewBag.AvailableSlots)
-
-                                    {
-                                        <div class="col-6">
-                                            <!-- Slot button triggers form submission -->
-                                            <button type="submit" name="selectedSlot" value="@slot" class="btn btn-outline-primary btn-sm w-100">@slot</button>
-                                        </div>
-                                    }
-
-                                }
-
-                                 
-                                else
-
-                                {
-                                    <p class="text-danger">No available slots for the selected date.</p>
-                                }
                             </div>
                         </div>
                     </form>
-
-
                 </div>
             </div>
         </div>
@@ -113,19 +114,24 @@
 
     <script>
         // JavaScript function to update the hidden date field based on the selected button
-        function updateDate(day) {
-            var today = new Date();
-            var selectedDate = new Date(today);
+        // JavaScript function to update the hidden date field based on the selected button
+function updateDate(day) {
+    var today = new Date();
+    var selectedDate = new Date(today);
 
-            if (day === 'today') {
-                selectedDate.setDate(today.getDate()); // Today
-            } else if (day === 'tomorrow') {
-                selectedDate.setDate(today.getDate() + 1); // Tomorrow
-            } 
+    if (day === 'today') {
+        selectedDate.setDate(today.getDate()); // Today
+    } else if (day === 'tomorrow') {
+        selectedDate.setDate(today.getDate() + 1); // Tomorrow
+    } 
 
-            // Update the hidden date input
-            document.getElementById('appointmentDate').value = selectedDate.toISOString().split('T')[0];
-        }
+    // Update the hidden date input
+    document.getElementById('appointmentDate').value = selectedDate.toISOString().split('T')[0];
+
+    // Optionally log the selected date to confirm
+    console.log("Selected date: " + selectedDate.toISOString().split('T')[0]);
+}
+
     </script>
 </body>
 </html>

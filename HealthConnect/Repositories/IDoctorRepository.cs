@@ -13,6 +13,5 @@ namespace HealthConnect.Repositories
         public Task<IEnumerable<string>> GetAvailableSlotsAsync(int doctorId, DateTime date);
         Task AddAppointmentAsync(Appointment appointment);
         Task<IEnumerable<Appointment>> GetAppointmentsForUserAsync(string userId);
-
     }
 }

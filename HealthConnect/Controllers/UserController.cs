@@ -66,9 +66,9 @@ namespace HealthConnect.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> BookAppointment(int doctorId, DateTime date)
+        public async Task<IActionResult> BookAppointment(int doctorId, DateTime date,bool isOnline)
         {
-            var doctor = await _doctorRepository.SearchDoctorAsync(doctorId);
+             var doctor = await _doctorRepository.SearchDoctorAsync(doctorId);
             if (doctor == null)
             {
                 TempData["Message"] = "Doctor not found.";
@@ -92,9 +92,14 @@ namespace HealthConnect.Controllers
                     })
                     .ToList();
             }
+            //if (availableSlots == null)
+            //{
+            //    availableSlots = new List<string>();  // Or any other default value you prefer
+            //}
 
             ViewBag.AvailableSlots = availableSlots;
             ViewBag.SelectedDate = date;
+            ViewBag.IsOnline = isOnline;
             ViewData["Title"] = "Book Appointment";
             return View(doctor);
         }
