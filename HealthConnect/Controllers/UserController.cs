@@ -76,11 +76,75 @@ namespace HealthConnect.Controllers
             }
 
             var availableSlots = await _doctorRepository.GetAvailableSlotsAsync(doctorId, date);
+            //Filter the slots by current time
+            if (date.Date == DateTime.Now.Date)
+            {
+                var currentTime = DateTime.Now.TimeOfDay;
+                availableSlots = availableSlots
+                    .Where(slot =>
+                    {
+                        // Parse slot string to TimeSpan
+                        if (TimeSpan.TryParse(slot, out var slotTime))
+                        {
+                            return slotTime > currentTime; // Compare with current time
+                        }
+                        return false;
+                    })
+                    .ToList();
+            }
+
             ViewBag.AvailableSlots = availableSlots;
             ViewBag.SelectedDate = date;
             ViewData["Title"] = "Book Appointment";
             return View(doctor);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableSlots(int doctorId, DateTime date)
+        {
+            // Simulate fetching slots for the given doctor and date
+            var slots = await _doctorRepository.GetAvailableSlotsAsync(doctorId, date);
+
+            if (slots == null || !slots.Any())
+            {
+                return Json(new List<string>()); // Return an empty list if no slots
+            }
+
+            return Json(slots);
+        }
+
+        //[HttpGet]
+        //public async Task<IActionResult> RescheduleAppointment(int doctorId,DateTime date,bool isOnline)
+        //{
+        //    var doctor = await _doctorRepository.SearchDoctorAsync(doctorId);
+        //    if (doctor == null)
+        //    {
+        //        TempData["Message"] = "Doctor not found.";
+        //        return RedirectToAction("FindDoctors");
+        //    }
+        //    var availableSlots = await _doctorRepository.GetAvailableSlotsAsync(doctorId, date);
+        //    //Filter the slots by current time
+        //    if (date.Date == DateTime.Now.Date)
+        //    {
+        //        var currentTime = DateTime.Now.TimeOfDay;
+        //        availableSlots = availableSlots
+        //            .Where(slot =>
+        //            {
+        //                // Parse slot string to TimeSpan
+        //                if (TimeSpan.TryParse(slot, out var slotTime))
+        //                {
+        //                    return slotTime > currentTime; // Compare with current time
+        //                }
+        //                return false;
+        //            })
+        //            .ToList();
+        //    }
+
+        //    ViewBag.AvailableSlots = availableSlots;
+        //    ViewBag.SelectedDate = date;
+        //    ViewData["Title"] = "Book Appointment";
+        //    return View(doctor);
+        //}
 
         [HttpPost]
         public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date)

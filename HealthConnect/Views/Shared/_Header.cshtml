@@ -1,4 +1,7 @@
-﻿<link rel="stylesheet" href="~/css/header.css" />
+﻿@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<User> smgr;
+@inject UserManager<User> user;
+<link rel="stylesheet" href="~/css/header.css" />
 <header class="header">
     <a class="HealthConnectLogo" style="text-decoration:none;color:black" asp-action="Index" asp-controller="Home">
         <h1 style="font-family: 'Gelasio', serif;">HEALTH CONNECT</h1>
@@ -20,15 +23,14 @@
                         <a class="dropdown-item" asp-controller="User" asp-action="EditProfile">
                             <div class="ms-3">
                                 <strong>@User.Identity.Name</strong>
-                                <small class="text-muted d-block">+91XXXXXXXXXX</small> <!-- Replace with user's phone number -->
                             </div>
                         </a>
                     </li>
                     <li><a class="dropdown-item" href="/Appointments">My Appointments</a></li>
-                    <li><a class="dropdown-item" href="/MedicalRecords">My Medical Records</a></li>
-                    <li><a class="dropdown-item" href="/OnlineConsultations">My Online Consultations</a></li>
+@*                     <li><a class="dropdown-item" href="/MedicalRecords">My Medical Records</a></li>
+ *@                    <li><a class="dropdown-item" href="/OnlineConsultations">My Online Consultations</a></li>
                     <li><a class="dropdown-item" href="/Feedback">My Feedback</a></li>
-                    <li><a class="dropdown-item" href="/Profile">View / Update Profile</a></li>
+                    <li><a asp-action="EditProfile" asp-controller="User" class="dropdown-item">View / Update Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
                         <a class="dropdown-item" asp-action="Logout" asp-controller="Account">Logout</a>
@@ -50,3 +52,18 @@
 
 
 </header>
+<script>
+    document.addEventListener('click', function (event) {
+        const dropdown = document.querySelector('.profile-dropdown');
+        const menu = document.querySelector('.dropdown-menu');
+
+        if (dropdown.contains(event.target)) {
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        } else {
+            menu.style.display = 'none';
+        }
+    });
+
+</script>
+
+

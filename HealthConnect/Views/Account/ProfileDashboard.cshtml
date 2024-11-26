@@ -1,57 +1,191 @@
-﻿<html>
+﻿@model HealthConnect.ViewModels.ProfileDashboardViewModel
+
+<html>
 <head>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .sidebar-link {
+            display: block;
+            text-decoration: none;
+        }
+
+            .sidebar-link:hover, .sidebar-link.active {
+                color: #0d6efd; /* Bootstrap primary color */
+                font-weight: bold;
+            }
+
+        .content-section {
+            display: none;
+        }
+
+            .content-section.active {
+                display: block;
+            }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="max-w-5xl mx-auto mt-10 border border-blue-500">
-        <div class="flex p-6 bg-white border-b">
-            <div class="w-16 h-16 bg-gray-300"></div>
-            <div class="ml-4">
-                <h2 class="text-xl font-semibold">Pranav</h2>
-                <p class="text-gray-600">+91 1234567890, pranav@examplemail.com</p>
-            </div>
-        </div>
-        <div class="flex">
-            <div class="w-1/4 bg-white border-r">
-                <ul class="space-y-4 p-6">
-                    <li class="text-gray-600">Medical Records</li>
-                    <li class="text-blue-500 font-semibold">Appointments</li>
-                    <li class="text-gray-600">Online Consultations</li>
-                    <li class="text-gray-600">Articles</li>
-                    <li class="text-gray-600">Feedback</li>
-                    <li class="text-gray-600">Payments</li>
-                </ul>
-            </div>
-            <div class="w-3/4 bg-white p-6">
-                <div class="flex items-center mb-4">
-                    <div class="w-16 text-center">
-                        <div class="text-2xl font-bold text-gray-600">24</div>
-                        <div class="text-sm text-gray-600">OCT</div>
-                    </div>
-                    <div class="ml-4 flex-1">
-                        <h3 class="text-lg font-semibold">Dr. Snehalata Kale, Dentist</h3>
-                        <p class="text-gray-600">Thursday 6:00 PM</p>
-                        <p class="text-gray-600">Kokilaben Superspeciality Dental Hospital</p>
-                        <p class="text-red-500">Cancelled</p>
-                    </div>
-                    <button class="ml-4 px-4 py-2 text-blue-500 border border-blue-500 rounded">Book again</button>
+<body class="bg-light">
+    <div class="container my-5">
+        <div class="border border-primary rounded bg-white shadow-sm">
+            <!-- Profile Header -->
+            <div class="d-flex align-items-center p-4 border-bottom">
+                <div class="bg-secondary rounded-circle" style="width: 64px; height: 64px;"></div>
+                <div class="ms-3">
+                    <h2 class="h5 fw-bold mb-1">Pranav</h2>
+                    <p class="text-muted mb-0">+91 1234567890, pranav@examplemail.com</p>
                 </div>
-                <div class="flex items-center">
-                    <div class="w-16 text-center">
-                        <div class="text-2xl font-bold text-gray-600">24</div>
-                        <div class="text-sm text-gray-600">OCT</div>
+            </div>
+
+            <!-- Sidebar and Main Content -->
+            <div class="row g-0">
+                <!-- Sidebar -->
+                <div class="col-md-3 bg-light border-end">
+                    <ul class="list-unstyled p-4">
+                        <li><a href="#inclinic-appointments" class="sidebar-link active" data-target="inclinic">Appointments</a></li>
+                        <hr class="sidebar-divider">
+                        <li><a href="#online-consultations" class="sidebar-link" data-target="online">Online Consultations</a></li>
+                        <hr class="sidebar-divider">
+                        <li><a href="#completed-appointments" class="sidebar-link" data-target="completed">Feedbacks</a></li>
+                    </ul>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-md-9 p-4">
+                    <!-- In-Clinic Appointments Section -->
+                    <div id="inclinic" class="content-section active">
+                        @foreach (var appointment in Model.InClinicAppointments)
+                        {
+                            <div class="d-flex align-items-center mb-4 border-bottom pb-3">
+                                <!-- Date Section -->
+                                <div class="text-center me-3" style="width: 64px;">
+                                    <div class="fs-4 fw-bold text-secondary">@appointment.AppointmentDate.ToString("dd")</div>
+                                    <div class="small text-secondary text-uppercase">@appointment.AppointmentDate.ToString("MMM")</div>
+                                </div>
+                                <!-- Appointment Details -->
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">Dr. @appointment.DoctorName, @appointment.DoctorSpecialization</h5>
+                                    <p class="text-secondary mb-1">@appointment.AppointmentDate.ToString("d"+" "+"ddd")</p>
+                                    <p class="text-secondary mb-1">@appointment.Location</p>
+
+                                    <!-- Status Display -->
+                                    @if (!appointment.IsCompleted)
+                                    {
+                                        <p class="text-muted mb-0">Upcoming</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-danger mb-0">Completed</p>
+                                    }
+                                </div>
+                                <!-- Action Buttons -->
+                                @if (appointment.IsCompleted)
+                                {
+                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="false" class="btn btn-outline-primary ms-3">Book again</a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-primary ms-3">Reschedule</button>
+                                    <button class="btn btn-outline-danger ms-3">Cancel</button>
+                                }
+                            </div>
+                        }
                     </div>
-                    <div class="ml-4 flex-1">
-                        <h3 class="text-lg font-semibold">Dr. Snehalata Kale, Dentist</h3>
-                        <p class="text-gray-600">Thursday 6:00 PM</p>
-                        <p class="text-gray-600">Kokilaben Superspeciality Dental Hospital</p>
+
+                    <!-- Online Consultations Section -->
+                    <div id="online" class="content-section">
+                        @foreach (var appointment in Model.OnlineConsultations)
+                        {
+                            <div class="d-flex align-items-center mb-4 border-bottom pb-3">
+                                <!-- Date Section -->
+                                <div class="text-center me-3" style="width: 64px;">
+                                    <div class="fs-4 fw-bold text-secondary">@appointment.AppointmentDate.ToString("dd")</div>
+                                    <div class="small text-secondary text-uppercase">@appointment.AppointmentDate.ToString("MMM")</div>
+                                </div>
+                                <!-- Appointment Details -->
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">Dr. @appointment.DoctorName, @appointment.DoctorSpecialization</h5>
+                                    <p class="text-secondary mb-1">@appointment.AppointmentDate</p>
+                                    <p class="text-secondary mb-1">@appointment.Location</p>
+
+                                    <!-- Status Display -->
+                                    @if (!appointment.IsCompleted)
+                                    {
+                                        <p class="text-muted mb-0">Status: Upcoming</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-danger mb-0">Status: Completed</p>
+                                    }
+                                </div>
+                                <!-- Action Buttons -->
+                                @if (appointment.IsCompleted)
+                                {
+                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="false" class="btn btn-outline-primary ms-3">Book again</a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-primary ms-3">Reschedule</button>
+                                    <button class="btn btn-outline-danger ms-3">Cancel</button>
+                                }
+                            </div>
+                        }
                     </div>
-                    <button class="ml-4 px-4 py-2 text-blue-500 border border-blue-500 rounded">Reschedule</button>
-                    <button class="ml-4 px-4 py-2 text-red-500 border border-red-500 rounded">Cancel</button>
+
+                    <!-- Completed Appointments Section -->
+                    <div id="completed" class="content-section">
+                        @foreach (var appointment in Model.CompletedAppointments)
+                        {
+                            <div class="d-flex align-items-center mb-4 border-bottom pb-3">
+                                <!-- Date Section -->
+                                <div class="text-center me-3" style="width: 64px;">
+                                    <div class="fs-4 fw-bold text-secondary">@appointment.AppointmentDate.ToString("dd")</div>
+                                    <div class="small text-secondary text-uppercase">@appointment.AppointmentDate.ToString("MMM")</div>
+                                </div>
+                                <!-- Appointment Details -->
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">Dr. @appointment.DoctorName, @appointment.DoctorSpecialization</h5>
+                                    <p class="text-secondary mb-1">@appointment.AppointmentDate.ToString("d")</p>
+                                    <p class="text-secondary mb-1">@appointment.Location</p>
+                                </div>
+                                <!-- Action Buttons -->
+                                <button class="btn btn-outline-primary ms-3">Feedback</button>
+
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Include Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const links = document.querySelectorAll(".sidebar-link");
+            const sections = document.querySelectorAll(".content-section");
+
+            links.forEach(link => {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+
+                    // Remove active class from all links
+                    links.forEach(l => l.classList.remove("active"));
+
+                    // Add active class to the clicked link
+                    link.classList.add("active");
+
+                    // Hide all sections
+                    sections.forEach(section => section.classList.remove("active"));
+
+                    // Show the targeted section
+                    const targetId = link.getAttribute("data-target");
+                    document.getElementById(targetId).classList.add("active");
+                });
+            });
+        });
+    </script>
 </body>
 </html>

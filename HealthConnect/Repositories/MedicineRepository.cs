@@ -42,8 +42,10 @@ namespace HealthConnect.Repositories
 
         public IEnumerable<Medicine> GetMedicineByName(string name)
         {
-            return _context.Medicines.
-                Where(m => m.Name.Contains(name));
+            return _context.Medicines
+                .Include(m => m.Alternatives)
+                .ThenInclude(ma => ma.Alternative)
+                .Where(m => m.Name.Contains(name));
         }
 
 

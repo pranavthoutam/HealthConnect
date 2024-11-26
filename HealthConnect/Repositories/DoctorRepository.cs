@@ -112,6 +112,15 @@ namespace HealthConnect.Repositories
             return availableSlots;
         }
 
+        public async Task<IEnumerable<Appointment>> GetAppointmentsForUserAsync(string userId)
+        {
+            return await _context.Appointments
+                .Include(a => a.Doctor) // Include related Doctor
+                .Where(a => a.UserId == userId)
+                .OrderBy(a => a.AppointmentDate)
+                .ToListAsync();
+        }
+
 
     }
 }

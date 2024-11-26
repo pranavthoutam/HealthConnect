@@ -80,9 +80,7 @@
         {
             <div class="d-grid gap-3">
                 @foreach (var doctor in Model.Doctors)
-
                 {
-                    <a class="DoctorDetails" asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" style="text-decoration:none">
                         <div class="card shadow-sm p-3 d-flex flex-row align-items-center">
                             <img src="@doctor.ClinicImagePath" alt="Portrait of @doctor.FullName" class="rounded-circle me-3" height="100" width="100" />
                             <div class="flex-fill">
@@ -96,16 +94,15 @@
                                 @if (doctor.OnlineConsultation)
 
                                 {
-                                    <button class="btn text-white" style="background-color:#8A45E6">Book Video Consult</button>
+                                    <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="true" class="btn text-white" style="background-color:#8A45E6">Book Video Consult</a>
                                 }
                                 @if (doctor.ClinicAppointment)
 
                                 {
-                                    <button class="btn text-white" style="background-color:#199FD9">Book Clinic Visit</button>
+                                <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="false"  class="btn text-white" style="background-color:#199FD9">Book Clinic Visit</a>
                                 }
                             </div>
                         </div>
-                    </a>
                 }
             </div>
         }

@@ -21,7 +21,19 @@ namespace HealthConnect.Models
         public DateTime AppointmentDate { get; set; }
 
         [Required]
-        public string Slot { get; set; } // Example: "10:15"
+        public string Slot { get; set; }
+
+        [Required]
+        public bool IsOnline { get; set; }
+
+        public AppointmentStatus Status { get; set; } = AppointmentStatus.Scheduled;
+    }
+
+    public enum AppointmentStatus
+    {
+        Scheduled,
+        ReScheduled,
+        Canceled
     }
 
 }

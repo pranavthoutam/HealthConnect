@@ -1,4 +1,5 @@
 ﻿using HealthConnect.Models;
+using HealthConnect.Repositories;
 using HealthConnect.Services;
 using HealthConnect.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -14,14 +15,16 @@ namespace HealthConnect.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly EmailService _emailService;
+        private readonly IDoctorRepository _doctorRepository;
 
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otps = new();
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager,EmailService emailService)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager,EmailService emailService,IDoctorRepository doctorRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _emailService = emailService;
+            _doctorRepository = doctorRepository;
         }
 
        
@@ -253,27 +256,76 @@ namespace HealthConnect.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Profile()
+        public async Task<IActionResult> ProfileDashboard()
         {
-            var userId = _userManager.GetUserId(User); // Get the logged-in user's ID
-            if (userId == null)
+            // Get the current user ID (assuming Identity is used)
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
             {
-                return RedirectToAction("Login"); // Redirect to login if not authenticated
+                return RedirectToAction("Login", "Account");
             }
 
-            var user = await _userManager.FindByIdAsync(userId); // Fetch the user details
-            if (user == null)
+            // Fetch appointments for the current user
+            var appointments = await _doctorRepository.GetAppointmentsForUserAsync(userId);
+
+            // Process appointments
+            var currentTime = DateTime.Now;
+            var viewModel = new ProfileDashboardViewModel
             {
-                return NotFound(); // Handle case if user is not found
-            }
+                InClinicAppointments = appointments
+    .Where(a => a.IsOnline == false && a.AppointmentDate.Date >= currentTime.Date)
+    .Select(a => new AppointmentViewModel
+    {
+        AppointmentId = a.Id,
+        DoctorName = a.Doctor.FullName,
+        DoctorId = a.Doctor.Id,
+        DoctorSpecialization = a.Doctor.Specialization,
+        AppointmentDate = a.AppointmentDate,
+        Slot = a.Slot,
+        Location = a.Doctor.Place,
+        CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
+        IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
+                      (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) <= currentTime.TimeOfDay)
+    })
+    .ToList(),
 
-            return View(user); // Pass the user object to the view
+
+                OnlineConsultations = appointments
+                    .Where(a => a.IsOnline==true && a.AppointmentDate.Date >= currentTime.Date)
+                    .Select(a => new AppointmentViewModel
+                    {
+                        AppointmentId = a.Id,
+                        DoctorName = a.Doctor.FullName,
+                        DoctorId = a.Doctor.Id,
+                        DoctorSpecialization = a.Doctor.Specialization,
+                        AppointmentDate = a.AppointmentDate,
+                        Slot = a.Slot,
+                        Location = "Online",
+                        CanRescheduleOrCancel = a.AppointmentDate.Subtract(currentTime).TotalHours > 3,
+                        IsCompleted = a.AppointmentDate < currentTime ||
+                                         (a.AppointmentDate==currentTime.Date && TimeSpan.Parse(a.Slot)<=currentTime.TimeOfDay)
+                    })
+                    .ToList(),
+
+                CompletedAppointments = appointments
+                    .Where(a => a.AppointmentDate.Date <= currentTime.Date & TimeSpan.Parse(a.Slot)< currentTime.TimeOfDay)
+                    .Select(a => new AppointmentViewModel
+                    {
+                        AppointmentId = a.Id,
+                        DoctorName = a.Doctor.FullName,
+                        DoctorId = a.Doctor.Id,
+                        DoctorSpecialization = a.Doctor.Specialization,
+                        AppointmentDate = a.AppointmentDate,
+                        Slot = a.Slot,
+                        Location = a.Doctor.Place ?? "Online"
+                    })
+                    .ToList()
+            };
+
+            return View(viewModel);
         }
 
-        public IActionResult ProfileDashboard()
-        {
-            return View();
-        }
 
     }
 }
