@@ -17,7 +17,7 @@
         public string Slot { get; set; }
         public string Location { get; set; }
         public bool CanRescheduleOrCancel { get; set; }
-        public bool IsCompleted { get; set; }
+        public bool IsCompleted { get; set; } = false;
     }
 
 }

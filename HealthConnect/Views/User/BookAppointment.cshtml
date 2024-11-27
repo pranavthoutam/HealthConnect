@@ -59,10 +59,15 @@
                 <div class="bg-white p-4 rounded shadow-sm mt-5">
                     <h5 class="font-weight-bold">Pick a time slot</h5>
 
+                    <div class="d-flex align-items-center">
+                            <span class="text-muted ml-2">₹@Model.ConsultationFee</span>
+                            <a href="#" class="text-primary ml-2">Verified details</a>
+                     </div>
+
                     <div class="mt-4">
                             <div class="mt-4">
-                                <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@Model.Id" asp-route-date="@DateTime.Today.ToString("yyyy-MM-dd")" class="btn btn-outline-primary btn-sm" >Today</a>
-                                <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@Model.Id" asp-route-date="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"class="btn btn-outline-primary btn-sm" >Tomorrow</a>
+                                <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@Model.Id" asp-route-date="@DateTime.Today.ToString("yyyy-MM-dd")"asp-route-isOnline="@ViewBag.IsOnline" class="btn btn-outline-primary btn-sm" >Today</a>
+                                <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@Model.Id" asp-route-date="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" asp-route-isOnline="@ViewBag.IsOnline" asp-route-appointmentId="@ViewBag.AppointmentId" class="btn btn-outline-primary btn-sm" >Tomorrow</a>
                             </div>
 
                         </div>
@@ -71,11 +76,9 @@
                     <form method="post" action="@Url.Action("ConfirmAppointment", "User")">
                         <input type="hidden" name="doctorId" value="@Model.Id" />
                         <input type="hidden" name="date" id="appointmentDate" value="@ViewBag.SelectedDate.ToString("yyyy-MM-dd")" />
-
-                        <div class="d-flex align-items-center">
-                            <span class="text-muted ml-2">₹@Model.ConsultationFee</span>
-                            <a href="#" class="text-primary ml-2">Verified details</a>
-                        </div>
+                        <input type="hidden" name="isOnline" value="@ViewBag.IsOnline" /> <!-- Hidden field for IsOnline -->
+                        <input type="hidden" name="status" value="@ViewBag.AppointmentStatus" />
+                        <input type="hidden" name="appointmentId" value="@ViewBag.AppointmentId"/>
 
                         <!-- Date Selection Buttons (Today, Tomorrow, etc.) -->
 
@@ -83,9 +86,9 @@
                         <div class="mt-4">
                             <h6 class="text-muted">Available Slots </h6>
                             <div class="row">
-                                @if (ViewBag.AvailableSlots != null && ViewBag.AvailableSlots.Count > 0)
+                                @if (ViewBag.AvailableSlots != null && ((List<string>)ViewBag.AvailableSlots).Count > 0)
 {
-    foreach (var slot in ViewBag.AvailableSlots)
+    foreach (var slot in (List<string>)ViewBag.AvailableSlots)
     {
         <div class="col-6">
             <!-- Slot button triggers form submission -->

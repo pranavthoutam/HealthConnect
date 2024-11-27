@@ -95,6 +95,19 @@ namespace HealthConnect.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task RescheduleAppointment(Appointment appointment)
+        {
+            _context.Appointments.Update(appointment);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CancelAppointmentAsync(Appointment appointment)
+        {
+            _context.Appointments.Remove(appointment);
+            await _context.SaveChangesAsync();
+
+        }
+
         public async Task<IEnumerable<Appointment>> GetAppointmentsForDoctorAsync(int doctorId, DateTime date)
         {
             return await _context.Appointments
@@ -120,7 +133,10 @@ namespace HealthConnect.Repositories
                 .OrderBy(a => a.AppointmentDate)
                 .ToListAsync();
         }
-
+        public async Task<Appointment> GetAppointmentByIdAsync(int appointmentId)
+        {
+            return await _context.Appointments.FirstOrDefaultAsync(a => a.Id == appointmentId);
+        }
         
     }
 }

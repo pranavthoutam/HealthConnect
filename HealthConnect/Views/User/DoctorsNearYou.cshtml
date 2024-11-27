@@ -94,12 +94,12 @@
                                 @if (doctor.OnlineConsultation)
 
                                 {
-                                    <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="true" class="btn text-white" style="background-color:#8A45E6">Book Video Consult</a>
+                                    <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-isOnline="1" class="btn text-white" style="background-color:#8A45E6">Book Video Consult</a>
                                 }
                                 @if (doctor.ClinicAppointment)
 
                                 {
-                                <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="false"  class="btn text-white" style="background-color:#199FD9">Book Clinic Visit</a>
+                                <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-isOnline="0"  class="btn text-white" style="background-color:#199FD9">Book Clinic Visit</a>
                                 }
                             </div>
                         </div>

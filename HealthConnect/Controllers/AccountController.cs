@@ -18,7 +18,7 @@ namespace HealthConnect.Controllers
         private readonly IDoctorRepository _doctorRepository;
 
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otps = new();
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager,EmailService emailService,IDoctorRepository doctorRepository)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, EmailService emailService, IDoctorRepository doctorRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -27,7 +27,7 @@ namespace HealthConnect.Controllers
             _doctorRepository = doctorRepository;
         }
 
-       
+
         // Create roles if they don't exist
         public async Task<IActionResult> CreateRoles()
         {
@@ -274,58 +274,58 @@ namespace HealthConnect.Controllers
             var viewModel = new ProfileDashboardViewModel
             {
                 InClinicAppointments = appointments
-    .Where(a => a.IsOnline == false && a.AppointmentDate.Date >= currentTime.Date)
-    .Select(a => new AppointmentViewModel
-    {
-        AppointmentId = a.Id,
-        DoctorName = a.Doctor.FullName,
-        DoctorId = a.Doctor.Id,
-        DoctorSpecialization = a.Doctor.Specialization,
-        AppointmentDate = a.AppointmentDate,
-        Slot = a.Slot,
-        Location = a.Doctor.Place,
-        CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
-        IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
-                      (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) <= currentTime.TimeOfDay)
-    })
-    .ToList(),
+                                       .Where(a => a.IsOnline == false)
+                                       .Select(a => new AppointmentViewModel
+                                       {
+                                           AppointmentId = a.Id,
+                                           DoctorName = a.Doctor.FullName,
+                                           DoctorId = a.Doctor.Id,
+                                           DoctorSpecialization = a.Doctor.Specialization,
+                                           AppointmentDate = a.AppointmentDate,
+                                           Slot = a.Slot,
+                                           Location = a.Doctor.Place,
+                                           CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
+                                           IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
+                                                          (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) <= currentTime.TimeOfDay)
+                                       })
+                                        .ToList(),
 
 
                 OnlineConsultations = appointments
-                    .Where(a => a.IsOnline==true && a.AppointmentDate.Date >= currentTime.Date)
-                    .Select(a => new AppointmentViewModel
-                    {
-                        AppointmentId = a.Id,
-                        DoctorName = a.Doctor.FullName,
-                        DoctorId = a.Doctor.Id,
-                        DoctorSpecialization = a.Doctor.Specialization,
-                        AppointmentDate = a.AppointmentDate,
-                        Slot = a.Slot,
-                        Location = "Online",
-                        CanRescheduleOrCancel = a.AppointmentDate.Subtract(currentTime).TotalHours > 3,
-                        IsCompleted = a.AppointmentDate < currentTime ||
-                                         (a.AppointmentDate==currentTime.Date && TimeSpan.Parse(a.Slot)<=currentTime.TimeOfDay)
-                    })
-                    .ToList(),
+                                        .Where(a => a.IsOnline == true)
+                                        .Select(a => new AppointmentViewModel
+                                        {
+                                            AppointmentId = a.Id,
+                                            DoctorName = a.Doctor.FullName,
+                                            DoctorId = a.Doctor.Id,
+                                            DoctorSpecialization = a.Doctor.Specialization,
+                                            AppointmentDate = a.AppointmentDate,
+                                            Slot = a.Slot,
+                                            Location = "Online",
+                                            CanRescheduleOrCancel = a.AppointmentDate.Subtract(currentTime).TotalHours > 3,
+                                            IsCompleted = a.AppointmentDate < currentTime ||
+                                                             (a.AppointmentDate == currentTime.Date && TimeSpan.Parse(a.Slot) <= currentTime.TimeOfDay)
+                                        })
+                                        .ToList(),
 
                 CompletedAppointments = appointments
-                    .Where(a => a.AppointmentDate.Date <= currentTime.Date & TimeSpan.Parse(a.Slot)< currentTime.TimeOfDay)
-                    .Select(a => new AppointmentViewModel
-                    {
-                        AppointmentId = a.Id,
-                        DoctorName = a.Doctor.FullName,
-                        DoctorId = a.Doctor.Id,
-                        DoctorSpecialization = a.Doctor.Specialization,
-                        AppointmentDate = a.AppointmentDate,
-                        Slot = a.Slot,
-                        Location = a.Doctor.Place ?? "Online"
-                    })
-                    .ToList()
+                                        .Where(a => a.AppointmentDate.Date < currentTime.Date ||
+                                            (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) <= currentTime.TimeOfDay))
+                                        .Select(a => new AppointmentViewModel
+                                        {
+                                            AppointmentId = a.Id,
+                                            DoctorName = a.Doctor.FullName,
+                                            DoctorId = a.Doctor.Id,
+                                            DoctorSpecialization = a.Doctor.Specialization,
+                                            AppointmentDate = a.AppointmentDate,
+                                            Slot = a.Slot,
+                                            Location = a.Doctor.Place ?? "Online"
+                                        })
+                                        .ToList()
             };
 
             return View(viewModel);
         }
-
 
     }
 }

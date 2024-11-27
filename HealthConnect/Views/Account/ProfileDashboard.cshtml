@@ -66,7 +66,8 @@
                                 <!-- Appointment Details -->
                                 <div class="flex-grow-1">
                                     <h5 class="mb-1">Dr. @appointment.DoctorName, @appointment.DoctorSpecialization</h5>
-                                    <p class="text-secondary mb-1">@appointment.AppointmentDate.ToString("d"+" "+"ddd")</p>
+                                    <p class="text-secondary mb-1">@appointment.AppointmentDate</p>
+                                    <p class="text-secondary mb-1">@appointment.Slot</p>
                                     <p class="text-secondary mb-1">@appointment.Location</p>
 
                                     <!-- Status Display -->
@@ -82,12 +83,12 @@
                                 <!-- Action Buttons -->
                                 @if (appointment.IsCompleted)
                                 {
-                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="false" class="btn btn-outline-primary ms-3">Book again</a>
+                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="0" class="btn btn-outline-primary ms-3">Book again</a>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-outline-primary ms-3">Reschedule</button>
-                                    <button class="btn btn-outline-danger ms-3">Cancel</button>
+                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="0" asp-route-status="1" asp-route-appointmentId="@appointment.AppointmentId"  class="btn btn-outline-primary ms-3">Reschedule</a>
+                                    <a asp-action="CancelAppointment" asp-controller="User" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-danger ms-3">Cancel</a>
                                 }
                             </div>
                         }
@@ -106,28 +107,29 @@
                                 <!-- Appointment Details -->
                                 <div class="flex-grow-1">
                                     <h5 class="mb-1">Dr. @appointment.DoctorName, @appointment.DoctorSpecialization</h5>
-                                    <p class="text-secondary mb-1">@appointment.AppointmentDate</p>
+                                    <p class="text-secondary mb-1">@appointment.AppointmentDate.ToString("yyyy-MM-dd")</p>
+                                    <p class="text-secondary mb-1">@appointment.Slot</p>
                                     <p class="text-secondary mb-1">@appointment.Location</p>
 
                                     <!-- Status Display -->
                                     @if (!appointment.IsCompleted)
                                     {
-                                        <p class="text-muted mb-0">Status: Upcoming</p>
+                                        <p class="text-muted mb-0">Upcoming</p>
                                     }
                                     else
                                     {
-                                        <p class="text-danger mb-0">Status: Completed</p>
+                                        <p class="text-danger mb-0">Completed</p>
                                     }
                                 </div>
                                 <!-- Action Buttons -->
                                 @if (appointment.IsCompleted)
                                 {
-                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="false" class="btn btn-outline-primary ms-3">Book again</a>
+                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="1" class="btn btn-outline-primary ms-3">Book again</a>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-outline-primary ms-3">Reschedule</button>
-                                    <button class="btn btn-outline-danger ms-3">Cancel</button>
+                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="1" asp-route-status="1" class="btn btn-outline-primary ms-3">Reschedule</a>
+                                    <a asp-action="CancelAppointment" asp-controller="User" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-danger ms-3" >Cancel</a>
                                 }
                             </div>
                         }

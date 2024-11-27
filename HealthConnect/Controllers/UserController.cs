@@ -66,7 +66,7 @@ namespace HealthConnect.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> BookAppointment(int doctorId, DateTime date,bool isOnline)
+        public async Task<IActionResult> BookAppointment(int doctorId, DateTime date,int isOnline,AppointmentStatus? status, int? appointmentId)
         {
              var doctor = await _doctorRepository.SearchDoctorAsync(doctorId);
             if (doctor == null)
@@ -97,62 +97,36 @@ namespace HealthConnect.Controllers
             //    availableSlots = new List<string>();  // Or any other default value you prefer
             //}
 
-            ViewBag.AvailableSlots = availableSlots;
+            ViewBag.AvailableSlots = availableSlots.ToList();
             ViewBag.SelectedDate = date;
             ViewBag.IsOnline = isOnline;
+            if(status == AppointmentStatus.ReScheduled) ViewBag.AppointmentStatus = status;
+            else ViewBag.AppointmentStatus = AppointmentStatus.Scheduled;
+            if (appointmentId != null) ViewBag.AppointmentId = appointmentId;
             ViewData["Title"] = "Book Appointment";
             return View(doctor);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAvailableSlots(int doctorId, DateTime date)
+        public async Task<IActionResult> CancelAppointment(int appointmentId)
         {
-            // Simulate fetching slots for the given doctor and date
-            var slots = await _doctorRepository.GetAvailableSlotsAsync(doctorId, date);
+            var appointment = await _doctorRepository.GetAppointmentByIdAsync(appointmentId);
 
-            if (slots == null || !slots.Any())
+            if (appointment == null || appointment.AppointmentDate.Add(TimeSpan.Parse(appointment.Slot)).Subtract(DateTime.Now).TotalHours < 3)
             {
-                return Json(new List<string>()); // Return an empty list if no slots
+                TempData["Error"] = "Appointment cannot be canceled within 3 hours of the scheduled time.";
+                return RedirectToAction("ProfileDashboard","Account");
             }
 
-            return Json(slots);
+            await _doctorRepository.CancelAppointmentAsync(appointment);
+            appointment.Status = AppointmentStatus.Canceled;
+            TempData["Success"] = "Appointment canceled successfully.";
+            return View();
+
+           
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> RescheduleAppointment(int doctorId,DateTime date,bool isOnline)
-        //{
-        //    var doctor = await _doctorRepository.SearchDoctorAsync(doctorId);
-        //    if (doctor == null)
-        //    {
-        //        TempData["Message"] = "Doctor not found.";
-        //        return RedirectToAction("FindDoctors");
-        //    }
-        //    var availableSlots = await _doctorRepository.GetAvailableSlotsAsync(doctorId, date);
-        //    //Filter the slots by current time
-        //    if (date.Date == DateTime.Now.Date)
-        //    {
-        //        var currentTime = DateTime.Now.TimeOfDay;
-        //        availableSlots = availableSlots
-        //            .Where(slot =>
-        //            {
-        //                // Parse slot string to TimeSpan
-        //                if (TimeSpan.TryParse(slot, out var slotTime))
-        //                {
-        //                    return slotTime > currentTime; // Compare with current time
-        //                }
-        //                return false;
-        //            })
-        //            .ToList();
-        //    }
-
-        //    ViewBag.AvailableSlots = availableSlots;
-        //    ViewBag.SelectedDate = date;
-        //    ViewData["Title"] = "Book Appointment";
-        //    return View(doctor);
-        //}
-
         [HttpPost]
-        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date)
+        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date,int isOnline,AppointmentStatus? status,int? appointmentId)
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -163,17 +137,32 @@ namespace HealthConnect.Controllers
                 TempData["Message"] = "Please select a valid time slot.";
                 return RedirectToAction("BookAppointment", new { doctorId, date });
             }
+            bool consultationType;
+            if (isOnline == 1) consultationType = true;
+            else consultationType = false;
+
+            if(appointmentId!=null)
+            {
+                Appointment appointment1 = await _doctorRepository.GetAppointmentByIdAsync((int)appointmentId);
+                appointment1.AppointmentDate= date;
+                appointment1.Slot = selectedSlot;
+                await _doctorRepository.RescheduleAppointment(appointment1);
+                return RedirectToAction("ProfileDashboard", "Account");
+            }
 
             var appointment = new Appointment
             {
                 DoctorId = doctorId,
                 UserId = User.FindFirstValue(ClaimTypes.NameIdentifier), // Assuming logged-in user
                 Slot = selectedSlot,
-                AppointmentDate = date
+                AppointmentDate = date,
+                IsOnline=consultationType,
             };
+            if(status==AppointmentStatus.Scheduled) await _doctorRepository.AddAppointmentAsync(appointment);
+            else await _doctorRepository.RescheduleAppointment(appointment);
 
-            await _doctorRepository.AddAppointmentAsync(appointment);
-            TempData["Message"] = "Appointment booked successfully!";
+            if (status == null) TempData["Message"] = "Appointment booked successfully!";
+            else TempData["Message"] = "Appointment Rescheduled Successfully";
             ViewBag.AppointmentDate = date;
             ViewBag.TimeSlot = selectedSlot;
 
