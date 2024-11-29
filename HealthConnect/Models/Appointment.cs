@@ -27,6 +27,7 @@ namespace HealthConnect.Models
         public bool IsOnline { get; set; }
 
         public AppointmentStatus Status { get; set; } = AppointmentStatus.Scheduled;
+
     }
 
     public enum AppointmentStatus

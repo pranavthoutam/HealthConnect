@@ -45,55 +45,35 @@ namespace HealthConnect.Controllers
             return Ok("Roles created successfully.");
         }
 
-        // Index view
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        // Register view (GET)
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
-        // Register view (POST)
+
         [HttpPost]
         public async Task<IActionResult> Register(RegisterUserViewModel userViewModel)
         {
-            await CreateRoles();
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = new User
-                {
-                    UserName = userViewModel.UserName,
-                    Email = userViewModel.Email,
-                };
-
-                var createUser = await _userManager.CreateAsync(user, userViewModel.Password);
-                if (createUser.Succeeded)
-                {
-                    var roleResult = await _userManager.AddToRoleAsync(user, userViewModel.Role);
-                    if (roleResult.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else
-                    {
-                        foreach (var error in roleResult.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
-                    }
-                }
-
-                foreach (var error in createUser.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                return View(userViewModel);
             }
 
+            User user = new User
+            {
+                UserName = userViewModel.UserName,
+                Email = userViewModel.Email,
+            };
+
+            var createUser = await _userManager.CreateAsync(user, userViewModel.Password);
+
+            if (createUser.Succeeded) RedirectToAction("Index", "Home");
+
+            foreach (var error in createUser.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
             return View(userViewModel);
         }
 
@@ -108,29 +88,23 @@ namespace HealthConnect.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginViewModel.Email);
-                if (user != null)
-                {
-                    var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, loginViewModel.RememberMe, false);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                }
+                return View(loginViewModel);
+            }
+
+            User user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+            if (user!=null)
+            {
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, loginViewModel.Password, loginViewModel.RememberMe, false);
+                
+                if (result.Succeeded) return RedirectToAction("Index", "Home");
             }
 
             return View(loginViewModel);
         }
+
+
         [HttpGet]
         public IActionResult DoctorRegister()
         {

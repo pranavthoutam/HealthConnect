@@ -22,6 +22,7 @@ builder.Services.AddIdentity<User, IdentityRole>()
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<MedicineRepository>();
+builder.Services.AddScoped<ZoomService>();
 
 var app = builder.Build();
 

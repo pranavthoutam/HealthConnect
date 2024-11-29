@@ -4,6 +4,7 @@ using HealthConnect.Models;
 using HealthConnect.Repositories;
 using System.Security.Claims;
 using HealthConnect.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthConnect.Controllers
 {
@@ -66,9 +67,9 @@ namespace HealthConnect.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> BookAppointment(int doctorId, DateTime date,int isOnline,AppointmentStatus? status, int? appointmentId)
+        public async Task<IActionResult> BookAppointment(int doctorId, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
         {
-             var doctor = await _doctorRepository.SearchDoctorAsync(doctorId);
+            var doctor = await _doctorRepository.SearchDoctorAsync(doctorId);
             if (doctor == null)
             {
                 TempData["Message"] = "Doctor not found.";
@@ -100,7 +101,7 @@ namespace HealthConnect.Controllers
             ViewBag.AvailableSlots = availableSlots.ToList();
             ViewBag.SelectedDate = date;
             ViewBag.IsOnline = isOnline;
-            if(status == AppointmentStatus.ReScheduled) ViewBag.AppointmentStatus = status;
+            if (status == AppointmentStatus.ReScheduled) ViewBag.AppointmentStatus = status;
             else ViewBag.AppointmentStatus = AppointmentStatus.Scheduled;
             if (appointmentId != null) ViewBag.AppointmentId = appointmentId;
             ViewData["Title"] = "Book Appointment";
@@ -114,7 +115,7 @@ namespace HealthConnect.Controllers
             if (appointment == null || appointment.AppointmentDate.Add(TimeSpan.Parse(appointment.Slot)).Subtract(DateTime.Now).TotalHours < 3)
             {
                 TempData["Error"] = "Appointment cannot be canceled within 3 hours of the scheduled time.";
-                return RedirectToAction("ProfileDashboard","Account");
+                return RedirectToAction("ProfileDashboard", "Account");
             }
 
             await _doctorRepository.CancelAppointmentAsync(appointment);
@@ -122,16 +123,13 @@ namespace HealthConnect.Controllers
             TempData["Success"] = "Appointment canceled successfully.";
             return View();
 
-           
+
         }
 
+        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date,int isOnline,AppointmentStatus? status,int? appointmentId)
+        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Login");
-            }
             if (string.IsNullOrEmpty(selectedSlot))
             {
                 TempData["Message"] = "Please select a valid time slot.";
@@ -141,10 +139,10 @@ namespace HealthConnect.Controllers
             if (isOnline == 1) consultationType = true;
             else consultationType = false;
 
-            if(appointmentId!=null)
+            if (appointmentId != null)
             {
                 Appointment appointment1 = await _doctorRepository.GetAppointmentByIdAsync((int)appointmentId);
-                appointment1.AppointmentDate= date;
+                appointment1.AppointmentDate = date;
                 appointment1.Slot = selectedSlot;
                 await _doctorRepository.RescheduleAppointment(appointment1);
                 return RedirectToAction("ProfileDashboard", "Account");
@@ -156,9 +154,9 @@ namespace HealthConnect.Controllers
                 UserId = User.FindFirstValue(ClaimTypes.NameIdentifier), // Assuming logged-in user
                 Slot = selectedSlot,
                 AppointmentDate = date,
-                IsOnline=consultationType,
+                IsOnline = consultationType,
             };
-            if(status==AppointmentStatus.Scheduled) await _doctorRepository.AddAppointmentAsync(appointment);
+            if (status == AppointmentStatus.Scheduled) await _doctorRepository.AddAppointmentAsync(appointment);
             else await _doctorRepository.RescheduleAppointment(appointment);
 
             if (status == null) TempData["Message"] = "Appointment booked successfully!";
@@ -228,7 +226,7 @@ namespace HealthConnect.Controllers
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Index","Home");  // Redirect to profile page on success
+                return RedirectToAction("Index", "Home");  // Redirect to profile page on success
             }
 
             // Handle errors (e.g., validation errors)
@@ -309,15 +307,15 @@ namespace HealthConnect.Controllers
                 return NotFound("Medicine not found.");
             }
 
-            return View("MedicineInfo",medicine);
+            return View("MedicineInfo", medicine);
         }
 
         [HttpGet]
-        public IActionResult SearchbyProduct(string medicineName,int categoryId)
+        public IActionResult SearchbyProduct(string medicineName, int categoryId)
         {
-            var medicines = _medicine.GetMedicineByName(medicineName,categoryId);
+            var medicines = _medicine.GetMedicineByName(medicineName, categoryId);
             ViewBag.CategoryId = categoryId;
-            return View("DisplayMedicines",medicines);
+            return View("DisplayMedicines", medicines);
         }
 
         [HttpGet("GetImage/{id}")]
