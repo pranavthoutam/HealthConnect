@@ -18,9 +18,15 @@ namespace HealthConnect.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult StatusCode(int code)
         {
-            return View();
+            _logger.LogWarning($"Error to load Page {code}");
+            if (code == 404)
+            {
+                return View("NotFound"); // The custom 404 view
+            }
+
+            return View("Error"); // Generic error view
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

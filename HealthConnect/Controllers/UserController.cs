@@ -12,12 +12,10 @@ namespace HealthConnect.Controllers
     public class UserController : Controller
     {
         private readonly UserManager<User> _userManager;
-        private readonly IDoctorRepository _doctorRepository;
+        private readonly DoctorRepository _doctorRepository;
         private readonly IConfiguration _configuration;
-        private const string apiKey = "AIzaSyDoQ2jdmGKmKALVj977-JCYZ7jUT6J6OHA";  // Use your Google API key
-        private const string apiUrl = "https://maps.googleapis.com/maps/api/geocode/json";
         private readonly MedicineRepository _medicine;
-        public UserController(UserManager<User> userManager, IDoctorRepository doctorRepository, IConfiguration configuration, MedicineRepository medicine)
+        public UserController(UserManager<User> userManager, DoctorRepository doctorRepository, IConfiguration configuration, MedicineRepository medicine)
         {
             _userManager = userManager;
             _doctorRepository = doctorRepository;
@@ -27,13 +25,6 @@ namespace HealthConnect.Controllers
 
         public IActionResult Index()
         {
-            return View();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> FindDoctors()
-        {
-            ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
             return View();
         }
 
@@ -93,10 +84,6 @@ namespace HealthConnect.Controllers
                     })
                     .ToList();
             }
-            //if (availableSlots == null)
-            //{
-            //    availableSlots = new List<string>();  // Or any other default value you prefer
-            //}
 
             ViewBag.AvailableSlots = availableSlots.ToList();
             ViewBag.SelectedDate = date;
@@ -184,6 +171,7 @@ namespace HealthConnect.Controllers
 
         // POST: Edit Profile
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfile(User updatedUser, IFormFile profilePhoto)
         {
@@ -193,16 +181,14 @@ namespace HealthConnect.Controllers
                 return View(updatedUser);
             }
 
-            var user = await _userManager.GetUserAsync(User);  // Get logged-in user
-            if (user == null)
-            {
-                return RedirectToAction("Login", "Account");  // Redirect to login if user not found
-            }
+            User? user = await _userManager.GetUserAsync(User);  // Get logged-in user
+            
 
             // Update the user properties
             user.UserName = updatedUser.UserName;
             user.DateofBirth = updatedUser.DateofBirth;
             user.Gender = updatedUser.Gender;
+            user.PhoneNumber = updatedUser.PhoneNumber;
             user.BloodGroup = updatedUser.BloodGroup;
             user.HouseNumber = updatedUser.HouseNumber;
             user.Street = updatedUser.Street;
@@ -247,20 +233,20 @@ namespace HealthConnect.Controllers
                 return File(user.ProfilePhoto, "image/jpeg");
             }
 
-            // Return a default profile photo if none is set
             return File("~/images/download.png", "image/jpeg");
         }
 
+        //Search Suggestions while searching for the Medicines
         [HttpGet]
         public IActionResult SearchSuggestions(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
             {
-                return Json(new List<string>()); // Return an empty list if no query
+                return Json(new List<string>());
             }
 
-            var suggestions = _medicine.GetMedicinesByPartialName(query); // Call the repository to fetch suggestions
-            return Json(suggestions.Take(4)); // Limit the results to 4
+            var suggestions = _medicine.GetMedicinesByPartialName(query);
+            return Json(suggestions.Take(4));
         }
 
         [HttpGet]
@@ -277,7 +263,6 @@ namespace HealthConnect.Controllers
         [HttpGet]
         public IActionResult MedicineInfo(int id)
         {
-            // Fetch medicine details by id
             var medicine = _medicine.GetMedicineById(id);
 
             // If medicine is not found, return a "Not Found" page or handle appropriately
@@ -296,11 +281,10 @@ namespace HealthConnect.Controllers
                 return NotFound("Invalid medicine name.");
             }
 
-            // Decode friendly URL (replace hyphens back to spaces)
+            // Decoding URL by replace(-,' ') 
             var decodedName = medicineName.Replace('-', ' ');
 
-            // Fetch medicine details
-            var medicine = _medicine.GetMedicineByName(decodedName).FirstOrDefault();
+            Medicine? medicine = _medicine.GetMedicineByName(decodedName).FirstOrDefault();
 
             if (medicine == null)
             {
@@ -328,7 +312,7 @@ namespace HealthConnect.Controllers
                 return NotFound(); // Return 404 if the medicine or image is not found
             }
 
-            return File(medicine.Image, "image/jpeg"); // Return the image as a file
+            return File(medicine.Image, "image/jpeg");
         }
     }
 }

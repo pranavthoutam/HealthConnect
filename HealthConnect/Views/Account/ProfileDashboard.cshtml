@@ -31,10 +31,20 @@
         <div class="border border-primary rounded bg-white shadow-sm">
             <!-- Profile Header -->
             <div class="d-flex align-items-center p-4 border-bottom">
-                <div class="bg-secondary rounded-circle" style="width: 64px; height: 64px;"></div>
+                <div class="bg-secondary rounded-circle" style="width: 64px; height: 64px;">
+                    @if (Model.ProfilePhoto != null)
+                    {
+                        <img src="data:image/png;base64,@Convert.ToBase64String(Model.ProfilePhoto)"
+                             alt="Profile Photo" class="img-fluid">
+                    }
+                    else
+                    {
+                        <i class="fas fa-user-circle text-white" style="font-size: 80px;"></i>
+                    }
+                </div>
                 <div class="ms-3">
-                    <h2 class="h5 fw-bold mb-1">Pranav</h2>
-                    <p class="text-muted mb-0">+91 1234567890, pranav@examplemail.com</p>
+                    <h2 class="h5 fw-bold mb-1">@Model.Name</h2>
+                    <p class="text-muted mb-0">@Model.PhoneNumber, @Model.Email</p>
                 </div>
             </div>
 

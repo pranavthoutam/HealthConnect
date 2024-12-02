@@ -2,9 +2,18 @@
 {
     public class ProfileDashboardViewModel
     {
-        public List<AppointmentViewModel> InClinicAppointments { get; set; }
-        public List<AppointmentViewModel> OnlineConsultations { get; set; }
-        public List<AppointmentViewModel> CompletedAppointments { get; set; }
+        public List<AppointmentViewModel>? InClinicAppointments { get; set; }
+        public List<AppointmentViewModel>? OnlineConsultations { get; set; }
+        public List<AppointmentViewModel>? CompletedAppointments { get; set; }
+        
+        public string Email { get; set; }
+
+        public string PhoneNumber { get; set; } 
+
+        public Byte[] ProfilePhoto { get; set; }
+
+        public string Name { get; set; }
+
     }
 
     public class AppointmentViewModel

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HealthConnect.Repositories
 {
-    public class DoctorRepository : IDoctorRepository
+    public class DoctorRepository 
     {
         private readonly ApplicationDbContext _context;
 
@@ -24,7 +24,7 @@ namespace HealthConnect.Repositories
         // Fetch doctors by location and specialization
         public IEnumerable<Doctor> GetDoctorsByLocationAndSpecialization(string location, string searchString)
         {
-            var query = _context.Doctors.Include(d=>d.User)
+            var query = _context.Doctors.Include(d=>d.User).Where(d=>d.ApprovalStatus=="Approved")
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(location))
@@ -49,7 +49,6 @@ namespace HealthConnect.Repositories
             if (filter.Gender!=null)
             {
                 query = query.Where(d => d.User.Gender == filter.Gender);
-                //query = query.Where(d => d.User != null && d.User.Gender == filter.Gender);
             }
 
             // Apply Experience Filter
@@ -84,7 +83,7 @@ namespace HealthConnect.Repositories
         public async Task<Doctor> SearchDoctorAsync(int doctorId)
         {
             return await _context.Doctors
-                         .Include(d => d.User) // Ensure User is included
+                         .Include(d => d.User)
                          .FirstOrDefaultAsync(d => d.Id == doctorId);
         }
 
@@ -128,7 +127,7 @@ namespace HealthConnect.Repositories
         public async Task<IEnumerable<Appointment>> GetAppointmentsForUserAsync(string userId)
         {
             return await _context.Appointments
-                .Include(a => a.Doctor) // Include related Doctor
+                .Include(a => a.Doctor)
                 .Where(a => a.UserId == userId)
                 .OrderBy(a => a.AppointmentDate)
                 .ToListAsync();

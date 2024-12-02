@@ -5,104 +5,107 @@
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <style>
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
 
+        .btn-purple {
+            background-color: #434EA2;
+        }
+
+        .text-teal {
+            color: #199FD9;
+        }
+
+        .bg-light {
+            background-color: #f8f9fa;
+        }
+    </style>
 </head>
 
 <body class="bg-light">
 
     <div class="container py-4">
         <form method="get">
-        <!-- Search Bar -->
-        <div class="d-flex justify-content-center mb-4">
-            <div class="d-flex border border-secondary rounded overflow-hidden w-100" style="max-width: 600px;">
-                <div class="d-flex align-items-center bg-secondary px-3">
-                    <i class="fas fa-map-marker-alt text-purple"></i>
+            <!-- Search Bar -->
+            <div class="d-flex justify-content-center mb-4">
+                <div class="d-flex border border-secondary rounded overflow-hidden w-100" style="max-width: 600px;">
+                    <div class="d-flex align-items-center bg-secondary px-3">
+                        <i class="fas fa-map-marker-alt text-purple"></i>
+                    </div>
+                    <input type="text" asp-for="Location" class="form-control border-0" placeholder="Enter Location" style="max-width: 120px;" />
+                    <div class="d-flex align-items-center bg-secondary px-3">
+                        <i class="fas fa-search text-muted"></i>
+                    </div>
+                    <input type="text" asp-for="SearchString" class="form-control border-0" placeholder="Enter Specialization or Keyword" />
                 </div>
-                <input type="text" asp-for="Location" class="form-control border-0" placeholder="Enter Location" style="max-width: 120px;" />
-                <div class="d-flex align-items-center bg-secondary px-3">
-                    <i class="fas fa-search text-muted"></i>
-                </div>
-                <input type="text" asp-for="SearchString" class="form-control border-0" placeholder="Enter Specialization or Keyword" />
             </div>
-        </div>
 
-        <!-- Filters Bar -->
-        <div class="py-2 mb-4 text-center" style="background-color:#434EA2; display:flex; flex-direction:column;">
-            
-
-                <!-- Gender Filter -->
-                <div class="dropdown">
-                    <select asp-for="Gender" class="form-select">
+            <!-- Filters Bar -->
+            <div class="py-2 mb-4 text-center" style="background-color:#434EA2;">
+                <div class="d-flex justify-content-center gap-2">
+                    <!-- Gender Filter -->
+                    <select asp-for="Gender" class="form-select w-auto">
                         <option value="">Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                     </select>
-                </div>
 
-                <!-- Experience Filter -->
-                <div class="dropdown">
-                    <select asp-for="Experience" class="form-select">
+                    <!-- Experience Filter -->
+                    <select asp-for="Experience" class="form-select w-auto">
                         <option value="">Experience</option>
                         <option value="0-5">0-5 years</option>
                         <option value="5-10">5-10 years</option>
                         <option value="10+">10+ years</option>
                     </select>
-                </div>
 
-                <!-- Sort By Filter -->
-                <div class="dropdown">
-                    <select asp-for="SortBy" class="form-select">
+                    <!-- Sort By Filter -->
+                    <select asp-for="SortBy" class="form-select w-auto">
                         <option value="">Sort By</option>
                         <option value="Rating">Rating</option>
                         <option value="Experience">Experience</option>
                         <option value="Fees">Fees</option>
                     </select>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-purple text-white">Apply Filters</button>
                 </div>
-
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary">Apply Filters</button>
-
-        </div>
-
+            </div>
         </form>
 
         <!-- Doctor List -->
         <h2 class="text-center fw-semibold mb-4">Doctors List</h2>
 
         @if (Model.Doctors == null || !Model.Doctors.Any())
-
         {
             <p class="text-center text-muted">No doctors found. Try another search.</p>
         }
-
         else
-
         {
             <div class="d-grid gap-3">
                 @foreach (var doctor in Model.Doctors)
                 {
-                        <div class="card shadow-sm p-3 d-flex flex-row align-items-center">
-                            <img src="@doctor.ClinicImagePath" alt="Portrait of @doctor.FullName" class="rounded-circle me-3" height="100" width="100" />
-                            <div class="flex-fill">
-                                <h3 class="h5 text-teal mb-1">@doctor.FullName</h3>
-                                <p class="mb-0 text-muted">@doctor.Specialization</p>
-                                <p class="mb-0 text-muted">@doctor.Experience years experience overall</p>
-                                <p class="mb-0 text-muted">@doctor.District, @doctor.Place</p>
-                                <p class="mb-0 text-muted">₹@doctor.ConsultationFee Consultation fee at clinic</p>
-                            </div>
-                            <div class="d-flex gap-2">
-                                @if (doctor.OnlineConsultation)
-
-                                {
-                                    <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-isOnline="1" class="btn text-white" style="background-color:#8A45E6">Book Video Consult</a>
-                                }
-                                @if (doctor.ClinicAppointment)
-
-                                {
-                                <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-isOnline="0"  class="btn text-white" style="background-color:#199FD9">Book Clinic Visit</a>
-                                }
-                            </div>
+                    <div class="card shadow-sm p-3 d-flex flex-row align-items-center">
+                        <img src="@doctor.ClinicImagePath" alt="Portrait of @doctor.FullName" class="rounded-circle me-3" height="100" width="100" />
+                        <div class="flex-fill">
+                            <h3 class="h5 text-teal mb-1">Dr @doctor.FullName</h3>
+                            <p class="mb-0 text-muted">@doctor.Specialization</p>
+                            <p class="mb-0 text-muted">@doctor.Experience years experience overall</p>
+                            <p class="mb-0 text-muted">@doctor.District, @doctor.Place</p>
+                            <p class="mb-0 text-muted">₹@doctor.ConsultationFee Consultation fee at clinic</p>
                         </div>
+                        <div class="d-flex gap-2">
+                            @if (doctor.OnlineConsultation)
+                            {
+                                <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-isOnline="1" class="btn text-white" style="background-color:#8A45E6">Book Video Consult</a>
+                            }
+                            @if (doctor.ClinicAppointment)
+                            {
+                                <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-isOnline="0" class="btn text-white" style="background-color:#199FD9">Book Clinic Visit</a>
+                            }
+                        </div>
+                    </div>
                 }
             </div>
         }

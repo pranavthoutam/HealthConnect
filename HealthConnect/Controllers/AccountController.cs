@@ -4,7 +4,6 @@ using HealthConnect.Services;
 using HealthConnect.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 
 namespace HealthConnect.Controllers
@@ -15,10 +14,10 @@ namespace HealthConnect.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly EmailService _emailService;
-        private readonly IDoctorRepository _doctorRepository;
+        private readonly DoctorRepository _doctorRepository;
 
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otps = new();
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, EmailService emailService, IDoctorRepository doctorRepository)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, EmailService emailService, DoctorRepository doctorRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -132,7 +131,7 @@ namespace HealthConnect.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    User? user = await _userManager.FindByEmailAsync(model.Email);
                     if (user == null)
                     {
                         ModelState.AddModelError("", "Email not found.");
@@ -206,7 +205,7 @@ namespace HealthConnect.Controllers
 
             if (ModelState.IsValid && model.NewPassword == model.ConfirmPassword)
             {
-                var user = await _userManager.FindByEmailAsync(email);
+                User? user = await _userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
                     ModelState.AddModelError("", "Invalid email.");
@@ -232,8 +231,8 @@ namespace HealthConnect.Controllers
 
         public async Task<IActionResult> ProfileDashboard()
         {
-            // Get the current user ID (assuming Identity is used)
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            //Fetch the Current UserId
+            string userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -241,12 +240,17 @@ namespace HealthConnect.Controllers
             }
 
             // Fetch appointments for the current user
-            var appointments = await _doctorRepository.GetAppointmentsForUserAsync(userId);
+            IEnumerable<Appointment> appointments = await _doctorRepository.GetAppointmentsForUserAsync(userId);
 
+            User user = await _userManager.FindByIdAsync(userId);
             // Process appointments
-            var currentTime = DateTime.Now;
-            var viewModel = new ProfileDashboardViewModel
+            DateTime currentTime = DateTime.Now;
+            ProfileDashboardViewModel viewModel = new ProfileDashboardViewModel
             {
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                ProfilePhoto = user.ProfilePhoto,
+                Name = user.UserName,
                 InClinicAppointments = appointments
                                        .Where(a => a.IsOnline == false)
                                        .Select(a => new AppointmentViewModel
@@ -260,7 +264,7 @@ namespace HealthConnect.Controllers
                                            Location = a.Doctor.Place,
                                            CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
                                            IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
-                                                          (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) <= currentTime.TimeOfDay)
+                                                        (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay)
                                        })
                                         .ToList(),
 
@@ -276,9 +280,9 @@ namespace HealthConnect.Controllers
                                             AppointmentDate = a.AppointmentDate,
                                             Slot = a.Slot,
                                             Location = "Online",
-                                            CanRescheduleOrCancel = a.AppointmentDate.Subtract(currentTime).TotalHours > 3,
-                                            IsCompleted = a.AppointmentDate < currentTime ||
-                                                             (a.AppointmentDate == currentTime.Date && TimeSpan.Parse(a.Slot) <= currentTime.TimeOfDay)
+                                            CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
+                                            IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
+                                                            (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay)
                                         })
                                         .ToList(),
 

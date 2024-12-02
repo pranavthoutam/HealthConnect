@@ -20,7 +20,7 @@ builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddTransient<EmailService>();
-builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
+builder.Services.AddScoped<DoctorRepository>();
 builder.Services.AddScoped<MedicineRepository>();
 builder.Services.AddScoped<ZoomService>();
 
@@ -30,9 +30,10 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+
     app.UseHsts();
 }
-
+app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

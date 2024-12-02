@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HealthConnect.Controllers
 {
-    [Authorize(Roles ="Doctor")]
+    
     public class DoctorController : Controller
     {
-        private readonly IDoctorRepository _doctorRepository;
+        private readonly DoctorRepository _doctorRepository;
 
-        public DoctorController(IDoctorRepository doctorRepository)
+        public DoctorController(DoctorRepository doctorRepository)
         {
             _doctorRepository = doctorRepository;
         }
@@ -24,6 +24,7 @@ namespace HealthConnect.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Doctor")]
         public IActionResult Register()
         {
             var model = new DoctorRegistrationViewModel();
