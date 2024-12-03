@@ -27,7 +27,12 @@ namespace HealthConnect.Controllers
         {
             return View();
         }
-
+        [HttpGet]
+        public IActionResult FindDoctors()
+        {
+            return View();
+        }
+        [HttpPost]
         public IActionResult FindDoctors(DoctorFilterViewModel filter)
         {
             // Fetch doctors based on location and search term

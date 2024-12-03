@@ -17,7 +17,7 @@ namespace HealthConnect.Models
         [DataType(DataType.Currency)]
         public decimal ConsultationFee { get; set; }
 
-        public float Rating { get; set; }
+        public double Rating { get; set; }
 
         public string ApprovalStatus { get; set; }
 

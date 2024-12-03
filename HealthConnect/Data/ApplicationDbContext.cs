@@ -70,6 +70,7 @@ namespace HealthConnect.Data
         public DbSet<Medicine> Medicines { get; set; }
         public DbSet<MedicineAlternatives> MedicinesAlternatives { get;set; }
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
 
     }
 }

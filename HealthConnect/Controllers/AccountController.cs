@@ -4,6 +4,7 @@ using HealthConnect.Services;
 using HealthConnect.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 
 namespace HealthConnect.Controllers
@@ -242,7 +243,12 @@ namespace HealthConnect.Controllers
             // Fetch appointments for the current user
             IEnumerable<Appointment> appointments = await _doctorRepository.GetAppointmentsForUserAsync(userId);
 
+            //Viewbag to pass userid required for feedback
+            ViewBag.UserId = userId;
+
             User user = await _userManager.FindByIdAsync(userId);
+            List<Feedback> feedbacks = (List<Feedback>)await _doctorRepository.GetFeedBacksAsync(userId);
+
             // Process appointments
             DateTime currentTime = DateTime.Now;
             ProfileDashboardViewModel viewModel = new ProfileDashboardViewModel
@@ -251,6 +257,7 @@ namespace HealthConnect.Controllers
                 PhoneNumber = user.PhoneNumber,
                 ProfilePhoto = user.ProfilePhoto,
                 Name = user.UserName,
+                Feedbacks = feedbacks,
                 InClinicAppointments = appointments
                                        .Where(a => a.IsOnline == false)
                                        .Select(a => new AppointmentViewModel

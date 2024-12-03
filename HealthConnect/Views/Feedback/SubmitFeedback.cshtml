@@ -1,5 +1,5 @@
-﻿@* @model FeedbackViewModel
- *@
+﻿@model Feedback
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,9 +11,16 @@
     <div class="container mt-5">
         <div class="card shadow p-4">
             <h1 class="h4 mb-4">
-                How was your appointment experience with <strong>@Model.DoctorName</strong>?
+                How was your appointment experience with
+                <strong>
+                    @(Model.Doctor != null ? Model.Doctor.FullName : "the Doctor")
+                </strong>?
             </h1>
             <form asp-action="SubmitFeedback" method="post">
+                <!-- Hidden Fields -->
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="DoctorId" />
+
                 <!-- Star Rating -->
                 <div class="mb-4">
                     <label class="form-label text-primary fw-bold">Rating*</label>
@@ -27,13 +34,15 @@
                                style="cursor: pointer;"></i>
                         }
                     </div>
-                    <input type="hidden" name="Rating" id="Rating" />
+                    <input type="hidden" asp-for="Rating" id="Rating" />
+                    <span asp-validation-for="Rating" class="text-danger"></span>
                 </div>
 
                 <!-- Feedback Description -->
                 <div class="mb-4">
-                    <label class="form-label text-primary fw-bold">Description*</label>
-                    <textarea name="Description" class="form-control" rows="4" placeholder="Share your feedback here..." required></textarea>
+                    <label asp-for="Description" class="form-label text-primary fw-bold">Description*</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Share your feedback here..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
                 <!-- Submit Button -->

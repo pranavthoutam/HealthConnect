@@ -1,11 +1,14 @@
-﻿namespace HealthConnect.ViewModels
+﻿using HealthConnect.Models;
+
+namespace HealthConnect.ViewModels
 {
     public class ProfileDashboardViewModel
     {
         public List<AppointmentViewModel>? InClinicAppointments { get; set; }
         public List<AppointmentViewModel>? OnlineConsultations { get; set; }
         public List<AppointmentViewModel>? CompletedAppointments { get; set; }
-        
+        public List<Feedback>? Feedbacks { get; set; }
+
         public string Email { get; set; }
 
         public string PhoneNumber { get; set; } 

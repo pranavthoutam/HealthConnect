@@ -162,8 +162,17 @@
                                     <p class="text-secondary mb-1">@appointment.Location</p>
                                 </div>
                                 <!-- Action Buttons -->
-                                <button class="btn btn-outline-primary ms-3">Feedback</button>
-
+                                @if (Model.Feedbacks.Any(f => f.AppointmentId == appointment.AppointmentId))
+                                {
+                                    <!-- Feedback already submitted, don't show the button -->
+                                }
+                                else
+                                {
+                                    <a asp-action="SubmitFeedback" asp-controller="Feedback" asp-route-doctorId="@appointment.DoctorId" asp-route-userId="@ViewBag.UserId" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-outline-primary ms-3">Feedback</a>
+                                }
+@* 
+                                <a asp-action="SubmitFeedback" asp-controller="Feedback" asp-route-doctorId="@appointment.DoctorId" asp-route-userId="@ViewBag.UserId" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-outline-primary ms-3">Feedback</a>
+ *@
                             </div>
                         }
                     </div>
