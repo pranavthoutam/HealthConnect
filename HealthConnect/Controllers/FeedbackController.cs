@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using HealthConnect.Models;
-using HealthConnect.Services;
-
-public class FeedbackController : Controller
+﻿public class FeedbackController : Controller
 {
     private readonly FeedbackService _feedbackService;
 

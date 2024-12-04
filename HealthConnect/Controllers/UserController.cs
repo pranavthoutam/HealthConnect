@@ -1,33 +1,19 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using HealthConnect.Models;
-using HealthConnect.Repositories;
-using System.Security.Claims;
-using HealthConnect.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-
-namespace HealthConnect.Controllers
+﻿namespace HealthConnect.Controllers
 {
-
     public class UserController : Controller
     {
         private readonly UserManager<User> _userManager;
         private readonly DoctorRepository _doctorRepository;
         private readonly IConfiguration _configuration;
-        private readonly MedicineRepository _medicine;
-        public UserController(UserManager<User> userManager, DoctorRepository doctorRepository, IConfiguration configuration, MedicineRepository medicine)
+        public UserController(UserManager<User> userManager, DoctorRepository doctorRepository, IConfiguration configuration)
         {
             _userManager = userManager;
             _doctorRepository = doctorRepository;
             _configuration = configuration;
-            _medicine = medicine;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
         [HttpGet]
+        //Finds the Doctors according to the location and Name or specialization of doctor
         public IActionResult FindDoctors()
         {
             return View();
@@ -35,33 +21,31 @@ namespace HealthConnect.Controllers
         [HttpPost]
         public IActionResult FindDoctors(DoctorFilterViewModel filter)
         {
-            // Fetch doctors based on location and search term
-            var doctors = _doctorRepository.GetDoctorsByLocationAndSpecialization(filter.Location, filter.SearchString);
-
-            // Initialize the filter view model with the fetched doctors
-            filter.Doctors = doctors.ToList();
-
-            // Return the doctors list with an empty filter model
             return RedirectToAction("DoctorsNearYou", new { location = filter.Location, searchString = filter.SearchString });
         }
 
 
-        // Display doctors with filters applied (gender, experience, etc.)
+        // Display doctors with filters applied (gender, experience)
         public IActionResult DoctorsNearYou(string location, string searchString, DoctorFilterViewModel filter)
         {
-            // Fetch doctors based on location and search string
             var doctors = _doctorRepository.GetDoctorsByLocationAndSpecialization(location, searchString);
 
-            // Apply filters if provided
             var filteredDoctors = _doctorRepository.ApplyFilters(doctors, filter);
 
-            // Update the filter model with the filtered doctor list
             filter.Doctors = filteredDoctors.ToList();
 
-            // Return the filtered list of doctors to the view
             return View(filter);
         }
 
+        /// <summary>
+        /// Gets the Doctor Profile and his available slots for the consultation
+        /// </summary>
+        /// <param name="doctorId"></param>
+        /// <param name="date"></param>
+        /// <param name="isOnline"></param>
+        /// <param name="status"></param>
+        /// <param name="appointmentId"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> BookAppointment(int doctorId, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
         {
@@ -73,17 +57,16 @@ namespace HealthConnect.Controllers
             }
 
             var availableSlots = await _doctorRepository.GetAvailableSlotsAsync(doctorId, date);
-            //Filter the slots by current time
+
             if (date.Date == DateTime.Now.Date)
             {
                 var currentTime = DateTime.Now.TimeOfDay;
                 availableSlots = availableSlots
                     .Where(slot =>
                     {
-                        // Parse slot string to TimeSpan
                         if (TimeSpan.TryParse(slot, out var slotTime))
                         {
-                            return slotTime > currentTime; // Compare with current time
+                            return slotTime > currentTime;
                         }
                         return false;
                     })
@@ -100,6 +83,117 @@ namespace HealthConnect.Controllers
             return View(doctor);
         }
 
+        //Confirm Appointment
+        //[Authorize]
+        //[HttpPost]
+        //public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
+        //{
+        //    if (string.IsNullOrEmpty(selectedSlot))
+        //    {
+        //        TempData["Message"] = "Please select a valid time slot.";
+        //        return RedirectToAction("BookAppointment", new { doctorId, date });
+        //    }
+
+        //    var consultationType = isOnline == 1;
+        //    string meetingLink = null;
+
+        //    if (consultationType)
+        //    {
+        //        var roomName = $"healthconnect-room-{doctorId}-{User.FindFirstValue(ClaimTypes.NameIdentifier)}-{Guid.NewGuid()}";
+        //        var startTime = date.Add(TimeSpan.Parse(selectedSlot)).AddMinutes(-5); // 5 minutes before
+        //        var expiryTime = startTime.AddHours(1); // 1 hour after start time
+
+        //        meetingLink = JitsiJwtService.GenerateJitsiMeetingLink(roomName, startTime, expiryTime,_userManager,User);
+        //        ViewBag.MeetingLink = meetingLink;
+        //    }
+
+        //    if (appointmentId != null)
+        //    {
+        //        var existingAppointment = await _doctorRepository.GetAppointmentByIdAsync((int)appointmentId);
+        //        existingAppointment.AppointmentDate = date;
+        //        existingAppointment.Slot = selectedSlot;
+        //        existingAppointment.ConsultationLink = meetingLink;
+        //        await _doctorRepository.RescheduleAppointment(existingAppointment);
+
+        //        return RedirectToAction("ProfileDashboard", "Account");
+        //    }
+
+        //    var newAppointment = new Appointment
+        //    {
+        //        DoctorId = doctorId,
+        //        UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+        //        Slot = selectedSlot,
+        //        AppointmentDate = date,
+        //        IsOnline = consultationType,
+        //        ConsultationLink = meetingLink
+        //    };
+
+        //    if (status == AppointmentStatus.Scheduled)
+        //        await _doctorRepository.AddAppointmentAsync(newAppointment);
+        //    else
+        //        await _doctorRepository.RescheduleAppointment(newAppointment);
+
+        //    TempData["Message"] = status == null ? "Appointment booked successfully!" : "Appointment rescheduled successfully.";
+        //    return View();
+        //}
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
+        {
+            if (string.IsNullOrEmpty(selectedSlot))
+            {
+                TempData["Message"] = "Please select a valid time slot.";
+                return RedirectToAction("BookAppointment", new { doctorId, date });
+            }
+
+            var consultationType = isOnline == 1;
+            string meetingLink = null;
+
+            if (consultationType)
+            {
+                var roomName = $"healthconnect-room-{doctorId}-{User.FindFirstValue(ClaimTypes.NameIdentifier)}-{Guid.NewGuid()}";
+                var startTime = date.Add(TimeSpan.Parse(selectedSlot)).AddMinutes(-5); // 5 minutes before
+                var expiryTime = startTime.AddHours(1); // 1 hour after start time
+
+                // Generate Daily.co meeting link
+                meetingLink = await DailyCoService.GenerateDailyRoomLink(roomName, startTime, expiryTime);
+                ViewBag.MeetingLink = meetingLink;
+            }
+
+            if (appointmentId != null)
+            {
+                var existingAppointment = await _doctorRepository.GetAppointmentByIdAsync((int)appointmentId);
+                existingAppointment.AppointmentDate = date;
+                existingAppointment.Slot = selectedSlot;
+                existingAppointment.ConsultationLink = meetingLink;
+                await _doctorRepository.RescheduleAppointment(existingAppointment);
+
+                return RedirectToAction("ProfileDashboard", "Account");
+            }
+
+            var newAppointment = new Appointment
+            {
+                DoctorId = doctorId,
+                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                Slot = selectedSlot,
+                AppointmentDate = date,
+                IsOnline = consultationType,
+                ConsultationLink = meetingLink
+            };
+
+            if (status == AppointmentStatus.Scheduled)
+                await _doctorRepository.AddAppointmentAsync(newAppointment);
+            else
+                await _doctorRepository.RescheduleAppointment(newAppointment);
+
+            TempData["Message"] = status == null ? "Appointment booked successfully!" : "Appointment rescheduled successfully.";
+            return View();
+        }
+
+
+
+
+        //Cancel Appointment
         public async Task<IActionResult> CancelAppointment(int appointmentId)
         {
             var appointment = await _doctorRepository.GetAppointmentByIdAsync(appointmentId);
@@ -116,47 +210,6 @@ namespace HealthConnect.Controllers
             return View();
 
 
-        }
-
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
-        {
-            if (string.IsNullOrEmpty(selectedSlot))
-            {
-                TempData["Message"] = "Please select a valid time slot.";
-                return RedirectToAction("BookAppointment", new { doctorId, date });
-            }
-            bool consultationType;
-            if (isOnline == 1) consultationType = true;
-            else consultationType = false;
-
-            if (appointmentId != null)
-            {
-                Appointment appointment1 = await _doctorRepository.GetAppointmentByIdAsync((int)appointmentId);
-                appointment1.AppointmentDate = date;
-                appointment1.Slot = selectedSlot;
-                await _doctorRepository.RescheduleAppointment(appointment1);
-                return RedirectToAction("ProfileDashboard", "Account");
-            }
-
-            var appointment = new Appointment
-            {
-                DoctorId = doctorId,
-                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier), // Assuming logged-in user
-                Slot = selectedSlot,
-                AppointmentDate = date,
-                IsOnline = consultationType,
-            };
-            if (status == AppointmentStatus.Scheduled) await _doctorRepository.AddAppointmentAsync(appointment);
-            else await _doctorRepository.RescheduleAppointment(appointment);
-
-            if (status == null) TempData["Message"] = "Appointment booked successfully!";
-            else TempData["Message"] = "Appointment Rescheduled Successfully";
-            ViewBag.AppointmentDate = date;
-            ViewBag.TimeSlot = selectedSlot;
-
-            return View();
         }
 
 
@@ -239,85 +292,6 @@ namespace HealthConnect.Controllers
             }
 
             return File("~/images/download.png", "image/jpeg");
-        }
-
-        //Search Suggestions while searching for the Medicines
-        [HttpGet]
-        public IActionResult SearchSuggestions(string query)
-        {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                return Json(new List<string>());
-            }
-
-            var suggestions = _medicine.GetMedicinesByPartialName(query);
-            return Json(suggestions.Take(4));
-        }
-
-        [HttpGet]
-        public IActionResult SearchMedicines()
-        {
-            return View();
-        }
-        public IActionResult DisplayMedicines(int categoryId)
-        {
-            var model = _medicine.getMedicines(categoryId);
-            ViewBag.CategoryId = categoryId;
-            return View(model);
-        }
-        [HttpGet]
-        public IActionResult MedicineInfo(int id)
-        {
-            var medicine = _medicine.GetMedicineById(id);
-
-            // If medicine is not found, return a "Not Found" page or handle appropriately
-            if (medicine == null)
-            {
-                return NotFound();
-            }
-
-            return View(medicine);
-        }
-        [HttpGet]
-        public IActionResult MedicineInfoByName(string medicineName)
-        {
-            if (string.IsNullOrWhiteSpace(medicineName))
-            {
-                return NotFound("Invalid medicine name.");
-            }
-
-            // Decoding URL by replace(-,' ') 
-            var decodedName = medicineName.Replace('-', ' ');
-
-            Medicine? medicine = _medicine.GetMedicineByName(decodedName).FirstOrDefault();
-
-            if (medicine == null)
-            {
-                return NotFound("Medicine not found.");
-            }
-
-            return View("MedicineInfo", medicine);
-        }
-
-        [HttpGet]
-        public IActionResult SearchbyProduct(string medicineName, int categoryId)
-        {
-            var medicines = _medicine.GetMedicineByName(medicineName, categoryId);
-            ViewBag.CategoryId = categoryId;
-            return View("DisplayMedicines", medicines);
-        }
-
-        [HttpGet("GetImage/{id}")]
-        public IActionResult GetImage(int id)
-        {
-            var medicine = _medicine.GetMedicineById(id);
-
-            if (medicine == null || medicine.Image == null)
-            {
-                return NotFound(); // Return 404 if the medicine or image is not found
-            }
-
-            return File(medicine.Image, "image/jpeg");
         }
     }
 }

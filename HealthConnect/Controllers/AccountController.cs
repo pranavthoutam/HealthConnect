@@ -1,13 +1,4 @@
-﻿using HealthConnect.Models;
-using HealthConnect.Repositories;
-using HealthConnect.Services;
-using HealthConnect.ViewModels;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Concurrent;
-
-namespace HealthConnect.Controllers
+﻿namespace HealthConnect.Controllers
 {
     public class AccountController : Controller
     {

@@ -93,55 +93,7 @@
     </div>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-                document.getElementById('search-input').addEventListener('input', function () {
-            const query = this.value.trim();
-            const suggestionBox = document.getElementById('suggestion-box');
-
-            // Clear suggestions if input is empty
-            if (query.length === 0) {
-                suggestionBox.innerHTML = '';
-                return;
-            }
-
-            // Fetch suggestions from the server
-            fetch(`/User/SearchSuggestions?query=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(data => {
-                    suggestionBox.innerHTML = ''; // Clear previous suggestions
-
-                    if (data.length > 0) {
-                        data.forEach(item => {
-                            // Create a clickable suggestion
-                            const suggestion = document.createElement('div');
-                            suggestion.className = 'list-group-item list-group-item-action';
-                            suggestion.textContent = item;
-
-                            // Add click event to navigate to MedicineInfo
-                            suggestion.addEventListener('click', () => {
-                                window.location.href = `/User/MedicineInfoByName?medicineName=${encodeURIComponent(item)}`;
-                            });
-
-                            // Add suggestion to the dropdown
-                            suggestionBox.appendChild(suggestion);
-                        });
-                    } else {
-                        // Show "No results found" if no matches
-                        const noResult = document.createElement('div');
-                        noResult.className = 'list-group-item text-muted';
-                        noResult.textContent = 'No results found';
-                        suggestionBox.appendChild(noResult);
-                    }
-                })
-                .catch(error => console.error('Error fetching suggestions:', error));
-        });
-                      suggestion.addEventListener('click', () => {
-            const friendlyName = item.replace(/\s+/g, '-');
-            window.location.href = `/User/MedicineInfoByName?medicineName=${encodeURIComponent(friendlyName)}`;
-        });
-
-
-    </script>
 
 </body>
 </html>
+

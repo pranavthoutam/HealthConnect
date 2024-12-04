@@ -35,7 +35,7 @@
             <div class="col-md-3">
                 <h5 class="text-xl fw-bold mb-4">CATEGORIES</h5>
                 <hr class="mb-4">
-                <ul class="list-unstyled" >
+                <ul class="list-unstyled">
                     <li class="category-item" onclick="setActiveCategory(this)">
                         <a asp-action="DisplayMedicines" asp-route-categoryId="1" class="text-dark text-decoration-none">Family Care</a>
                     </li>
@@ -66,7 +66,7 @@
             <div class="col-md-9">
                 <!-- Search Bar -->
                 <div class="mb-4 w-75">
-                    <form asp-action="SearchByProduct" asp-controller="User" method="get">
+                    <form asp-action="SearchByProduct" method="get">
                         <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
                         <input type="text" name="medicineName" class="form-control" placeholder="Search for products..." />
                     </form>
@@ -79,12 +79,12 @@
                         <div class="col-md-4">
                             <div class="card shadow-sm ">
                                 <!-- Replace src with a fallback logic if no image is provided -->
-                                <img src="@Url.Action("GetImage", "User", new { id = medicine.Id })" class="card-img-top" height="170px" width="150px" alt="@medicine.Name packaging">
+                                <img src="@Url.Action("GetImage", "Medicine", new { id = medicine.Id })" class="card-img-top" height="170px" width="150px" alt="@medicine.Name packaging">
                                 <hr class="my-1">
                                 <div class="card-body text-center">
                                     <p class="card-title text-gray-700">@medicine.Name</p>
                                     <p class="card-text text-primary fw-bold">₹100</p>
-                                    <form asp-controller="User" asp-action="MedicineInfo" method="get">
+                                    <form asp-controller="Medicine" asp-action="MedicineInfo" method="get">
                                         <input type="hidden" name="id" value="@medicine.Id" />
                                         <button type="submit" class="btn btn-outline-primary">DETAILS</button>
                                     </form>

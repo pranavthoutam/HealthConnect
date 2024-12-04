@@ -28,6 +28,8 @@ namespace HealthConnect.Models
 
         public AppointmentStatus Status { get; set; } = AppointmentStatus.Scheduled;
 
+        public string? ConsultationLink  { get; set; }
+
     }
 
     public enum AppointmentStatus

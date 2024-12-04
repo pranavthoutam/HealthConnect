@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace HealthConnect.Models
+﻿namespace HealthConnect.Models
 {
     public class Doctor
     {
@@ -61,7 +58,7 @@ namespace HealthConnect.Models
             {
                 (Start: TimeSpan.Parse("10:00"), End: TimeSpan.Parse("13:00")),
                 (Start: TimeSpan.Parse("14:00"), End: TimeSpan.Parse("16:00")),
-                (Start: TimeSpan.Parse("18:00"), End: TimeSpan.Parse("20:00"))
+                (Start: TimeSpan.Parse("16:00"), End: TimeSpan.Parse("20:00"))
             };
 
             foreach (var range in timeRanges)
@@ -70,7 +67,7 @@ namespace HealthConnect.Models
                 while (current < range.End)
                 {
                     slots.Add(current.ToString(@"hh\:mm"));
-                    current = current.Add(TimeSpan.FromMinutes(15));
+                    current = current.Add(TimeSpan.FromMinutes(5));
                 }
             }
             return slots;

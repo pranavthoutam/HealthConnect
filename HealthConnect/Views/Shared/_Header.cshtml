@@ -10,13 +10,13 @@
     <nav>
         <a asp-controller="User" asp-action="FindDoctors">Find Doctors</a>
         <a href="#">Video Consult</a>
-        <a asp-controller="User" asp-action="SearchMedicines">Medicines</a>
+        <a asp-controller="Medicine" asp-action="SearchMedicines">Medicines</a>
     </nav>
     <div id="auth-links">
         @if (User.Identity.IsAuthenticated)
         {
             <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-decoration-none " data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="d-flex align-items-center text-decoration-none " data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="@Url.Action("GetProfilePhoto", "User", new { userId = User.FindFirstValue(ClaimTypes.NameIdentifier) })" alt="Profile" class="rounded-circle" width="40" height="40">
                 </a>
                 <ul class="dropdown-menu">
@@ -46,7 +46,7 @@
     </div>
     
     <!-- Logout form-->
-    <form id="logoutForm" asp-area="" asp-controller="Account" asp-action="Logout" method="post" style="display: none;"></form>
+    <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post" style="display: none;"></form>
 
 
 </header>

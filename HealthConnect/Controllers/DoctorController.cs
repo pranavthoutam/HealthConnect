@@ -1,12 +1,4 @@
-﻿using HealthConnect.Models;
-using HealthConnect.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using HealthConnect.Repositories;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-
-
-namespace HealthConnect.Controllers
+﻿namespace HealthConnect.Controllers
 {
     
     public class DoctorController : Controller

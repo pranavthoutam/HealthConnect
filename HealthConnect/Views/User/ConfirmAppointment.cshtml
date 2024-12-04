@@ -17,6 +17,11 @@
             <p class="mt-3">Your appointment has been successfully scheduled.</p>
             <p><strong>Date:</strong> @ViewBag.AppointmentDate</p>
             <p><strong>Time Slot:</strong> @ViewBag.TimeSlot</p>
+            @if(ViewBag.MeetingLink != null)
+            {
+                <a href="@ViewBag.MeetingLink" target="_blank" class="btn btn-primary">Meeting Link</a>
+
+            }
             <a href="/" class="btn btn-primary mt-3">Back to Home</a>
         </div>
     </div>

@@ -1,10 +1,3 @@
-using HealthConnect.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using HealthConnect.Models;
-using HealthConnect.Services;
-using HealthConnect.Repositories;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

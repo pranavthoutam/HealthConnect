@@ -1,7 +1,3 @@
-using HealthConnect.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-
 namespace HealthConnect.Controllers
 {
     public class HomeController : Controller

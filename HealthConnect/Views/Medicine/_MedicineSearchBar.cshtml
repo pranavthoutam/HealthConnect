@@ -26,7 +26,7 @@
         }
 
         // Fetch suggestions from the server
-        fetch(`/User/SearchSuggestions?query=${encodeURIComponent(query)}`)
+        fetch(`/Medicine/SearchSuggestions?query=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(data => {
                 suggestionBox.innerHTML = ''; // Clear previous suggestions
@@ -40,7 +40,7 @@
 
                         // Add click event to navigate to MedicineInfo
                         suggestion.addEventListener('click', () => {
-                            window.location.href = `/User/MedicineInfoByName?medicineName=${encodeURIComponent(item)}`;
+                            window.location.href = `/Medicine/MedicineInfoByName?medicineName=${encodeURIComponent(item)}`;
                         });
 
                         // Add suggestion to the dropdown
@@ -58,7 +58,7 @@
     });
                   suggestion.addEventListener('click', () => {
         const friendlyName = item.replace(/\s+/g, '-');
-        window.location.href = `/User/MedicineInfoByName?medicineName=${encodeURIComponent(friendlyName)}`;
+        window.location.href = `/Medicine/MedicineInfoByName?medicineName=${encodeURIComponent(friendlyName)}`;
     });
 
 

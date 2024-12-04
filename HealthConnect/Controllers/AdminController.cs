@@ -1,9 +1,4 @@
-﻿using HealthConnect.Data;
-using HealthConnect.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-namespace HealthConnect.Controllers
+﻿namespace HealthConnect.Controllers
 {
     public class AdminController : Controller
     {
