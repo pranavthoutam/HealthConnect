@@ -15,11 +15,9 @@ namespace HealthConnect.Services
 
         public async Task SubmitFeedbackAsync(Feedback feedback)
         {
-            // Save feedback to the database
             _context.Feedbacks.Add(feedback);
             await _context.SaveChangesAsync();
 
-            // Update doctor's average rating
             await UpdateDoctorRatingAsync(feedback.DoctorId);
         }
 
@@ -27,7 +25,7 @@ namespace HealthConnect.Services
         {
             var ratings = await _context.Feedbacks
         .Where(f => f.DoctorId == doctorId)
-        .Select(f => (double?)f.Rating) // Use nullable to handle empty collections
+        .Select(f => (double?)f.Rating) 
         .ToListAsync();
 
             return ratings.Any() ? ratings.Average() ?? 0 : 0;
@@ -44,6 +42,19 @@ namespace HealthConnect.Services
                 doctor.Rating = averageRating;
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<Appointment> GetAppointmentByIdAsync(int appointmentId)
+        {
+            return await _context.Appointments
+                .Include("Doctor")
+                .Include("User")
+                .FirstOrDefaultAsync(a=>a.Id==appointmentId);
+        }
+
+        public IEnumerable<Feedback> GetDoctorFeedBacks(int doctorId)
+        {
+            return _context.Feedbacks.Where(f=>f.DoctorId ==doctorId).ToList();
         }
     }
 

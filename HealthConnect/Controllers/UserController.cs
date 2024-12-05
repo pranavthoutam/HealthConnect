@@ -5,11 +5,13 @@
         private readonly UserManager<User> _userManager;
         private readonly DoctorRepository _doctorRepository;
         private readonly IConfiguration _configuration;
-        public UserController(UserManager<User> userManager, DoctorRepository doctorRepository, IConfiguration configuration)
+        private readonly FeedbackService _feedbackService;
+        public UserController(UserManager<User> userManager, DoctorRepository doctorRepository, IConfiguration configuration, FeedbackService feedbackService)
         {
             _userManager = userManager;
             _doctorRepository = doctorRepository;
             _configuration = configuration;
+            _feedbackService = feedbackService;
         }
 
         [HttpGet]
@@ -28,7 +30,11 @@
         // Display doctors with filters applied (gender, experience)
         public IActionResult DoctorsNearYou(string location, string searchString, DoctorFilterViewModel filter)
         {
-            var doctors = _doctorRepository.GetDoctorsByLocationAndSpecialization(location, searchString);
+            var loggedInDoctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            bool isDoctor = User.IsInRole("Doctor");
+
+            var doctors = _doctorRepository.GetDoctorsByLocationAndSpecialization(location, searchString,isDoctor ? loggedInDoctorId : null);
 
             var filteredDoctors = _doctorRepository.ApplyFilters(doctors, filter);
 
@@ -58,24 +64,12 @@
 
             var availableSlots = await _doctorRepository.GetAvailableSlotsAsync(doctorId, date);
 
-            if (date.Date == DateTime.Now.Date)
-            {
-                var currentTime = DateTime.Now.TimeOfDay;
-                availableSlots = availableSlots
-                    .Where(slot =>
-                    {
-                        if (TimeSpan.TryParse(slot, out var slotTime))
-                        {
-                            return slotTime > currentTime;
-                        }
-                        return false;
-                    })
-                    .ToList();
-            }
 
+            ViewBag.Feedbacks = _feedbackService.GetDoctorFeedBacks(doctorId);
             ViewBag.AvailableSlots = availableSlots.ToList();
             ViewBag.SelectedDate = date;
             ViewBag.IsOnline = isOnline;
+
             if (status == AppointmentStatus.ReScheduled) ViewBag.AppointmentStatus = status;
             else ViewBag.AppointmentStatus = AppointmentStatus.Scheduled;
             if (appointmentId != null) ViewBag.AppointmentId = appointmentId;
@@ -84,58 +78,6 @@
         }
 
         //Confirm Appointment
-        //[Authorize]
-        //[HttpPost]
-        //public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
-        //{
-        //    if (string.IsNullOrEmpty(selectedSlot))
-        //    {
-        //        TempData["Message"] = "Please select a valid time slot.";
-        //        return RedirectToAction("BookAppointment", new { doctorId, date });
-        //    }
-
-        //    var consultationType = isOnline == 1;
-        //    string meetingLink = null;
-
-        //    if (consultationType)
-        //    {
-        //        var roomName = $"healthconnect-room-{doctorId}-{User.FindFirstValue(ClaimTypes.NameIdentifier)}-{Guid.NewGuid()}";
-        //        var startTime = date.Add(TimeSpan.Parse(selectedSlot)).AddMinutes(-5); // 5 minutes before
-        //        var expiryTime = startTime.AddHours(1); // 1 hour after start time
-
-        //        meetingLink = JitsiJwtService.GenerateJitsiMeetingLink(roomName, startTime, expiryTime,_userManager,User);
-        //        ViewBag.MeetingLink = meetingLink;
-        //    }
-
-        //    if (appointmentId != null)
-        //    {
-        //        var existingAppointment = await _doctorRepository.GetAppointmentByIdAsync((int)appointmentId);
-        //        existingAppointment.AppointmentDate = date;
-        //        existingAppointment.Slot = selectedSlot;
-        //        existingAppointment.ConsultationLink = meetingLink;
-        //        await _doctorRepository.RescheduleAppointment(existingAppointment);
-
-        //        return RedirectToAction("ProfileDashboard", "Account");
-        //    }
-
-        //    var newAppointment = new Appointment
-        //    {
-        //        DoctorId = doctorId,
-        //        UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-        //        Slot = selectedSlot,
-        //        AppointmentDate = date,
-        //        IsOnline = consultationType,
-        //        ConsultationLink = meetingLink
-        //    };
-
-        //    if (status == AppointmentStatus.Scheduled)
-        //        await _doctorRepository.AddAppointmentAsync(newAppointment);
-        //    else
-        //        await _doctorRepository.RescheduleAppointment(newAppointment);
-
-        //    TempData["Message"] = status == null ? "Appointment booked successfully!" : "Appointment rescheduled successfully.";
-        //    return View();
-        //}
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
@@ -146,31 +88,52 @@
                 return RedirectToAction("BookAppointment", new { doctorId, date });
             }
 
-            var consultationType = isOnline == 1;
+            bool consultationType = isOnline == 1;
             string meetingLink = null;
 
+            // Generate a meeting link if the consultation is online
             if (consultationType)
             {
-                var roomName = $"healthconnect-room-{doctorId}-{User.FindFirstValue(ClaimTypes.NameIdentifier)}-{Guid.NewGuid()}";
-                var startTime = date.Add(TimeSpan.Parse(selectedSlot)).AddMinutes(-5); // 5 minutes before
-                var expiryTime = startTime.AddHours(1); // 1 hour after start time
-
-                // Generate Daily.co meeting link
-                meetingLink = await DailyCoService.GenerateDailyRoomLink(roomName, startTime, expiryTime);
+                string roomName = $"healthconnect-room-{doctorId}-{User.FindFirstValue(ClaimTypes.NameIdentifier)}-{Guid.NewGuid()}";
+                meetingLink = $"https://meet.jit.si/{roomName}";
                 ViewBag.MeetingLink = meetingLink;
             }
 
+            // Handle rescheduling if appointmentId is provided
             if (appointmentId != null)
             {
                 var existingAppointment = await _doctorRepository.GetAppointmentByIdAsync((int)appointmentId);
-                existingAppointment.AppointmentDate = date;
-                existingAppointment.Slot = selectedSlot;
-                existingAppointment.ConsultationLink = meetingLink;
-                await _doctorRepository.RescheduleAppointment(existingAppointment);
+                if (existingAppointment != null)
+                {
+                    existingAppointment.AppointmentDate = date;
+                    existingAppointment.Slot = selectedSlot;
+                    existingAppointment.IsOnline = consultationType;
+                    existingAppointment.ConsultationLink = meetingLink;
+                    existingAppointment.Status = status ?? AppointmentStatus.ReScheduled;
 
+                    await _doctorRepository.RescheduleAppointment(existingAppointment);
+
+                    TempData["Message"] = "Appointment rescheduled successfully.";
+                    ViewBag.TimeSlot = selectedSlot;
+                    ViewBag.AppointmentDate = date;
+                    return RedirectToAction("ProfileDashboard", "Account");
+                }
+                else
+                {
+                    TempData["Message"] = "Appointment not found for rescheduling.";
+                    return RedirectToAction("ProfileDashboard", "Account");
+                }
+            }
+
+            // Check for duplicate appointments
+            var duplicateAppointment = await _doctorRepository.GetAppointmentByDetailsAsync(doctorId, User.FindFirstValue(ClaimTypes.NameIdentifier), date, selectedSlot);
+            if (duplicateAppointment != null)
+            {
+                TempData["Message"] = "You already have an appointment for this time slot.";
                 return RedirectToAction("ProfileDashboard", "Account");
             }
 
+            // Create a new appointment
             var newAppointment = new Appointment
             {
                 DoctorId = doctorId,
@@ -178,18 +141,17 @@
                 Slot = selectedSlot,
                 AppointmentDate = date,
                 IsOnline = consultationType,
-                ConsultationLink = meetingLink
+                ConsultationLink = meetingLink,
+                Status = status ?? AppointmentStatus.Scheduled
             };
 
-            if (status == AppointmentStatus.Scheduled)
-                await _doctorRepository.AddAppointmentAsync(newAppointment);
-            else
-                await _doctorRepository.RescheduleAppointment(newAppointment);
+            await _doctorRepository.AddAppointmentAsync(newAppointment);
 
-            TempData["Message"] = status == null ? "Appointment booked successfully!" : "Appointment rescheduled successfully.";
+            TempData["Message"] = "Appointment booked successfully!";
+            ViewBag.TimeSlot = selectedSlot;
+            ViewBag.AppointmentDate = date;
             return View();
         }
-
 
 
 

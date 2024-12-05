@@ -94,6 +94,22 @@
                             <p class="mb-0 text-muted">@doctor.Experience years experience overall</p>
                             <p class="mb-0 text-muted">@doctor.District, @doctor.Place</p>
                             <p class="mb-0 text-muted">₹@doctor.ConsultationFee Consultation fee at clinic</p>
+                            <p class="mb-0">
+                                <span class="text-warning">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= doctor.Rating)
+                                        {
+                                            <i class="fas fa-star"></i> <!-- Filled Star -->
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-star"></i> <!-- Empty Star -->
+                                        }
+                                    }
+                                </span>
+                                <span class="text-muted">(@doctor.Rating/5)</span>
+                            </p>
                         </div>
                         <div class="d-flex gap-2">
                             @if (doctor.OnlineConsultation)

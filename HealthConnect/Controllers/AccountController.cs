@@ -137,7 +137,6 @@
                     // Store OTP with expiration
                     _otps[model.Email] = (generatedOtp, expiration);
 
-                    // Send OTP via email
                     await _emailService.SendEmailAsync(model.Email, "Password Reset OTP", $"Your OTP is {generatedOtp}. It will expire in 3 minutes.");
 
                     TempData["Email"] = model.Email;
@@ -162,10 +161,8 @@
                 {
                     if (otpDetails.Otp == otp && otpDetails.Expiration > DateTime.UtcNow)
                     {
-                        // OTP verified, remove from store
                         _otps.TryRemove(email, out _);
 
-                        // Redirect to reset password
                         TempData["Email"] = email;
                         return RedirectToAction("ResetPassword");
                     }
@@ -223,7 +220,6 @@
 
         public async Task<IActionResult> ProfileDashboard()
         {
-            //Fetch the Current UserId
             string userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(userId))
@@ -231,10 +227,8 @@
                 return RedirectToAction("Login", "Account");
             }
 
-            // Fetch appointments for the current user
             IEnumerable<Appointment> appointments = await _doctorRepository.GetAppointmentsForUserAsync(userId);
 
-            //Viewbag to pass userid required for feedback
             ViewBag.UserId = userId;
 
             User user = await _userManager.FindByIdAsync(userId);
@@ -262,7 +256,7 @@
                                            Location = a.Doctor.Place,
                                            CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
                                            IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
-                                                        (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay)
+                                                        (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay),
                                        })
                                         .ToList(),
 
@@ -280,7 +274,8 @@
                                             Location = "Online",
                                             CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
                                             IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
-                                                            (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay)
+                                                            (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay),
+                                            MeetingLink=a.ConsultationLink
                                         })
                                         .ToList(),
 

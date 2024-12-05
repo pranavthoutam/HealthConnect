@@ -1,9 +1,4 @@
-﻿using HealthConnect.Data;
-using HealthConnect.Models;
-using HealthConnect.ViewModels;
-using Microsoft.EntityFrameworkCore;
-
-
+﻿
 namespace HealthConnect.Repositories
 {
     public class DoctorRepository 
@@ -18,13 +13,15 @@ namespace HealthConnect.Repositories
         public async Task AddDoctorAsync(Doctor doctor)
         {
             await _context.Doctors.AddAsync(doctor);
+
             await _context.SaveChangesAsync();
         }
 
         // Fetch doctors by location and specialization
-        public IEnumerable<Doctor> GetDoctorsByLocationAndSpecialization(string location, string searchString)
+        public IEnumerable<Doctor> GetDoctorsByLocationAndSpecialization(string location, string searchString, string loggedInUserId = null)
         {
-            var query = _context.Doctors.Include(d=>d.User).Where(d=>d.ApprovalStatus=="Approved")
+
+            var query = _context.Doctors.Include(d=>d.User).Where(d=>d.ApprovalStatus=="Approved" && d.UserId != loggedInUserId )
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(location))
@@ -121,6 +118,20 @@ namespace HealthConnect.Repositories
 
             var bookedSlots = (await GetAppointmentsForDoctorAsync(doctorId, date)).Select(a => a.Slot).ToList();
             var availableSlots = doctor.AvailableSlots.Where(s => !bookedSlots.Contains(s));
+            if (date.Date == DateTime.Now.Date)
+            {
+                var currentTime = DateTime.Now.TimeOfDay;
+                availableSlots = availableSlots
+                    .Where(slot =>
+                    {
+                        if (TimeSpan.TryParse(slot, out var slotTime))
+                        {
+                            return slotTime > currentTime;
+                        }
+                        return false;
+                    })
+                    .ToList();
+            }
             return availableSlots;
         }
 
@@ -140,6 +151,16 @@ namespace HealthConnect.Repositories
         public async Task<IEnumerable<Feedback>> GetFeedBacksAsync(string userId)
         {
             return await _context.Feedbacks.Include(f => f.Appointment).Where(f=>f.UserId == userId).ToListAsync();
+        }
+
+        public async Task<Appointment> GetAppointmentByDetailsAsync(int doctorId, string userId, DateTime date, string slot)
+        {
+            return await _context.Appointments
+                .FirstOrDefaultAsync(a =>
+                    a.DoctorId == doctorId &&
+                    a.UserId == userId &&
+                    a.AppointmentDate.Date == date.Date &&
+                    a.Slot == slot);
         }
     }
 }

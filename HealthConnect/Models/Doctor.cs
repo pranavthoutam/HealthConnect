@@ -58,7 +58,7 @@
             {
                 (Start: TimeSpan.Parse("10:00"), End: TimeSpan.Parse("13:00")),
                 (Start: TimeSpan.Parse("14:00"), End: TimeSpan.Parse("16:00")),
-                (Start: TimeSpan.Parse("16:00"), End: TimeSpan.Parse("20:00"))
+                (Start: TimeSpan.Parse("18:00"), End: TimeSpan.Parse("20:00"))
             };
 
             foreach (var range in timeRanges)
@@ -67,7 +67,7 @@
                 while (current < range.End)
                 {
                     slots.Add(current.ToString(@"hh\:mm"));
-                    current = current.Add(TimeSpan.FromMinutes(5));
+                    current = current.Add(TimeSpan.FromMinutes(15));
                 }
             }
             return slots;

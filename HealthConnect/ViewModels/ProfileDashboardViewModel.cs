@@ -1,5 +1,4 @@
-﻿using HealthConnect.Models;
-
+﻿
 namespace HealthConnect.ViewModels
 {
     public class ProfileDashboardViewModel
@@ -30,6 +29,8 @@ namespace HealthConnect.ViewModels
         public string Location { get; set; }
         public bool CanRescheduleOrCancel { get; set; }
         public bool IsCompleted { get; set; } = false;
+
+        public string MeetingLink { get; set; }
     }
 
 }

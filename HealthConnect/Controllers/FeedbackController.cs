@@ -8,15 +8,24 @@
     }
 
     [HttpGet]
-    public IActionResult SubmitFeedback(int doctorId, string userId, int appointmentId)
+    public async Task<IActionResult> SubmitFeedback(int appointmentId)
     {
+        var appointment =await  _feedbackService.GetAppointmentByIdAsync(appointmentId);
+
+        if (appointment == null)
+        {
+            return NotFound(); // Handle invalid appointment case
+        }
         var feedback = new Feedback
         {
-            DoctorId = doctorId,
-            UserId = userId,
-            AppointmentId = appointmentId
+            DoctorId = appointment.DoctorId,
+            UserId = appointment.UserId,
+            AppointmentId = appointmentId,
+            Appointment = appointment,
+            Doctor = appointment.Doctor,
+            User = appointment.User
         };
-        return View(feedback); // Returns the feedback form view
+        return View(feedback);
     }
 
     [HttpPost]
@@ -24,22 +33,19 @@
     {
         ModelState.Remove("Doctor");
         ModelState.Remove("User");
+        ModelState.Remove("Appointment");
         if (!ModelState.IsValid)
         {
-            TempData["ErrorMessage"] = "Please provide valid feedback.";
             return View(feedback);
         }
 
         try
         {
             await _feedbackService.SubmitFeedbackAsync(feedback);
-            TempData["SuccessMessage"] = "Thank you for your feedback!";
-            return RedirectToAction("ProfileDashboard", "User");
+            return RedirectToAction("ProfileDashboard", "Account");
         }
         catch (Exception ex)
         {
-            // Log error if needed
-            TempData["ErrorMessage"] = "An error occurred while submitting feedback.";
             return View(feedback);
         }
     }

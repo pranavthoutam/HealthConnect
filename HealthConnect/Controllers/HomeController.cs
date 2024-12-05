@@ -22,7 +22,7 @@ namespace HealthConnect.Controllers
                 return View("NotFound"); // The custom 404 view
             }
 
-            return View("Error"); // Generic error view
+            return View("Error"); 
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
