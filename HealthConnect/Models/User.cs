@@ -1,5 +1,4 @@
-﻿
-namespace HealthConnect.Models
+﻿namespace HealthConnect.Models
 {
     public class User : IdentityUser
     {
@@ -18,6 +17,7 @@ namespace HealthConnect.Models
         public string? City { get; set; }
 
         [StringLength(6)]
+
         public string? PostalCode { get; set; }
 
         public string? State { get; set; }

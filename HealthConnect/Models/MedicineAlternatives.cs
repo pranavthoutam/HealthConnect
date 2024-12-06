@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace HealthConnect.Models
+﻿namespace HealthConnect.Models
 {
     public class MedicineAlternatives
     {

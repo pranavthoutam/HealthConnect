@@ -206,6 +206,7 @@
                 if (resetResult.Succeeded)
                 {
                     await _userManager.AddPasswordAsync(user, model.NewPassword);
+                    TempData.Remove("Email");
                     return RedirectToAction("Login");
                 }
 

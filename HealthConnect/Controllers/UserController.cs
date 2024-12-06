@@ -175,25 +175,47 @@
         }
 
 
-
-        // GET: Edit Profile
+        // GET: EditProfile
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> EditProfile()
         {
             var user = await _userManager.GetUserAsync(User);  // Get logged-in user
             if (user == null)
             {
-                return RedirectToAction("Login", "Account");  // Redirect to login if user not found
+                return NotFound();  // If user not found, return 404
             }
 
-            return View(user);  // Return the profile data to the view
+            var model = new UserProfileViewModel
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Gender = user.Gender,
+                BloodGroup = user.BloodGroup,
+                DateofBirth = user.DateofBirth,
+                HouseNumber = user.HouseNumber,
+                Street = user.Street,
+                City = user.City,
+                State = user.State,
+                Country = user.Country,
+                PostalCode = user.PostalCode,
+            };
+
+            // Pass profile photo (as byte array) to the view for previewing
+            if (user.ProfilePhoto != null)
+            {
+                ViewBag.ProfilePhoto = user.ProfilePhoto;  // Store it in ViewBag
+            }
+
+            return View(model);
         }
 
-        // POST: Edit Profile
+        // POST: EditProfile
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProfile(User updatedUser, IFormFile profilePhoto)
+        public async Task<IActionResult> EditProfile(UserProfileViewModel updatedUser)
         {
             if (!ModelState.IsValid)
             {
@@ -202,9 +224,12 @@
             }
 
             User? user = await _userManager.GetUserAsync(User);  // Get logged-in user
-            
+            if (user == null)
+            {
+                return NotFound();  // If user not found, return 404
+            }
 
-            // Update the user properties
+            // Update the user properties from the view model
             user.UserName = updatedUser.UserName;
             user.DateofBirth = updatedUser.DateofBirth;
             user.Gender = updatedUser.Gender;
@@ -217,12 +242,12 @@
             user.Country = updatedUser.Country;
             user.PostalCode = updatedUser.PostalCode;
 
-            // Handle profile photo upload
-            if (profilePhoto != null && profilePhoto.Length > 0)
+            // Handle profile photo upload (convert IFormFile to byte array)
+            if (updatedUser.ProfilePhoto != null && updatedUser.ProfilePhoto.Length > 0)
             {
                 using (var memoryStream = new MemoryStream())
                 {
-                    await profilePhoto.CopyToAsync(memoryStream);
+                    await updatedUser.ProfilePhoto.CopyToAsync(memoryStream);
                     user.ProfilePhoto = memoryStream.ToArray();  // Store the profile photo as byte array
                 }
             }
@@ -232,7 +257,7 @@
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Index", "Home");  // Redirect to profile page on success
+                return RedirectToAction("Index", "Home");  // Redirect to the profile page on success
             }
 
             // Handle errors (e.g., validation errors)
@@ -242,8 +267,9 @@
             }
 
             // Return the view with validation errors
-            return Ok("Unsuucessful");
+            return View(updatedUser);
         }
+
 
         public async Task<IActionResult> GetProfilePhoto(string userId)
         {
