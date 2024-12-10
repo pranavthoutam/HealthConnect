@@ -5,7 +5,7 @@
     public class SearchController : ControllerBase
     {
         private readonly List<string> Locations = new List<string> { "Madhapur", "Gachibowli", "Uppal", "Kukatpally", "LB Nagar" };
-        private readonly List<string> Items = new List<string> { "Cardiologist", "Dermatologist", "Paracetamol", "Ibuprofen", "Baby Care" };
+        private readonly List<string> Items = new List<string> { "Cardiology", "Dermatology", "General Physician" , "Pediatrics" };
 
         [HttpGet("locations")]
         public IActionResult GetLocations([FromQuery] string query)

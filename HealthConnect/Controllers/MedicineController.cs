@@ -2,21 +2,17 @@
 {
     public class MedicineController : Controller
     {
-        private readonly MedicineRepository _medicine;
-        public MedicineController(MedicineRepository medicine)
+        private readonly IMedicineService _medicineService;
+
+        public MedicineController(IMedicineService medicineService)
         {
-            _medicine = medicine;
+            _medicineService = medicineService;
         }
 
         [HttpGet]
         public IActionResult SearchSuggestions(string query)
         {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                return Json(new List<string>());
-            }
-
-            var suggestions = _medicine.GetMedicinesByPartialName(query);
+            var suggestions = _medicineService.GetSuggestions(query);
             return Json(suggestions.Take(4));
         }
 
@@ -25,50 +21,40 @@
         {
             return View();
         }
+
         public IActionResult DisplayMedicines(int categoryId)
         {
-            var model = _medicine.getMedicines(categoryId);
+            var model = _medicineService.GetMedicinesByCategory(categoryId);
             ViewBag.CategoryId = categoryId;
             return View(model);
         }
+
         [HttpGet]
         public IActionResult MedicineInfo(int id)
         {
-            var medicine = _medicine.GetMedicineById(id);
+            var medicine = _medicineService.GetMedicineById(id);
 
-            // If medicine is not found, return a "Not Found" page or handle appropriately
             if (medicine == null)
-            {
                 return NotFound();
-            }
 
             return View(medicine);
         }
+
         [HttpGet]
         public IActionResult MedicineInfoByName(string medicineName)
         {
-            if (string.IsNullOrWhiteSpace(medicineName))
-            {
-                return NotFound("Invalid medicine name.");
-            }
-
-            // Decoding URL by replace(-,' ') 
-            var decodedName = medicineName.Replace('-', ' ');
-
-            Medicine? medicine = _medicine.GetMedicineByName(decodedName).FirstOrDefault();
+            var medicine = _medicineService.GetMedicineByName(medicineName);
 
             if (medicine == null)
-            {
                 return NotFound("Medicine not found.");
-            }
 
             return View("MedicineInfo", medicine);
         }
 
         [HttpGet]
-        public IActionResult SearchbyProduct(string medicineName, int categoryId)
+        public IActionResult SearchByProduct(string medicineName, int categoryId)
         {
-            var medicines = _medicine.GetMedicineByName(medicineName, categoryId);
+            var medicines = _medicineService.GetMedicineByNameAndCategory(medicineName, categoryId);
             ViewBag.CategoryId = categoryId;
             return View("DisplayMedicines", medicines);
         }
@@ -76,14 +62,12 @@
         [HttpGet("GetImage/{id}")]
         public IActionResult GetImage(int id)
         {
-            var medicine = _medicine.GetMedicineById(id);
+            var image = _medicineService.GetMedicineImage(id);
 
-            if (medicine == null || medicine.Image == null)
-            {
-                return NotFound(); // Return 404 if the medicine or image is not found
-            }
+            if (image == null)
+                return NotFound();
 
-            return File(medicine.Image, "image/jpeg");
+            return File(image, "image/jpeg");
         }
     }
 }

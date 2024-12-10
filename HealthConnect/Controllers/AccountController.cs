@@ -77,6 +77,7 @@
 
         // Login view (POST)
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
             if (!ModelState.IsValid)
@@ -84,16 +85,33 @@
                 return View(loginViewModel);
             }
 
+            // Find the user by email
             User user = await _userManager.FindByEmailAsync(loginViewModel.Email);
-            if (user!=null)
+            if (user != null)
             {
+                // Try to sign in the user
                 var result = await _signInManager.PasswordSignInAsync(user.UserName, loginViewModel.Password, loginViewModel.RememberMe, false);
-                
-                if (result.Succeeded) return RedirectToAction("Index", "Home");
+
+                // If login is successful, redirect to Home
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+
+                // If login fails (incorrect password), add an error to the password field
+                ModelState.AddModelError("Password", "Incorrect password. Please try again.");
+            }
+            else
+            {
+                // Optionally handle the case where the user is not found (invalid email)
+                ModelState.AddModelError("Email", "No user found with this email address.");
             }
 
+            // If login fails, return the view with validation errors
             return View(loginViewModel);
         }
+
+
 
 
         [HttpGet]
@@ -118,8 +136,7 @@
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model, string otp = null)
         {
-            // If no TempData Email exists, we are in the first step (sending OTP)
-            if (TempData["Email"] == null)
+            if (model.Email == null)
             {
                 if (ModelState.IsValid)
                 {
@@ -130,33 +147,28 @@
                         return View();
                     }
 
-                    // Generate OTP
-                    string generatedOtp = new Random().Next(100000, 999999).ToString();
-                    DateTime expiration = DateTime.UtcNow.AddMinutes(3);
 
-                    // Store OTP with expiration
-                    _otps[model.Email] = (generatedOtp, expiration);
-
-                    await _emailService.SendEmailAsync(model.Email, "Password Reset OTP", $"Your OTP is {generatedOtp}. It will expire in 3 minutes.");
-
-                    TempData["Email"] = model.Email;
-                    TempData.Keep("Email");
+                    // TempData.Keep("Email");
                     return View();
                 }
             }
             else
             {
-                // Email already provided, validate OTP
-                string email = TempData["Email"].ToString();
-                TempData.Keep("Email");
+                string email = model.Email;
+                // TempData.Keep("Email");
 
                 if (string.IsNullOrEmpty(otp))
                 {
+                    string generatedOtp = new Random().Next(100000, 999999).ToString();
+                    DateTime expiration = DateTime.UtcNow.AddMinutes(3);
+                    _otps[model.Email] = (generatedOtp, expiration);
+
+                    await _emailService.SendEmailAsync(model.Email, "Password Reset OTP", $"Your OTP is {generatedOtp}. It will expire in 3 minutes.");
+                    TempData["Email"] = model.Email;
                     ModelState.AddModelError("", "Please enter the OTP.");
-                    return View();
+                    return View(model);
                 }
 
-                // Check if OTP is valid and not expired
                 if (_otps.TryGetValue(email, out var otpDetails))
                 {
                     if (otpDetails.Otp == otp && otpDetails.Expiration > DateTime.UtcNow)
@@ -173,6 +185,28 @@
 
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ResendOtp([FromBody] ResendOtpViewModel model)
+        {
+            if (string.IsNullOrEmpty(model.Email))
+            {
+                return Json(new { success = false, message = "Invalid email." });
+            }
+
+            if (_otps.ContainsKey(model.Email))
+            {
+                string generatedOtp = new Random().Next(100000, 999999).ToString();
+                DateTime expiration = DateTime.UtcNow.AddMinutes(3);
+                _otps[model.Email] = (generatedOtp, expiration);
+
+                await _emailService.SendEmailAsync(model.Email, "Password Reset OTP", $"Your new OTP is {generatedOtp}. It will expire in 3 minutes.");
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false, message = "Email not found." });
+        }
+
 
         [HttpGet]
         public IActionResult ResetPassword()
@@ -206,7 +240,7 @@
                 if (resetResult.Succeeded)
                 {
                     await _userManager.AddPasswordAsync(user, model.NewPassword);
-                    TempData.Remove("Email");
+                    //TempData.Remove("Email");
                     return RedirectToAction("Login");
                 }
 
@@ -217,86 +251,6 @@
             }
 
             return View(model);
-        }
-
-        public async Task<IActionResult> ProfileDashboard()
-        {
-            string userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            IEnumerable<Appointment> appointments = await _doctorRepository.GetAppointmentsForUserAsync(userId);
-
-            ViewBag.UserId = userId;
-
-            User user = await _userManager.FindByIdAsync(userId);
-            List<Feedback> feedbacks = (List<Feedback>)await _doctorRepository.GetFeedBacksAsync(userId);
-
-            // Process appointments
-            DateTime currentTime = DateTime.Now;
-            ProfileDashboardViewModel viewModel = new ProfileDashboardViewModel
-            {
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                ProfilePhoto = user.ProfilePhoto,
-                Name = user.UserName,
-                Feedbacks = feedbacks,
-                InClinicAppointments = appointments
-                                       .Where(a => a.IsOnline == false)
-                                       .Select(a => new AppointmentViewModel
-                                       {
-                                           AppointmentId = a.Id,
-                                           DoctorName = a.Doctor.FullName,
-                                           DoctorId = a.Doctor.Id,
-                                           DoctorSpecialization = a.Doctor.Specialization,
-                                           AppointmentDate = a.AppointmentDate,
-                                           Slot = a.Slot,
-                                           Location = a.Doctor.Place,
-                                           CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
-                                           IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
-                                                        (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay),
-                                       })
-                                        .ToList(),
-
-
-                OnlineConsultations = appointments
-                                        .Where(a => a.IsOnline == true)
-                                        .Select(a => new AppointmentViewModel
-                                        {
-                                            AppointmentId = a.Id,
-                                            DoctorName = a.Doctor.FullName,
-                                            DoctorId = a.Doctor.Id,
-                                            DoctorSpecialization = a.Doctor.Specialization,
-                                            AppointmentDate = a.AppointmentDate,
-                                            Slot = a.Slot,
-                                            Location = "Online",
-                                            CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
-                                            IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
-                                                            (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay),
-                                            MeetingLink=a.ConsultationLink
-                                        })
-                                        .ToList(),
-
-                CompletedAppointments = appointments
-                                        .Where(a => a.AppointmentDate.Date < currentTime.Date ||
-                                            (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) <= currentTime.TimeOfDay))
-                                        .Select(a => new AppointmentViewModel
-                                        {
-                                            AppointmentId = a.Id,
-                                            DoctorName = a.Doctor.FullName,
-                                            DoctorId = a.Doctor.Id,
-                                            DoctorSpecialization = a.Doctor.Specialization,
-                                            AppointmentDate = a.AppointmentDate,
-                                            Slot = a.Slot,
-                                            Location = a.Doctor.Place ?? "Online"
-                                        })
-                                        .ToList()
-            };
-
-            return View(viewModel);
         }
 
     }

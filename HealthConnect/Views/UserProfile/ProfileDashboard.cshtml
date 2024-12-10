@@ -1,4 +1,4 @@
-﻿@model HealthConnect.ViewModels.ProfileDashboardViewModel
+﻿@model ProfileDashboardViewModel
 
 <html>
 <head>
@@ -7,11 +7,11 @@
     <!-- Include FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
+
         .sidebar-link {
             display: block;
             text-decoration: none;
         }
-
             .sidebar-link:hover, .sidebar-link.active {
                 color: #0d6efd; /* Bootstrap primary color */
                 font-weight: bold;
@@ -28,7 +28,7 @@
 </head>
 <body class="bg-light">
     <div class="container my-5">
-        <div class="border border-primary rounded bg-white shadow-sm">
+        <div class="border border-primary rounded bg-white shadow-sm" >
             <!-- Profile Header -->
             <div class="d-flex align-items-center p-4 border-bottom">
                 <div class="bg-secondary rounded-circle" style="width: 64px; height: 64px;">
@@ -53,7 +53,7 @@
                 <!-- Sidebar -->
                 <div class="col-md-3 bg-light border-end">
                     <ul class="list-unstyled p-4">
-                        <li><a href="#inclinic-appointments" class="sidebar-link active" data-target="inclinic">Appointments</a></li>
+                        <li><a href="#inclinic-appointments" class="sidebar-link active" data-target="inclinic">Clinic Appointments</a></li>
                         <hr class="sidebar-divider">
                         <li><a href="#online-consultations" class="sidebar-link" data-target="online">Online Consultations</a></li>
                         <hr class="sidebar-divider">
@@ -97,8 +97,19 @@
                                 }
                                 else
                                 {
-                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="0" asp-route-status="1" asp-route-appointmentId="@appointment.AppointmentId"  class="btn btn-outline-primary ms-3">Reschedule</a>
-                                    <a asp-action="CancelAppointment" asp-controller="User" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-danger ms-3">Cancel</a>
+                                    <a href="@Url.Action("Reschedule", new { appointmentId = appointment.AppointmentId })"
+                                       class="btn btn-outline-primary ms-3 btn-reschedule"
+                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                       data-slot-time="@appointment.Slot">
+                                        Reschedule
+                                    </a>
+
+                                    <a href="@Url.Action("Cancel", new { appointmentId = appointment.AppointmentId })"
+                                       class="btn btn-danger ms-3 btn-cancel"
+                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                       data-slot-time="@appointment.Slot">
+                                        Cancel
+                                    </a>
                                 }
                             </div>
                         }
@@ -134,8 +145,19 @@
                                 }
                                 else
                                 {
-                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="1" asp-route-status="1" class="btn btn-outline-primary ms-3">Reschedule</a>
-                                    <a asp-action="CancelAppointment" asp-controller="User" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-danger ms-3">Cancel</a>
+                                    <a href="@Url.Action("Reschedule", new { appointmentId = appointment.AppointmentId })"
+                                       class="btn btn-outline-primary ms-3 btn-reschedule"
+                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                       data-slot-time="@appointment.Slot">
+                                        Reschedule
+                                    </a>
+
+                                    <a href="@Url.Action("Cancel", new { appointmentId = appointment.AppointmentId })"
+                                       class="btn btn-danger ms-3 btn-cancel"
+                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                       data-slot-time="@appointment.Slot">
+                                        Cancel
+                                    </a>
 
                                     @if (TimeSpan.TryParse(appointment.Slot, out var slotTime))
                                     {
@@ -172,6 +194,11 @@
                                 {
                                     <a asp-action="SubmitFeedback" asp-controller="Feedback" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-outline-primary ms-3">Feedback</a>
                                 }
+                                else
+                                {
+                                    <span class="text-primary ms-3">Feedback Submitted</span>
+                                }
+
 
                             </div>
                         }
@@ -180,6 +207,27 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for Warning -->
+    <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-warning" id="warningModalLabel">Action Restricted</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    You cannot reschedule or cancel an appointment within 3 hours of the scheduled time.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <!-- Include Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -204,6 +252,50 @@
                     // Show the targeted section
                     const targetId = link.getAttribute("data-target");
                     document.getElementById(targetId).classList.add("active");
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const rescheduleButtons = document.querySelectorAll(".btn-reschedule");
+            const cancelButtons = document.querySelectorAll(".btn-cancel");
+            const warningModal = new bootstrap.Modal(document.getElementById("warningModal"));
+
+            const handleAction = (appointmentDate, slotTime, actionCallback) => {
+                const appointmentDateTime = new Date(appointmentDate + "T" + slotTime);
+                const now = new Date();
+
+                // Check if the action is restricted
+                if (appointmentDateTime - now <= 3 * 60 * 60 * 1000) { // 3 hours in milliseconds
+                    warningModal.show();
+                } else {
+                    actionCallback();
+                }
+            };
+
+            // Attach event listeners to Reschedule buttons
+            rescheduleButtons.forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const appointmentDate = button.getAttribute("data-appointment-date");
+                    const slotTime = button.getAttribute("data-slot-time");
+                    handleAction(appointmentDate, slotTime, () => {
+                        window.location.href = button.getAttribute("href");
+                    });
+                });
+            });
+
+            // Attach event listeners to Cancel buttons
+            cancelButtons.forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const appointmentDate = button.getAttribute("data-appointment-date");
+                    const slotTime = button.getAttribute("data-slot-time");
+                    handleAction(appointmentDate, slotTime, () => {
+                        window.location.href = button.getAttribute("href");
+                    });
                 });
             });
         });

@@ -11,11 +11,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-
+builder.Services.AddMemoryCache();
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<DoctorRepository>();
-builder.Services.AddScoped<MedicineRepository>();
+builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
+builder.Services.AddScoped<IMedicineService, MedicineService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<FeedbackService>();
+builder.Services.AddScoped<DoctorService>();
+builder.Services.AddScoped<AppointmentService>();
+
 
 var app = builder.Build();
 

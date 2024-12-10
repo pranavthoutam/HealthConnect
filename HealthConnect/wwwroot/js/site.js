@@ -1,5 +1,4 @@
-﻿// Timer logic
-let timerElement = document.getElementById("timer");
+﻿let timerElement = document.getElementById("timer");
 let resendButton = document.getElementById("resendOtp");
 let formElement = document.getElementById("otpForm");
 
@@ -47,7 +46,7 @@ resendButton.addEventListener("click", () => {
             if (data.success) {
                 alert("A new OTP has been sent to your email.");
             } else {
-                alert("Failed to resend OTP. Please try again later.");
+                alert(data.message || "Failed to resend OTP. Please try again later.");
             }
         })
         .catch((error) => {

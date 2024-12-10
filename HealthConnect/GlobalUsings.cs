@@ -8,7 +8,8 @@ global using System.Collections.Concurrent;
 global using HealthConnect.Data;
 global using System.Security.Claims;
 global using Microsoft.AspNetCore.Authorization;
-global using System.Diagnostics;
 global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using Microsoft.EntityFrameworkCore;
+global using HealthConnect.Services.Interfaces;
+

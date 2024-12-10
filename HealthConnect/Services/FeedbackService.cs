@@ -1,8 +1,4 @@
-﻿using HealthConnect.Data;
-using HealthConnect.Models;
-using Microsoft.EntityFrameworkCore;
-
-namespace HealthConnect.Services
+﻿namespace HealthConnect.Services
 {
     public class FeedbackService
     {
@@ -47,14 +43,14 @@ namespace HealthConnect.Services
         public async Task<Appointment> GetAppointmentByIdAsync(int appointmentId)
         {
             return await _context.Appointments
-                .Include("Doctor")
-                .Include("User")
+                .Include(a=>a.Doctor)
+                .Include(a=>a.User)
                 .FirstOrDefaultAsync(a=>a.Id==appointmentId);
         }
 
         public IEnumerable<Feedback> GetDoctorFeedBacks(int doctorId)
         {
-            return _context.Feedbacks.Where(f=>f.DoctorId ==doctorId).ToList();
+            return _context.Feedbacks.Where(f=>f.DoctorId ==doctorId).Include(f=>f.User).ToList();
         }
     }
 
