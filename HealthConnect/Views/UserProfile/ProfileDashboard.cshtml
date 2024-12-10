@@ -97,19 +97,8 @@
                                 }
                                 else
                                 {
-                                    <a href="@Url.Action("Reschedule", new { appointmentId = appointment.AppointmentId })"
-                                       class="btn btn-outline-primary ms-3 btn-reschedule"
-                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
-                                       data-slot-time="@appointment.Slot">
-                                        Reschedule
-                                    </a>
-
-                                    <a href="@Url.Action("Cancel", new { appointmentId = appointment.AppointmentId })"
-                                       class="btn btn-danger ms-3 btn-cancel"
-                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
-                                       data-slot-time="@appointment.Slot">
-                                        Cancel
-                                    </a>
+                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="1" asp-route-status="1" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-outline-primary ms-3 btn-reschedule">Reschedule</a>
+                                    <a asp-action="CancelAppointment" asp-controller="User" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-danger ms-3 btn-cancel">Cancel</a>
                                 }
                             </div>
                         }
@@ -145,19 +134,9 @@
                                 }
                                 else
                                 {
-                                    <a href="@Url.Action("Reschedule", new { appointmentId = appointment.AppointmentId })"
-                                       class="btn btn-outline-primary ms-3 btn-reschedule"
-                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
-                                       data-slot-time="@appointment.Slot">
-                                        Reschedule
-                                    </a>
+                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="1" asp-route-status="1" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-outline-primary ms-3 btn-reschedule">Reschedule</a>
+                                    <a asp-action="CancelAppointment" asp-controller="User" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-danger ms-3 btn-cancel">Cancel</a>
 
-                                    <a href="@Url.Action("Cancel", new { appointmentId = appointment.AppointmentId })"
-                                       class="btn btn-danger ms-3 btn-cancel"
-                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
-                                       data-slot-time="@appointment.Slot">
-                                        Cancel
-                                    </a>
 
                                     @if (TimeSpan.TryParse(appointment.Slot, out var slotTime))
                                     {

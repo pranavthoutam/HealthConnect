@@ -31,7 +31,7 @@ namespace HealthConnect.Repositories
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                query = query.Where(d => d.Specialization.Contains(searchString) || d.FullName.Contains(searchString) );
+                query = query.Where(d => d.Specialization.Contains(searchString) || EF.Functions.Like(d.FullName, $"%{searchString}%") );
             }
 
             return query.ToList();

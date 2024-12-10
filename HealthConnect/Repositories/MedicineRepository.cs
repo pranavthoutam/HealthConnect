@@ -24,10 +24,11 @@
     public IEnumerable<string> GetMedicinesByPartialName(string partialName)
     {
         return _context.Medicines
-            .Where(m => m.Name.Contains(partialName))
+            .Where(m => EF.Functions.Like(m.Name, $"%{partialName}%"))
             .Select(m => m.Name)
             .ToList();
     }
+
 
     public List<Medicine> GetMedicineByName(string name, int? categoryId = null)
     {

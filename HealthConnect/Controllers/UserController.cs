@@ -101,7 +101,7 @@
             };
 
             await _appointmentService.AddAppointmentAsync(newAppointment);
-            ViewBag.AppointmentDate = date;
+            ViewBag.AppointmentDate = date.ToShortDateString();
             ViewBag.TimeSlot = selectedSlot;
             TempData["Message"] = "Appointment booked successfully!";
             ViewBag.MeetingLink = consultationLink;

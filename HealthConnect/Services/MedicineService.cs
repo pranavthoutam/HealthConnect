@@ -1,13 +1,17 @@
 ﻿
+using Microsoft.Extensions.Caching.Memory;
+
 namespace HealthConnect.Services
 {
     public class MedicineService : IMedicineService
     {
         private readonly IMedicineRepository _medicineRepository;
+        private readonly IMemoryCache _cache;
 
-        public MedicineService(IMedicineRepository medicineRepository)
+        public MedicineService(IMedicineRepository medicineRepository,IMemoryCache cache)
         {
             _medicineRepository = medicineRepository;
+            _cache = cache;
         }
 
         public IEnumerable<string> GetSuggestions(string query)
@@ -15,7 +19,16 @@ namespace HealthConnect.Services
             if (string.IsNullOrWhiteSpace(query))
                 return Enumerable.Empty<string>();
 
-            return _medicineRepository.GetMedicinesByPartialName(query);
+            string cacheKey = $"MedicineSuggestions_{query.ToLower()}";
+            if (!_cache.TryGetValue(cacheKey, out IEnumerable<string> suggestions))
+            {
+                suggestions = _medicineRepository.GetMedicinesByPartialName(query).Take(4).ToList();
+
+                // Cache the suggestions for 10 minutes
+                _cache.Set(cacheKey, suggestions, TimeSpan.FromMinutes(10));
+            }
+
+            return suggestions;
         }
 
         public List<Medicine> GetMedicinesByCategory(int categoryId)

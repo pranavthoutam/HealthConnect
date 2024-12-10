@@ -83,7 +83,6 @@
                                 <hr class="my-1">
                                 <div class="card-body text-center">
                                     <p class="card-title text-gray-700">@medicine.Name</p>
-                                    <p class="card-text text-primary fw-bold">₹100</p>
                                     <form asp-controller="Medicine" asp-action="MedicineInfo" method="get">
                                         <input type="hidden" name="id" value="@medicine.Id" />
                                         <button type="submit" class="btn btn-outline-primary">DETAILS</button>
