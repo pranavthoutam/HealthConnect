@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Patient Details";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card shadow-sm p-4">
+            <h2 class="text-center">Appointment Details</h2>
+            <hr />
+            <div>
+                <p><strong>Doctor:</strong> @ViewBag.DoctorName</p>
+                <p><strong>Date:</strong> @ViewBag.SelectedDate.ToShortDateString()</p>
+                <p><strong>Time Slot:</strong> @ViewBag.SelectedSlot</p>
+                <p><strong>Consultation Mode:</strong> @ViewBag.IsOnline</p>
+                <p><strong>Consultation Fee:</strong> ₹@ViewBag.ConsultationFee</p>
+            </div>
+            <form asp-action="ConfirmAppointment" method="post">
+                <input type="hidden" name="doctorId" value="@ViewBag.DoctorId" />
+                <input type="hidden" name="selectedSlot" value="@ViewBag.SelectedSlot" />
+                <input type="hidden" name="date" value="@ViewBag.SelectedDate" />
+                <input type="hidden" name="isOnline" value="@(ViewBag.IsOnline == 1 ? "Online" : "Clinic Visit")" />
+                <input type="hidden" name="status" value="@ViewBag.AppointmentStatus" />
+                <input type="hidden" name="appointmentId" value="@ViewBag.AppointmentId" />
+
+                <div class="form-group">
+                    <label for="patientName">Patient Name</label>
+                    <input type="text" name="patientName" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label for="healthConcern">Suffering From</label>
+                    <input type="text" name="healthConcern" class="form-control" required />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block mt-3">Confirm Appointment</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

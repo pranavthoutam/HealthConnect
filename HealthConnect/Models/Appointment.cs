@@ -15,6 +15,12 @@
         public User User { get; set; }
 
         [Required]
+        public string PatientName { get; set; }
+
+        [Required]
+        public string HealthConcern {  get; set; }
+
+        [Required]
         public DateTime AppointmentDate { get; set; }
 
         [Required]

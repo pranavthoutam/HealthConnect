@@ -52,13 +52,33 @@
             ViewBag.IsOnline = isOnline;
             ViewBag.AppointmentStatus = status ?? AppointmentStatus.Scheduled;
             ViewBag.AppointmentId = appointmentId;
+            ViewBag.ConsultationFee = doctor.ConsultationFee;
+            ViewBag.DoctorName = doctor.FullName;
 
             return View(doctor);
         }
 
+        [HttpPost]
+        public IActionResult PatientDetails(int doctorId, string doctorName, DateTime date,
+                                            string selectedSlot, int isOnline, decimal consultationFee,
+                                            int? appointmentId ,AppointmentStatus? status)
+        {
+            ViewBag.DoctorId = doctorId;
+            ViewBag.SelectedDate = date;
+            ViewBag.SelectedSlot = selectedSlot;
+            ViewBag.IsOnline = isOnline;
+            ViewBag.AppointmentStatus = status ?? AppointmentStatus.Scheduled;
+            ViewBag.AppointmentId = appointmentId;
+            ViewBag.DoctorName = doctorName;
+            ViewBag.ConsultationFee = consultationFee;
+            return View();
+        }
+
+
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
+        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date,
+            int isOnline,string patientName,string healthConcern,AppointmentStatus? status, int? appointmentId)
         {
             if (string.IsNullOrEmpty(selectedSlot))
             {
@@ -97,7 +117,9 @@
                 AppointmentDate = date,
                 IsOnline = isOnline == 1,
                 ConsultationLink = consultationLink,
-                Status = status ?? AppointmentStatus.Scheduled
+                Status = status ?? AppointmentStatus.Scheduled,
+                PatientName = patientName,
+                HealthConcern = healthConcern,
             };
 
             await _appointmentService.AddAppointmentAsync(newAppointment);
