@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Net.Mail;
-
-namespace HealthConnect.Services
+﻿namespace HealthConnect.Services
 {
     public class EmailService
     {

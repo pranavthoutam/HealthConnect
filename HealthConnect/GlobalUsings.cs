@@ -12,4 +12,7 @@ global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using Microsoft.EntityFrameworkCore;
 global using HealthConnect.Services.Interfaces;
+global using System.Net;
+global using System.Net.Mail;
+global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 

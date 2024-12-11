@@ -5,12 +5,18 @@
         private readonly DoctorService _doctorService;
         private readonly AppointmentService _appointmentService;
         private readonly FeedbackService _feedbackService;
+        private readonly EmailService _emailService;
+        private readonly EmailScheduler _emailScheduler;
 
-        public UserController(DoctorService doctorService, AppointmentService appointmentService, FeedbackService feedbackService)
+        public UserController(DoctorService doctorService, AppointmentService appointmentService,
+                              FeedbackService feedbackService,EmailService emailService,
+                              EmailScheduler emailScheduler)
         {
             _doctorService = doctorService;
             _appointmentService = appointmentService;
             _feedbackService = feedbackService;
+            _emailService = emailService;
+            _emailScheduler = emailScheduler;
         }
 
         [HttpGet]
@@ -58,6 +64,7 @@
             return View(doctor);
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult PatientDetails(int doctorId, string doctorName, DateTime date,
                                             string selectedSlot, int isOnline, decimal consultationFee,
@@ -77,8 +84,10 @@
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> ConfirmAppointment(int doctorId, string selectedSlot, DateTime date,
-            int isOnline,string patientName,string healthConcern,AppointmentStatus? status, int? appointmentId)
+        public async Task<IActionResult> ConfirmAppointment(
+    int doctorId, string selectedSlot, DateTime date,
+    int isOnline, string patientName, string healthConcern,
+    AppointmentStatus? status, int? appointmentId)
         {
             if (string.IsNullOrEmpty(selectedSlot))
             {
@@ -87,16 +96,15 @@
             }
 
             string consultationLink = isOnline == 1
-            ? $"https://meet.jit.si/healthconnect-room-{Guid.NewGuid()}#config.disableModerator=true"
-            : null;
-
+                ? $"https://meet.jit.si/healthconnect-room-{Guid.NewGuid()}#config.disableModerator=true"
+                : null;
 
             if (appointmentId != null)
             {
                 if (await _appointmentService.RescheduleAppointmentAsync((int)appointmentId, date, selectedSlot, isOnline == 1, consultationLink))
                 {
                     TempData["Message"] = "Appointment rescheduled successfully.";
-                    return View();
+                    return RedirectToAction("ProfileDashboard", "UserProfile");
                 }
 
                 TempData["Message"] = "Appointment not found for rescheduling.";
@@ -123,12 +131,47 @@
             };
 
             await _appointmentService.AddAppointmentAsync(newAppointment);
+
+            // Schedule emails
+            string userEmail = User.FindFirstValue(ClaimTypes.Email);
+            string confirmationSubject = isOnline == 1
+                ? "Online Appointment Confirmation"
+                : "In-Clinic Appointment Confirmation";
+            string confirmationBody = isOnline == 1
+                ? $"Your appointment has been scheduled successfully. You will receive the meeting link 10 minutes before your scheduled time."
+                : $"Your in-clinic appointment has been scheduled successfully for {date.ToShortDateString()} at {selectedSlot}.";
+
+            _emailScheduler.ScheduleEmail(userEmail, confirmationSubject, confirmationBody, DateTime.Now.AddSeconds(1));
+            if (TimeSpan.TryParse(selectedSlot, out var slotTime))
+            {
+                var appointmentDateTime = date.Date.Add(slotTime);
+
+                if (isOnline == 1)
+                {
+                    string reminderSubject = "Your Online Appointment Reminder";
+                    string reminderBody = $"Your appointment starts in 10 minutes. Use this link: {consultationLink}";
+                    _emailScheduler.ScheduleEmail(userEmail, reminderSubject, reminderBody, appointmentDateTime.AddMinutes(-10));
+                }
+                else
+                {
+                    string reminderSubject = "Your In-Clinic Appointment Reminder";
+                    string reminderBody = $"Your in-clinic appointment starts in 30 minutes at {appointmentDateTime.ToString("f")}.";
+                    _emailScheduler.ScheduleEmail(userEmail, reminderSubject, reminderBody, appointmentDateTime.AddMinutes(-30));
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Invalid time slot format.";
+            }
+
             ViewBag.AppointmentDate = date.ToShortDateString();
             ViewBag.TimeSlot = selectedSlot;
             TempData["Message"] = "Appointment booked successfully!";
             ViewBag.MeetingLink = consultationLink;
             return View();
         }
+
+
 
         public async Task<IActionResult> CancelAppointment(int appointmentId)
         {

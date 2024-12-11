@@ -105,23 +105,35 @@
                     {
                         foreach (var feedback in (List<Feedback>)ViewBag.Feedbacks)
                         {
+                            // Calculate the difference between the current date and the feedback date
+                            var monthsAgo = DateTime.Now.Month - feedback.FeedbackDate.Month + 12 * (DateTime.Now.Year - feedback.FeedbackDate.Year);
+                            var yearsAgo = monthsAgo / 12;
+                            var monthsDisplay = monthsAgo % 12;
+
+                            string timeAgoDisplay = monthsAgo > 12
+                            ? $"{yearsAgo} year{(yearsAgo > 1 ? "s" : "")} ago"
+                            : $"{monthsDisplay} month{(monthsDisplay > 1 ? "s" : "")} ago";
+
                             <div class="border-bottom py-2">
-                                <p class="mb-1">
-                                    <strong>@feedback.User.UserName</strong>
-                                    <span class="text-warning">
-                                        @for (int i = 1; i <= 5; i++)
-                                        {
-                                            if (i <= feedback.Rating)
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>@feedback.User.UserName</strong>
+                                        <span class="text-warning ms-2">
+                                            @for (int i = 1; i <= 5; i++)
                                             {
-                                                <i class="fas fa-star"></i> <!-- Filled star -->
+                                                if (i <= feedback.Rating)
+                                                {
+                                                    <i class="fas fa-star"></i> <!-- Filled star -->
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star"></i> <!-- Empty star -->
+                                                }
                                             }
-                                            else
-                                            {
-                                                <i class="far fa-star"></i> <!-- Empty star -->
-                                            }
-                                        }
-                                    </span>
-                                </p>
+                                        </span>
+                                    </div>
+                                    <span class="text-muted">@timeAgoDisplay</span> <!-- Display time ago -->
+                                </div>
                                 <p class="mb-2">@feedback.Description</p>
                             </div>
                         }

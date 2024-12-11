@@ -26,6 +26,8 @@ namespace HealthConnect.ViewModels
         [AtLeastOneRequired]
         public bool ClinicAppoinment { get; set; }
 
+        public string? ClinicLocation { get; set; }
+
         public string ClinicName { get; set; }
 
         public string HnoAndStreetName { get; set; }

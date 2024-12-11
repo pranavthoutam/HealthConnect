@@ -32,6 +32,8 @@
 
         public string ClinicName { get; set; }
 
+        public string? ClinicLocation { get; set; }
+
         public string HnoAndStreetName { get; set; }
 
         public string District { get; set; }
@@ -44,7 +46,6 @@
         public string CertificatePath { get; set; }
 
         public virtual User User { get; set; }
-
         //Slot Management
 
         

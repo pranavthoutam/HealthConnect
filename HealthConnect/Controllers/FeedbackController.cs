@@ -31,6 +31,7 @@
     [HttpPost]
     public async Task<IActionResult> SubmitFeedback(Feedback feedback)
     {
+        feedback.FeedbackDate = DateTime.Now;
         ModelState.Remove("Doctor");
         ModelState.Remove("User");
         ModelState.Remove("Appointment");
@@ -42,7 +43,7 @@
         try
         {
             await _feedbackService.SubmitFeedbackAsync(feedback);
-            return RedirectToAction("ProfileDashboard", "Account");
+            return RedirectToAction("ProfileDashboard", "UserProfile");
         }
         catch (Exception ex)
         {

@@ -13,6 +13,7 @@ builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddMemoryCache();
 builder.Services.AddTransient<EmailService>();
+builder.Services.AddSingleton<EmailScheduler>();
 builder.Services.AddScoped<DoctorRepository>();
 builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
 builder.Services.AddScoped<IMedicineService, MedicineService>();

@@ -83,11 +83,11 @@
                                     <!-- Status Display -->
                                     @if (!appointment.IsCompleted)
                                     {
-                                        <p class="text-muted mb-0">Upcoming</p>
+                                        <p class=" text-danger mb-0">Upcoming</p>
                                     }
                                     else
                                     {
-                                        <p class="text-danger mb-0">Completed</p>
+                                        <p class="text-primary mb-0">Completed</p>
                                     }
                                 </div>
                                 <!-- Action Buttons -->
@@ -97,8 +97,26 @@
                                 }
                                 else
                                 {
-                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="1" asp-route-status="1" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-outline-primary ms-3 btn-reschedule">Reschedule</a>
-                                    <a asp-action="CancelAppointment" asp-controller="User" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-danger ms-3 btn-cancel">Cancel</a>
+                                    <a asp-action="BookAppointment"
+                                       asp-controller="User"
+                                       asp-route-doctorId="@appointment.DoctorId"
+                                       asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                       asp-route-IsOnline="1"
+                                       asp-route-status="1"
+                                       asp-route-appointmentId="@appointment.AppointmentId"
+                                       class="btn btn-outline-primary ms-3 btn-reschedule"
+                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                       data-slot-time="@appointment.Slot">
+                                        Reschedule
+                                    </a>
+                                    <a asp-action="CancelAppointment"
+                                       asp-controller="User"
+                                       asp-route-appointmentId="@appointment.AppointmentId"
+                                       class="btn btn-danger ms-3 btn-cancel"
+                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                       data-slot-time="@appointment.Slot">
+                                        Cancel
+                                    </a>
                                 }
                             </div>
                         }
@@ -121,11 +139,11 @@
 
                                     @if (!appointment.IsCompleted)
                                     {
-                                        <p class="text-muted mb-0">Upcoming</p>
+                                        <p class="text-danger mb-0">Upcoming</p>
                                     }
                                     else
                                     {
-                                        <p class="text-danger mb-0">Completed</p>
+                                        <p class="text-primary mb-0">Completed</p>
                                     }
                                 </div>
                                 @if (appointment.IsCompleted)
@@ -134,8 +152,26 @@
                                 }
                                 else
                                 {
-                                    <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="1" asp-route-status="1" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-outline-primary ms-3 btn-reschedule">Reschedule</a>
-                                    <a asp-action="CancelAppointment" asp-controller="User" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-danger ms-3 btn-cancel">Cancel</a>
+                                    <a asp-action="BookAppointment"
+                                       asp-controller="User"
+                                       asp-route-doctorId="@appointment.DoctorId"
+                                       asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                       asp-route-IsOnline="1"
+                                       asp-route-status="1"
+                                       asp-route-appointmentId="@appointment.AppointmentId"
+                                       class="btn btn-outline-primary ms-3 btn-reschedule"
+                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                       data-slot-time="@appointment.Slot">
+                                        Reschedule
+                                    </a>
+                                    <a asp-action="CancelAppointment"
+                                       asp-controller="User"
+                                       asp-route-appointmentId="@appointment.AppointmentId"
+                                       class="btn btn-danger ms-3 btn-cancel"
+                                       data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                       data-slot-time="@appointment.Slot">
+                                        Cancel
+                                    </a>
 
 
                                     @if (TimeSpan.TryParse(appointment.Slot, out var slotTime))
@@ -243,16 +279,17 @@
             const warningModal = new bootstrap.Modal(document.getElementById("warningModal"));
 
             const handleAction = (appointmentDate, slotTime, actionCallback) => {
-                const appointmentDateTime = new Date(appointmentDate + "T" + slotTime);
+                const appointmentDateTime = new Date(`${appointmentDate}T${slotTime}`);
                 const now = new Date();
 
-                // Check if the action is restricted
+                // Check if the action is restricted (less than or equal to 3 hours remaining)
                 if (appointmentDateTime - now <= 3 * 60 * 60 * 1000) { // 3 hours in milliseconds
                     warningModal.show();
                 } else {
                     actionCallback();
                 }
             };
+
 
             // Attach event listeners to Reschedule buttons
             rescheduleButtons.forEach(button => {

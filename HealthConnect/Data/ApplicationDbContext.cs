@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using HealthConnect.Models;
-using System.Reflection.Emit;
-
-namespace HealthConnect.Data
+﻿namespace HealthConnect.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User>
     {

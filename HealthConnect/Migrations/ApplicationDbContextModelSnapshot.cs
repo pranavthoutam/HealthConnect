@@ -60,7 +60,7 @@ namespace HealthConnect.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Appointments");
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Doctor", b =>
@@ -135,7 +135,7 @@ namespace HealthConnect.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Doctors");
+                    b.ToTable("Doctors", (string)null);
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Feedback", b =>
@@ -172,7 +172,7 @@ namespace HealthConnect.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Feedbacks");
+                    b.ToTable("Feedbacks", (string)null);
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Medicine", b =>
@@ -221,7 +221,7 @@ namespace HealthConnect.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Medicines");
+                    b.ToTable("Medicines", (string)null);
                 });
 
             modelBuilder.Entity("HealthConnect.Models.MedicineAlternatives", b =>
@@ -244,7 +244,7 @@ namespace HealthConnect.Migrations
 
                     b.HasIndex("MedicineId");
 
-                    b.ToTable("MedicinesAlternatives");
+                    b.ToTable("MedicinesAlternatives", (string)null);
                 });
 
             modelBuilder.Entity("HealthConnect.Models.MedicineCategory", b =>
@@ -261,7 +261,7 @@ namespace HealthConnect.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MedicineCategories");
+                    b.ToTable("MedicineCategories", (string)null);
                 });
 
             modelBuilder.Entity("HealthConnect.Models.User", b =>
