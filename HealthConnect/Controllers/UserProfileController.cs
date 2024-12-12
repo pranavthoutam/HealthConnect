@@ -3,10 +3,11 @@
     public class UserProfileController : Controller
     {
         private readonly IUserProfileService _userProfileService;
-
-        public UserProfileController(IUserProfileService userProfileService)
+        private readonly UserManager<User> _userManager;
+        public UserProfileController(IUserProfileService userProfileService,UserManager<User> userManager)
         {
             _userProfileService = userProfileService;
+            _userManager = userManager;
         }
 
         [Authorize]
@@ -18,7 +19,7 @@
             {
                 return RedirectToAction("Login", "Account");
             }
-
+            
             var dashboard = await _userProfileService.GetDashboardAsync(userId);
             if (dashboard == null)
             {
@@ -41,7 +42,6 @@
                 return NotFound();
             }
 
-            // Pass the profile photo as a byte array to the view
             ViewBag.ProfilePhoto = await _userProfileService.GetProfilePhotoAsync(userId);
 
             return View(userProfile);

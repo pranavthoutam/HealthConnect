@@ -162,5 +162,10 @@ namespace HealthConnect.Repositories
                     a.AppointmentDate.Date == date.Date &&
                     a.Slot == slot);
         }
+
+        public int GetDoctorId(string userId)
+        {
+            return  _context.Doctors.FirstOrDefault(d=>d.UserId==userId).Id;
+        }
     }
 }

@@ -1,15 +1,12 @@
 ﻿namespace HealthConnect.Controllers
 {
-    
     public class DoctorController : Controller
     {
         private readonly DoctorRepository _doctorRepository;
-
         public DoctorController(DoctorRepository doctorRepository)
         {
             _doctorRepository = doctorRepository;
         }
-
         public IActionResult Index()
         {
             return View();
@@ -22,7 +19,6 @@
             var model = new DoctorRegistrationViewModel();
             return View(model);
         }
-
         [HttpPost]
         public async Task<IActionResult> Register(DoctorRegistrationViewModel model)
         {
@@ -31,7 +27,6 @@
                 string clinicImagePath = null;
                 string certificatePath = null;
 
-                // Handle file uploads for Clinic Image
                 if (model.ClinicImage != null && model.ClinicImage.Length > 0)
                 {
                     clinicImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "clinicimages", model.ClinicImage.FileName);
@@ -40,8 +35,6 @@
                         await model.ClinicImage.CopyToAsync(stream);
                     }
                 }
-
-                // Handle file uploads for Certificate
                 if (model.Certificate != null && model.Certificate.Length > 0)
                 {
                     certificatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "certificates", model.Certificate.FileName);
@@ -50,10 +43,7 @@
                         await model.Certificate.CopyToAsync(stream);
                     }
                 }
-
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                // Create a Doctor object and set the properties
                 var doctor = new Doctor
                 {
                     FullName = model.FullName,
@@ -66,7 +56,7 @@
                     ClinicName = model.ClinicName,
                     ClinicImagePath = "/uploads/clinicimages/" + model.ClinicImage.FileName,
                     CertificatePath = "/uploads/certificates/" + model.Certificate.FileName,
-                    ApprovalStatus = "Pending" ,// Set default approval status
+                    ApprovalStatus = "Pending" ,
                     HnoAndStreetName = model.HnoAndStreetName,
                     Place=model.Place,
                     District=model.District,
@@ -74,19 +64,25 @@
 
                 };
 
-                // Save the doctor data using the service (which internally uses the repository)
                 await _doctorRepository.AddDoctorAsync(doctor);
-
                 return RedirectToAction("Index", "Doctor");
             }
-
-            // If the model is invalid, return the same view with validation errors
             return View(model);
         }
-
-        public IActionResult Feedback()
+        public async Task<IActionResult> TodaysAppointments()
         {
-            return View();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var doctorId = _doctorRepository.GetDoctorId(userId);
+
+            var appointments = (List<Appointment>) await _doctorRepository.GetAppointmentsForDoctorAsync(doctorId,DateTime.Now.Date);
+
+            var viewModel = new ProfileDashboardViewModel
+            {
+               Appointments = appointments
+            };
+
+            return View(viewModel); 
         }
     }
 }

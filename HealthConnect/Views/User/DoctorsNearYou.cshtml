@@ -1,4 +1,4 @@
-﻿@model HealthConnect.ViewModels.DoctorFilterViewModel
+﻿@model DoctorFilterViewModel
 
 <html>
 
@@ -87,8 +87,10 @@
                 @foreach (var doctor in Model.Doctors)
                 {
                     <div class="card shadow-sm p-3 d-flex flex-row align-items-center">
-                        <img src="@doctor.ClinicImagePath" alt="Portrait of @doctor.FullName" class="rounded-circle me-3" height="100" width="100" />
-                        <div class="flex-fill">
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(doctor.User.ProfilePhoto)"
+                             alt="Portrait of @doctor.FullName"
+                             class="rounded-circle me-3" height="100" width="100" />   
+                             <div class="flex-fill">
                             <h3 class="h5 text-teal mb-1">Dr @doctor.FullName</h3>
                             <p class="mb-0 text-muted">@doctor.Specialization</p>
                             <p class="mb-0 text-muted">@doctor.Experience years experience overall</p>

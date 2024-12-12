@@ -27,7 +27,11 @@
                         <div class="rounded-circle overflow-hidden bg-secondary" style="width: 120px; height: 120px;">
                             @if (!string.IsNullOrEmpty(profilePhotoBase64))
                             {
-                                <img id="profilePhotoPreview" src="@profilePhotoBase64" alt="Profile Photo" class="img-fluid">
+                                <img id="profilePhotoPreview"
+                                     src="@profilePhotoBase64"
+                                     alt="Profile Photo"
+                                     class="img-fluid"
+                                     style="object-fit: cover; width: 100%; height: 100%;">
                             }
                             else
                             {
@@ -36,7 +40,10 @@
                         </div>
                         <div class="ms-3">
                             <label class="form-label text-muted mb-1">Update your profile picture</label>
-                            <input type="file" name="ProfilePhoto" class="form-control" accept="image/*" onchange="previewProfilePhoto(event)">
+@*                             <input type="file" name="ProfilePhoto" class="form-control" accept="image/*" onchange="previewProfilePhoto(event)">
+
+                            *@<input type="file" id="profilePhotoInput" name="ProfilePhoto" class="form-control" accept="image/*">
+
                         </div>
                     </div>
 
@@ -126,18 +133,27 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function previewProfilePhoto(event) {
-            const reader = new FileReader();
-            reader.onload = function () {
-                const output = document.getElementById('profilePhotoPreview');
-                output.src = reader.result;
-            };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+   
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const profilePhotoInput = document.getElementById('profilePhotoInput');
+            const profilePhotoPreview = document.getElementById('profilePhotoPreview');
 
+            if (profilePhotoInput && profilePhotoPreview) {
+                profilePhotoInput.addEventListener('change', function (event) {
+                    const file = event.target.files[0]; // Get the selected file
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function () {
+                            profilePhotoPreview.src = reader.result; // Set the image preview
+                        };
+                        reader.readAsDataURL(file); // Convert the file to a Data URL
+                    }
+                });
+            }
+        });
+    </script>
    </body>
 </html>
+

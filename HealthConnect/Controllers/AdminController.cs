@@ -11,7 +11,7 @@
         [HttpGet]
         public IActionResult AddMedicine()
         {
-            ViewBag.Categories = _context.MedicineCategories.ToList(); // Load categories for dropdown
+            ViewBag.Categories = _context.MedicineCategories.ToList();
             return View();
         }
 
@@ -24,19 +24,14 @@
                     using (var ms = new MemoryStream())
                     {
                         await Image.CopyToAsync(ms);
-                        model.Image = ms.ToArray(); // Convert image to byte array
+                        model.Image = ms.ToArray(); 
                     }
                 }
-
-                _context.Medicines.Add(model); // Add medicine to the database
+                _context.Medicines.Add(model);
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Medicine added successfully!";
-                return RedirectToAction("SearchMedicines","User"); // Redirect to the list page
-            
-
-            //ViewBag.Categories = _context.MedicineCategories.ToList();
-            //return View(model); // Reload form with validation errors
+                return RedirectToAction("SearchMedicines","Medicine"); 
         }
 
     }

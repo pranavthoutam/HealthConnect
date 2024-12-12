@@ -17,7 +17,7 @@
         [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }
 
-        [RegularExpression(@"^.*\.(jpg|jpeg|png)$", ErrorMessage = "Only image files (jpg, jpeg, png) are allowed.")]
+        //[RegularExpression(@"^.*\.(jpg|jpeg|png)$", ErrorMessage = "Only image files (jpg, jpeg, png) are allowed.")]
         public IFormFile? ProfilePhoto { get; set; }
 
         [StringLength(100, ErrorMessage = "House number cannot exceed 100 characters.")]

@@ -1,4 +1,4 @@
-﻿@model HealthConnect.Models.Doctor
+﻿@model Doctor
 
 @{
     ViewData["Title"] = "Book Appointment";
@@ -59,7 +59,9 @@
                     <!-- Doctor Profile -->
                     <div class="d-flex">
                         <div class="pr-4">
-                            <img alt="Profile picture of @Model.User.UserName" class="rounded-circle" height="100" width="100" src="@Model.CertificatePath" />
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.User.ProfilePhoto)"
+                                 alt="Portrait of @Model.FullName"
+                                 class="rounded-circle me-3" height="100" width="100" />
                         </div>
                         <div>
                             <h1 class="h4 font-weight-bold">@Model.FullName</h1>

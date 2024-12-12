@@ -19,7 +19,6 @@
         }
 
 
-        // Create roles if they don't exist
         public async Task<IActionResult> CreateRoles()
         {
             string[] roleNames = { "Admin", "Doctor", "User" };
@@ -55,6 +54,13 @@
                 return View(userViewModel);
             }
 
+            var existingUser = await _userManager.FindByNameAsync(userViewModel.UserName);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError(nameof(userViewModel.UserName), "Username is already taken.");
+                return View(userViewModel);
+            }
+
             User user = new User
             {
                 UserName = userViewModel.UserName,
@@ -62,15 +68,20 @@
             };
 
             var createUser = await _userManager.CreateAsync(user, userViewModel.Password);
-
-            if (createUser.Succeeded) RedirectToAction("Index", "Home");
+            var userRole = await _userManager.AddToRoleAsync(user, userViewModel.Role);
+            if (createUser.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
 
             foreach (var error in createUser.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
+
             return View(userViewModel);
         }
+
 
         // Login view (GET)
         [HttpGet]
@@ -92,42 +103,30 @@
                 return View(loginViewModel);
             }
 
-            // Find the user by email
             User user = await _userManager.FindByEmailAsync(loginViewModel.Email);
             if (user != null)
             {
-                // Try to sign in the user
                 var result = await _signInManager.PasswordSignInAsync(user.UserName, loginViewModel.Password, loginViewModel.RememberMe, false);
 
-                // If login is successful, redirect to Home
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Index", "Home");
                 }
 
-                // If login fails (incorrect password), add an error to the password field
                 ModelState.AddModelError("Password", "Incorrect password. Please try again.");
             }
             else
             {
-                // Optionally handle the case where the user is not found (invalid email)
                 ModelState.AddModelError("Email", "No user found with this email address.");
             }
 
-            // If login fails, return the view with validation errors
             return View(loginViewModel);
         }
-
-
-
-
         [HttpGet]
         public IActionResult DoctorRegister()
         {
             return View();
         }
-
-        // Logout
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
