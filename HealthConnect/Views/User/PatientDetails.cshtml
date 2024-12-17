@@ -39,12 +39,15 @@
 
                 <div class="form-group">
                     <label for="patientName">Patient Name</label>
-                    <input type="text" name="patientName" class="form-control" required />
+                    <input type="text" name="patientName" class="form-control"
+                           value="@ViewBag.PatientName" required />
                 </div>
                 <div class="form-group">
                     <label for="healthConcern">Suffering From</label>
-                    <input type="text" name="healthConcern" class="form-control" required />
+                    <input type="text" name="healthConcern" class="form-control"
+                           value="@ViewBag.HealthConcern" required />
                 </div>
+
                 <button type="submit" class="btn btn-primary btn-block mt-3">Confirm Appointment</button>
             </form>
         </div>

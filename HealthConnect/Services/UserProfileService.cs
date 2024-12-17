@@ -30,7 +30,7 @@
                 Name = user.UserName,
                 Feedbacks = feedbacks,
                 InClinicAppointments = appointments
-                                       .Where(a => a.IsOnline == false)
+                                       .Where(a => a.Clinic.ClinicId!=null)
                                        .Select(a => new AppointmentViewModel
                                        {
                                            AppointmentId = a.Id,
@@ -39,7 +39,7 @@
                                            DoctorSpecialization = a.Doctor.Specialization,
                                            AppointmentDate = a.AppointmentDate,
                                            Slot = a.Slot,
-                                           Location = a.Doctor.Place,
+                                           Location = a.Clinic.Place,
                                            CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
                                            IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
                                                         (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay),
@@ -48,7 +48,7 @@
 
 
                 OnlineConsultations = appointments
-                                        .Where(a => a.IsOnline == true)
+                                        .Where(a => a.Clinic.Place==null)
                                         .Select(a => new AppointmentViewModel
                                         {
                                             AppointmentId = a.Id,
@@ -76,7 +76,7 @@
                                             DoctorSpecialization = a.Doctor.Specialization,
                                             AppointmentDate = a.AppointmentDate,
                                             Slot = a.Slot,
-                                            Location = a.Doctor.Place ?? "Online"
+                                            Location = a.Clinic.Place ?? "Online"
                                         })
                                         .ToList()
             };

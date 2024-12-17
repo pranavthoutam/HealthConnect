@@ -94,8 +94,17 @@
                             <h3 class="h5 text-teal mb-1">Dr @doctor.FullName</h3>
                             <p class="mb-0 text-muted">@doctor.Specialization</p>
                             <p class="mb-0 text-muted">@doctor.Experience years experience overall</p>
-                            <p class="mb-0 text-muted">@doctor.District, @doctor.Place</p>
-                            <p class="mb-0 text-muted">₹@doctor.ConsultationFee Consultation fee at clinic</p>
+                            @if (doctor.Clinics != null && doctor.Clinics.Any())
+                            {
+                                foreach (var clinic in doctor.Clinics)
+                                {
+                                    <p class="mb-0 text-muted">@clinic.Place</p>
+                                }
+                            }
+                            else
+                            {
+                                <p class="mb-0 text-muted">No clinic places available.</p>
+                            }                            <p class="mb-0 text-muted">₹@doctor.ConsultationFee Consultation fee at clinic</p>
                             <p class="mb-0">
                                 <span class="text-warning">
                                     @for (int i = 1; i <= 5; i++)

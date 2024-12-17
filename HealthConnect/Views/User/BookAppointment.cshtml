@@ -93,9 +93,24 @@
 
                     <!-- Clinic Details -->
                     <div class="mt-4">
-                        <h5 class="text-primary">@Model.ClinicName</h5>
-                        <p class="text-muted">@Model.HnoAndStreetName</p>
-                        <p class="text-muted">@Model.Place</p>
+                        <h5 class="text-primary">Clinics</h5>
+
+                        @if (Model.Clinics != null && Model.Clinics.Any())
+                        {
+                            @foreach (var clinic in Model.Clinics)
+                            {
+                                <div class="mb-3">
+                                    <h6 class="text-success font-weight-bold">@clinic.ClinicName</h6>
+                                    <p class="text-muted">@clinic.HnoAndStreetName</p>
+                                    <p class="text-muted">@clinic.Place</p>
+                                    <hr />
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">No clinic details available for this doctor.</p>
+                        }
                     </div>
                 </div>
 

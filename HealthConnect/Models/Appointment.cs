@@ -18,7 +18,7 @@
         public string PatientName { get; set; }
 
         [Required]
-        public string HealthConcern {  get; set; }
+        public string HealthConcern { get; set; }
 
         [Required]
         public DateTime AppointmentDate { get; set; }
@@ -26,13 +26,14 @@
         [Required]
         public string Slot { get; set; }
 
-        [Required]
-        public bool IsOnline { get; set; }
+        // Nullable ClinicId to account for online consultations
+        public int? ClinicId { get; set; }
+        [ForeignKey("ClinicId")]
+        public Clinic Clinic { get; set; }
 
         public AppointmentStatus Status { get; set; } = AppointmentStatus.Scheduled;
 
-        public string? ConsultationLink  { get; set; }
-
+        public string? ConsultationLink { get; set; }
     }
 
     public enum AppointmentStatus
@@ -41,5 +42,4 @@
         ReScheduled,
         Canceled
     }
-
 }

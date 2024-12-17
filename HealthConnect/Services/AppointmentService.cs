@@ -8,13 +8,18 @@
             _doctorRepository = doctorRepository;
         }
 
-        public async Task<bool> RescheduleAppointmentAsync(int appointmentId, DateTime date, string slot, bool isOnline, string consultationLink)
+        public async Task<Appointment?> GetAppointmentByIdAsync(int appointmentId)
+        {
+            return await _doctorRepository.GetAppointmentByIdAsync(appointmentId);
+        }
+
+        public async Task<bool> RescheduleAppointmentAsync(int appointmentId, DateTime date, string slot, int? clinicId, string consultationLink,string userRole)
         {
             var appointment = await _doctorRepository.GetAppointmentByIdAsync(appointmentId);
             if (appointment != null)
             {
                 // Check if rescheduling is allowed (at least 3 hours before the appointment)
-                if ((appointment.AppointmentDate - DateTime.Now).TotalHours < 3)
+                if (userRole!="Doctor" && (appointment.AppointmentDate - DateTime.Now).TotalHours < 3)
                 {
                     return false; // Cannot reschedule within 3 hours of the appointment
                 }
@@ -22,7 +27,7 @@
                 // Reschedule the appointment
                 appointment.AppointmentDate = date;
                 appointment.Slot = slot;
-                appointment.IsOnline = isOnline;
+                appointment.ClinicId = clinicId;
                 appointment.ConsultationLink = consultationLink;
                 appointment.Status = AppointmentStatus.ReScheduled;
 
@@ -32,13 +37,13 @@
             return false;
         }
 
-        public async Task<bool> CancelAppointmentAsync(int appointmentId)
+        public async Task<bool> CancelAppointmentAsync(int appointmentId, string userRole)
         {
             var appointment = await _doctorRepository.GetAppointmentByIdAsync(appointmentId);
             if (appointment != null)
             {
                 // Check if cancellation is allowed (at least 3 hours before the appointment)
-                if ((appointment.AppointmentDate - DateTime.Now).TotalHours < 3)
+                if (userRole!="Doctor" && (appointment.AppointmentDate - DateTime.Now).TotalHours < 3)
                 {
                     return false; // Cannot cancel within 3 hours of the appointment
                 }

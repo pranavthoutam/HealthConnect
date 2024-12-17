@@ -53,19 +53,24 @@
                     ConsultationFee = model.ConsultationFee,
                     OnlineConsultation = model.OnlineConsultation,
                     ClinicAppointment = model.ClinicAppoinment,
-                    ClinicName = model.ClinicName,
-                    ClinicImagePath = "/uploads/clinicimages/" + model.ClinicImage.FileName,
                     CertificatePath = "/uploads/certificates/" + model.Certificate.FileName,
                     ApprovalStatus = "Pending" ,
-                    HnoAndStreetName = model.HnoAndStreetName,
-                    Place=model.Place,
-                    District=model.District,
                     UserId=userId
-
                 };
 
                 await _doctorRepository.AddDoctorAsync(doctor);
-                return RedirectToAction("Index", "Doctor");
+
+                int doctorId = _doctorRepository.GetDoctorId(userId);
+
+                Clinic clinic = new Clinic
+                {
+                    DoctorId = doctorId,
+                    ClinicName = model.ClinicName,
+                    ClinicImagePath = "/uploads/clinicimages/" + model.ClinicImage.FileName,
+                    HnoAndStreetName = model.HnoAndStreetName,
+                    Place = model.Place,
+                    District = model.District
+                };
             }
             return View(model);
         }

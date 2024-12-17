@@ -21,12 +21,15 @@ namespace HealthConnect.Repositories
         public IEnumerable<Doctor> GetDoctorsByLocationAndSpecialization(string location, string searchString, string loggedInUserId = null)
         {
 
-            var query = _context.Doctors.Include(d=>d.User).Where(d=>d.ApprovalStatus=="Approved" && d.UserId != loggedInUserId )
+            var query = _context.Doctors
+                    .Include(d=>d.User)
+                    .Include(d=>d.Clinics)
+                    .Where(d=>d.ApprovalStatus=="Approved" && d.UserId != loggedInUserId )
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(location))
             {
-                query = query.Where(d => d.Place.Contains(location));
+                query = query.Where(d => d.Clinics.Any(c => c.Place.Contains(location)));
             }
 
             if (!string.IsNullOrEmpty(searchString))
@@ -81,6 +84,7 @@ namespace HealthConnect.Repositories
         {
             return await _context.Doctors
                          .Include(d => d.User)
+                         .Include(d=>d.Clinics)
                          .FirstOrDefaultAsync(d => d.Id == doctorId);
         }
 
@@ -147,7 +151,7 @@ namespace HealthConnect.Repositories
         {
             return await _context.Appointments.FirstOrDefaultAsync(a => a.Id == appointmentId);
         }
-
+        
         public async Task<IEnumerable<Feedback>> GetFeedBacksAsync(string userId)
         {
             return await _context.Feedbacks.Include(f => f.Appointment).Where(f=>f.UserId == userId).ToListAsync();

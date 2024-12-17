@@ -43,11 +43,16 @@
         try
         {
             await _feedbackService.SubmitFeedbackAsync(feedback);
-            return RedirectToAction("ProfileDashboard", "UserProfile");
+            return RedirectToAction("FeedbackConfirmation");
         }
         catch (Exception ex)
         {
             return View(feedback);
         }
+    }
+
+    public IActionResult FeedbackConfirmation()
+    {
+        return View();
     }
 }

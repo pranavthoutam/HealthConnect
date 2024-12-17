@@ -41,9 +41,9 @@
                 .WithOne()
                 .HasForeignKey<Doctor>(d => d.UserId);
             builder.Entity<Medicine>()
-        .HasOne(m => m.MedicineCategory)
-        .WithMany(mc => mc.Medicines)
-        .HasForeignKey(m => m.CategoryId);
+                .HasOne(m => m.MedicineCategory)
+                .WithMany(mc => mc.Medicines)
+                .HasForeignKey(m => m.CategoryId);
 
             // Configure MedicineAlternatives relationships
             builder.Entity<MedicineAlternatives>()
@@ -57,14 +57,24 @@
                 .WithMany() // No reverse navigation property
                 .HasForeignKey(ma => ma.AlternativeId)
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
+
+            builder.Entity<Doctor>()
+                .HasMany(d => d.Clinics)
+                .WithOne(c => c.Doctor)
+                .HasForeignKey(c => c.DoctorId);
+
+            builder.Entity<Clinic>()
+                .HasMany(c => c.Availabilities)
+                .WithOne(a => a.Clinic)
+                .HasForeignKey(a => a.ClinicId);
         }
         public DbSet<Doctor> Doctors { get; set; }
-
         public DbSet<MedicineCategory> MedicineCategories { get; set; }
         public DbSet<Medicine> Medicines { get; set; }
         public DbSet<MedicineAlternatives> MedicinesAlternatives { get;set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
-
+        public DbSet<Clinic> Clinics { get; set; }
+        public DbSet<DoctorAvailability> DoctorAvailability { get; set; }
     }
 }

@@ -35,7 +35,9 @@
                     @if (await user.IsInRoleAsync(await user.GetUserAsync(User), "Doctor"))
                     {
                         <li><a class="dropdown-item" asp-action="Register" asp-controller="Doctor">Register Your Practice</a></li>
-                        <li><a class="dropdown-item" asp-action="AddHealthFeed" asp-controller="Doctor">Add Health Feed</a></li>
+@*                         <li><a class="dropdown-item" asp-action="AddHealthFeed" asp-controller="Doctor">Add Health Feed</a></li>
+ *@
+                        <li><a class="dropdown-item" asp-action="ClinicDashboard" asp-controller="Clinic">Update Availability</a></li>
                         <li><a class="dropdown-item" asp-action="TodaysAppointments" asp-controller="Doctor">Todays Appointments</a></li>
                     }
 

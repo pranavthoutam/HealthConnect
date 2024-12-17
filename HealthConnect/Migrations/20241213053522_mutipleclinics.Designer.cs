@@ -4,6 +4,7 @@ using HealthConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthConnect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241213053522_mutipleclinics")]
+    partial class mutipleclinics
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,9 +36,6 @@ namespace HealthConnect.Migrations
                     b.Property<DateTime>("AppointmentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ClinicId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ConsultationLink")
                         .HasColumnType("nvarchar(max)");
 
@@ -45,6 +45,9 @@ namespace HealthConnect.Migrations
                     b.Property<string>("HealthConcern")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PatientName")
                         .IsRequired()
@@ -62,8 +65,6 @@ namespace HealthConnect.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClinicId");
 
                     b.HasIndex("DoctorId");
 
@@ -129,13 +130,32 @@ namespace HealthConnect.Migrations
                     b.Property<bool>("ClinicAppointment")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ClinicImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClinicLocation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClinicName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("ConsultationFee")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Experience")
                         .HasColumnType("int");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HnoAndStreetName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -145,6 +165,10 @@ namespace HealthConnect.Migrations
 
                     b.Property<bool>("OnlineConsultation")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Place")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Rating")
                         .HasColumnType("float");
@@ -556,10 +580,6 @@ namespace HealthConnect.Migrations
 
             modelBuilder.Entity("HealthConnect.Models.Appointment", b =>
                 {
-                    b.HasOne("HealthConnect.Models.Clinic", "Clinic")
-                        .WithMany()
-                        .HasForeignKey("ClinicId");
-
                     b.HasOne("HealthConnect.Models.Doctor", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId")
@@ -571,8 +591,6 @@ namespace HealthConnect.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Clinic");
 
                     b.Navigation("Doctor");
 

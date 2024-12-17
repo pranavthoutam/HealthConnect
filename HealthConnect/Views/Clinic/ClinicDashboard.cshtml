@@ -1,0 +1,204 @@
+﻿@model List<Clinic>
+
+@{
+    ViewData["Title"] = "Manage Clinics";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .clinic-card {
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-clinic-btn {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .clinic-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .clinic-info {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .clinic-actions button {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h1 class="h4">@ViewData["Title"]</h1>
+            <button class="btn add-clinic-btn" data-toggle="modal" data-target="#addClinicModal">
+                <i class="fas fa-plus"></i> Add Clinic
+            </button>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div>
+                @foreach (var clinic in Model)
+                {
+                    <div class="clinic-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="clinic-header">@clinic.ClinicName</h5>
+                                <p class="clinic-info">
+                                    @clinic.HnoAndStreetName, @clinic.Place
+                                </p>
+                                <img src="@clinic.ClinicImagePath" alt="Clinic Image" class="img-fluid" />
+                            </div>
+                            <div class="clinic-actions">
+                                <button class="btn btn-sm btn-outline-primary mr-2" data-toggle="modal" data-target="#editClinicModal" data-id="@clinic.ClinicId">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <a class="btn btn-sm btn-outline-danger" asp-action="DeleteClinic" asp-controller="Clinic" asp-route-clinicId="@clinic.ClinicId">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No clinics available. Add a clinic to get started.</p>
+        }
+
+        <!-- Add Clinic Modal -->
+        <div class="modal fade" id="addClinicModal" tabindex="-1" role="dialog" aria-labelledby="addClinicModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addClinicModalLabel">Add Clinic</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" enctype="multipart/form-data" asp-action="AddOrUpdateClinic" >
+                        <div class="modal-body">
+                            <!-- Clinic Name -->
+                            <div class="form-group">
+                                <label for="clinicName">Clinic Name</label>
+                                <input type="text" class="form-control" id="clinicName" name="ClinicName" required>
+                            </div>
+                            <input type="hidden" class="form-control" id="doctorId" name="DoctorId" value="@ViewBag.DoctorId" required />
+
+                            <!-- House Number and Street Name -->
+                            <div class="form-group">
+                                <label for="hnoAndStreetName">H.No and Street Name</label>
+                                <input type="text" class="form-control" id="hnoAndStreetName" name="HnoAndStreetName" required>
+                            </div>
+
+                            <!-- District -->
+                            <div class="form-group">
+                                <label for="district">District</label>
+                                <input type="text" class="form-control" id="district" name="District" required>
+                            </div>
+
+                            <!-- Place -->
+                            <div class="form-group">
+                                <label for="place">Place</label>
+                                <input type="text" class="form-control" id="place" name="Place" required>
+                            </div>
+
+                            <!-- Clinic Image -->
+                            <div class="form-group">
+                                <label for="clinicImage">Clinic Image</label>
+                                <input type="file" class="form-control-file" id="clinicImage" name="ClinicImage" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Edit Clinic Modal -->
+        <div class="modal fade" id="editClinicModal" tabindex="-1" role="dialog" aria-labelledby="editClinicModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editClinicModalLabel">Edit Clinic</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" asp-action="AddOrUpdateClinic">
+                        <div class="modal-body">
+                            <input type="hidden" id="clinicId" name="clinicId">
+                            <div class="form-group">
+                                <label for="editClinicName">Clinic Name</label>
+                                <input type="text" class="form-control" id="editClinicName" name="clinicName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editHnoAndStreetName">H.No and Street Name</label>
+                                <input type="text" class="form-control" id="editHnoAndStreetName" name="hnoAndStreetName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editPlace">Place</label>
+                                <input type="text" class="form-control" id="editPlace" name="place" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        
+
+        $('#editClinicModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var clinicId = button.data('id');
+            // Fetch clinic details via AJAX or populate data directly
+            $('#clinicId').val(clinicId);
+            // Populate other fields based on clinicId
+        });
+    </script>
+</body>
+</html>

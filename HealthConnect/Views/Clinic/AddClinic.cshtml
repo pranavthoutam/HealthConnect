@@ -1,0 +1,21 @@
+﻿@model Clinic
+<form asp-action="AddClinic" method="post">
+    <input type="hidden" name="DoctorId" value="@Model.DoctorId" />
+    <div>
+        <label for="ClinicName">Clinic Name</label>
+        <input id="ClinicName" name="ClinicName" type="text" required />
+    </div>
+    <div>
+        <label for="HnoAndStreetName">Address</label>
+        <input id="HnoAndStreetName" name="HnoAndStreetName" type="text" />
+    </div>
+    <div>
+        <label for="District">District</label>
+        <input id="District" name="District" type="text" />
+    </div>
+    <div>
+        <label for="Place">Place</label>
+        <input id="Place" name="Place" type="text" />
+    </div>
+    <button type="submit">Add Clinic</button>
+</form>

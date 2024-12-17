@@ -30,25 +30,13 @@
 
         public bool ClinicAppointment { get; set; }
 
-        public string ClinicName { get; set; }
-
-        public string? ClinicLocation { get; set; }
-
-        public string HnoAndStreetName { get; set; }
-
-        public string District { get; set; }
-
-        public string Place { get; set; }
-
-        // Store file paths instead of byte arrays
-        public string ClinicImagePath { get; set; }
-
-        public string CertificatePath { get; set; }
+        public string CertificatePath   { get; set; }
 
         public virtual User User { get; set; }
-        //Slot Management
 
-        
+        public ICollection<Clinic> Clinics { get; set; } = new List<Clinic>();
+
+        // Slot Management
         [NotMapped]
         public List<string> AvailableSlots => GenerateAvailableSlots();
 

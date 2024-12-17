@@ -66,9 +66,11 @@
 
         [Authorize]
         [HttpPost]
-        public IActionResult PatientDetails(int doctorId, string doctorName, DateTime date,
-                                            string selectedSlot, int isOnline, decimal consultationFee,
-                                            int? appointmentId ,AppointmentStatus? status)
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> PatientDetails(int doctorId, string doctorName, DateTime date,
+                                                string selectedSlot, int isOnline, decimal consultationFee,
+                                                int? appointmentId, AppointmentStatus? status)
         {
             ViewBag.DoctorId = doctorId;
             ViewBag.SelectedDate = date;
@@ -78,15 +80,28 @@
             ViewBag.AppointmentId = appointmentId;
             ViewBag.DoctorName = doctorName;
             ViewBag.ConsultationFee = consultationFee;
+
+            if (appointmentId != null)
+            {
+                // Fetch existing appointment details for rescheduling
+                var existingAppointment = await _appointmentService.GetAppointmentByIdAsync((int)appointmentId);
+                if (existingAppointment != null)
+                {
+                    ViewBag.PatientName = existingAppointment.PatientName;
+                    ViewBag.HealthConcern = existingAppointment.HealthConcern;
+                }
+            }
+
             return View();
         }
+
 
 
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> ConfirmAppointment(
     int doctorId, string selectedSlot, DateTime date,
-    int isOnline, string patientName, string healthConcern,
+    int? clinicId, string patientName, string healthConcern,
     AppointmentStatus? status, int? appointmentId)
         {
             if (string.IsNullOrEmpty(selectedSlot))
@@ -94,14 +109,18 @@
                 TempData["Message"] = "Please select a valid time slot.";
                 return RedirectToAction("BookAppointment", new { doctorId, date });
             }
-
-            string consultationLink = isOnline == 1
-                ? $"https://meet.jit.si/healthconnect-room-{Guid.NewGuid()}#config.disableModerator=true"
-                : null;
+            string consultationLink = string.Empty;
+            bool isOnline = false;
+            if (clinicId != null)
+            {
+                isOnline = true;
+                consultationLink = $"https://meet.jit.si/healthconnect-room-{Guid.NewGuid()}#config.disableModerator=true";
+            }
 
             if (appointmentId != null)
             {
-                if (await _appointmentService.RescheduleAppointmentAsync((int)appointmentId, date, selectedSlot, isOnline == 1, consultationLink))
+                var userRole = User.IsInRole("Doctor") ? "Doctor" : "User";
+                if (await _appointmentService.RescheduleAppointmentAsync((int)appointmentId, date, selectedSlot,clinicId, consultationLink,userRole))
                 {
                     TempData["Message"] = "Appointment rescheduled successfully.";
                     return RedirectToAction("ProfileDashboard", "UserProfile");
@@ -123,7 +142,7 @@
                 UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
                 Slot = selectedSlot,
                 AppointmentDate = date,
-                IsOnline = isOnline == 1,
+                ClinicId = clinicId,
                 ConsultationLink = consultationLink,
                 Status = status ?? AppointmentStatus.Scheduled,
                 PatientName = patientName,
@@ -134,10 +153,10 @@
 
             // Schedule emails
             string userEmail = User.FindFirstValue(ClaimTypes.Email);
-            string confirmationSubject = isOnline == 1
+            string confirmationSubject = isOnline
                 ? "Online Appointment Confirmation"
                 : "In-Clinic Appointment Confirmation";
-            string confirmationBody = isOnline == 1
+            string confirmationBody = isOnline
                 ? $"Your appointment has been scheduled successfully. You will receive the meeting link 10 minutes before your scheduled time."
                 : $"Your in-clinic appointment has been scheduled successfully for {date.ToShortDateString()} at {selectedSlot}.";
 
@@ -146,7 +165,7 @@
             {
                 var appointmentDateTime = date.Date.Add(slotTime);
 
-                if (isOnline == 1)
+                if (isOnline)
                 {
                     string reminderSubject = "Your Online Appointment Reminder";
                     string reminderBody = $"Your appointment starts in 10 minutes. Use this link: {consultationLink}";
@@ -175,7 +194,8 @@
 
         public async Task<IActionResult> CancelAppointment(int appointmentId)
         {
-            if (await _appointmentService.CancelAppointmentAsync(appointmentId))
+            var userRole = User.IsInRole("Doctor") ? "Doctor" : "User";
+            if (await _appointmentService.CancelAppointmentAsync(appointmentId,userRole))
             {
                 TempData["Success"] = "Appointment canceled successfully.";
             }
