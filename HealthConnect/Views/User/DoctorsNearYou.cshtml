@@ -94,7 +94,7 @@
                             <h3 class="h5 text-teal mb-1">Dr @doctor.FullName</h3>
                             <p class="mb-0 text-muted">@doctor.Specialization</p>
                             <p class="mb-0 text-muted">@doctor.Experience years experience overall</p>
-                            @if (doctor.Clinics != null && doctor.Clinics.Any())
+                            @* @if (doctor.Clinics != null && doctor.Clinics.Any())
                             {
                                 foreach (var clinic in doctor.Clinics)
                                 {
@@ -104,7 +104,7 @@
                             else
                             {
                                 <p class="mb-0 text-muted">No clinic places available.</p>
-                            }                            <p class="mb-0 text-muted">₹@doctor.ConsultationFee Consultation fee at clinic</p>
+                            }      *@                       <p class="mb-0 text-muted">₹@doctor.ConsultationFee Consultation fee at clinic</p>
                             <p class="mb-0">
                                 <span class="text-warning">
                                     @for (int i = 1; i <= 5; i++)
@@ -125,13 +125,54 @@
                         <div class="d-flex gap-2">
                             @if (doctor.OnlineConsultation)
                             {
-                                <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-isOnline="1" class="btn text-white" style="background-color:#8A45E6">Book Video Consult</a>
+                                <a asp-action="BookAppointment"
+                                   asp-route-doctorId="@doctor.Id"
+                                   asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                   asp-route-isOnline="1"
+                                   class="btn text-white" style="background-color:#8A45E6">Book Video Consult</a>
                             }
                             @if (doctor.ClinicAppointment)
                             {
-                                <a asp-action="BookAppointment" asp-route-doctorId="@doctor.Id" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-isOnline="0" class="btn text-white" style="background-color:#199FD9">Book Clinic Visit</a>
+                                @if (doctor.Clinics != null && doctor.Clinics.Count > 1)
+                                {
+                                    <!-- Dropdown to select clinic -->
+                                    <div class="dropdown">
+                                        <button class="btn text-white dropdown-toggle" style="background-color:#199FD9" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Book Clinic Visit
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @foreach (var clinic in doctor.Clinics)
+                                            {
+                                                <li>
+                                                    <a class="dropdown-item" asp-action="BookAppointment"
+                                                       asp-route-doctorId="@doctor.Id"
+                                                       asp-route-SelectedClinicId="@clinic.ClinicId"
+                                                       asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                                       asp-route-isOnline="0">
+                                                        @clinic.Place
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                                else if (doctor.Clinics != null && doctor.Clinics.Count == 1)
+                                {
+                                    <!-- Direct button if only one clinic -->
+                                    <a asp-action="BookAppointment"
+                                       asp-route-doctorId="@doctor.Id"
+                                       asp-route-clinicId="@doctor.Clinics.First().ClinicId"
+                                       asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                       asp-route-isOnline="0"
+                                       class="btn text-white" style="background-color:#199FD9">Book Clinic Visit</a>
+                                }
+                                else
+                                {
+                                    <button class="btn text-white disabled" style="background-color:#199FD9">No Clinics Available</button>
+                                }
                             }
                         </div>
+
                     </div>
                 }
             </div>

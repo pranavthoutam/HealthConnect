@@ -26,7 +26,7 @@
         [Required]
         public string Slot { get; set; }
 
-        // Nullable ClinicId to account for online consultations
+        //Nullable ClinicId to account for online consultations
         public int? ClinicId { get; set; }
         [ForeignKey("ClinicId")]
         public Clinic Clinic { get; set; }

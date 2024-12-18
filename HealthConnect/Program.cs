@@ -21,6 +21,7 @@ builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<DoctorService>();
 builder.Services.AddScoped<AppointmentService>();
+builder.Services.AddScoped<ClinicService>();
 
 
 var app = builder.Build();

@@ -24,9 +24,16 @@
             return await _doctorRepository.SearchDoctorAsync(doctorId);
         }
 
-        public async Task<IEnumerable<string>> GetAvailableSlotsAsync(int doctorId, DateTime date)
+        public async Task<IEnumerable<string>> GetAvailableSlotsAsync(int doctorId, DateTime date, int selectedClinicId)
         {
-            return await _doctorRepository.GetAvailableSlotsAsync(doctorId, date);
+            return await _doctorRepository.GetAvailableSlotsAsync(doctorId, date, selectedClinicId);
         }
+
+        public async Task<IEnumerable<string>> GetAvailableOnlineSlotsAsync(int doctorId, DateTime date)
+        {
+            const int slotDuration = 15;
+            return await _doctorRepository.GetAvailableOnlineSlotsAsync(doctorId, date, slotDuration);
+        }
+
     }
 }

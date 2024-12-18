@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
-    <!-- Bootstrap CSS CDN -->
+    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
@@ -34,16 +34,18 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .add-clinic-btn {
-            background-color: #007bff;
-            color: #fff;
-            font-weight: 500;
+        .clinic-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-right: 1rem;
         }
 
         .clinic-header {
             font-size: 1.2rem;
             font-weight: bold;
-            color: #28a745;
+            color: #007bff;
         }
 
         .clinic-info {
@@ -51,7 +53,18 @@
             color: #6c757d;
         }
 
+        .add-clinic-btn {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: 500;
+        }
+
         .clinic-actions button {
+            font-size: 0.9rem;
+        }
+
+        .modal input,
+        .modal select {
             font-size: 0.9rem;
         }
     </style>
@@ -70,24 +83,61 @@
             <div>
                 @foreach (var clinic in Model)
                 {
-                    <div class="clinic-card">
-                        <div class="d-flex justify-content-between align-items-start">
+                    <div class="clinic-card d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="@clinic.ClinicImagePath" alt="Clinic Image" class="clinic-image" />
                             <div>
                                 <h5 class="clinic-header">@clinic.ClinicName</h5>
                                 <p class="clinic-info">
-                                    @clinic.HnoAndStreetName, @clinic.Place
+                                    @clinic.HnoAndStreetName, @clinic.Place, @clinic.District
                                 </p>
-                                <img src="@clinic.ClinicImagePath" alt="Clinic Image" class="img-fluid" />
-                            </div>
-                            <div class="clinic-actions">
-                                <button class="btn btn-sm btn-outline-primary mr-2" data-toggle="modal" data-target="#editClinicModal" data-id="@clinic.ClinicId">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                                <a class="btn btn-sm btn-outline-danger" asp-action="DeleteClinic" asp-controller="Clinic" asp-route-clinicId="@clinic.ClinicId">
-                                    <i class="fas fa-trash"></i> Delete
-                                </a>
+                                @if (clinic.Availabilities != null && clinic.Availabilities.Any())
+                                {
+                                    <p class="timings-info">
+                                        <strong>Available Timings:</strong>
+                                        <ul>
+                                            @foreach (var timing in clinic.Availabilities)
+                                            {
+                                                <li>@timing.StartTime.ToString(@"hh\:mm") to @timing.EndTime.ToString(@"hh\:mm")</li>
+                                            }
+
+
+                                        </ul>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p class="timings-info text-muted">No available timings set for this clinic.</p>
+                                }
                             </div>
                         </div>
+                        <div class="clinic-actions">
+                            <!-- Existing Edit and Delete Buttons -->
+                            <button class="btn btn-sm btn-outline-primary mr-2"
+                                    data-toggle="modal"
+                                    data-target="#editClinicModal"
+                                    data-id="@clinic.ClinicId"
+                                    data-name="@clinic.ClinicName"
+                                    data-street="@clinic.HnoAndStreetName"
+                                    data-place="@clinic.Place"
+                                    data-district="@clinic.District">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <a class="btn btn-sm btn-outline-danger"
+                               asp-action="DeleteClinic"
+                               asp-controller="Clinic"
+                               asp-route-clinicId="@clinic.ClinicId">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                            <!-- New Update Availability Button -->
+                            <button class="btn btn-sm btn-outline-success"
+                                    data-toggle="modal"
+                                    data-target="#updateAvailabilityModal"
+                                    data-id="@clinic.ClinicId">
+                                <i class="fas fa-calendar-alt"></i> Update Availability
+                            </button>
+                        </div>
+
                     </div>
                 }
             </div>
@@ -107,34 +157,24 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form method="post" enctype="multipart/form-data" asp-action="AddOrUpdateClinic" >
+                    <form method="post" enctype="multipart/form-data" asp-action="AddOrUpdateClinic">
                         <div class="modal-body">
-                            <!-- Clinic Name -->
                             <div class="form-group">
                                 <label for="clinicName">Clinic Name</label>
                                 <input type="text" class="form-control" id="clinicName" name="ClinicName" required>
                             </div>
-                            <input type="hidden" class="form-control" id="doctorId" name="DoctorId" value="@ViewBag.DoctorId" required />
-
-                            <!-- House Number and Street Name -->
                             <div class="form-group">
                                 <label for="hnoAndStreetName">H.No and Street Name</label>
                                 <input type="text" class="form-control" id="hnoAndStreetName" name="HnoAndStreetName" required>
                             </div>
-
-                            <!-- District -->
                             <div class="form-group">
                                 <label for="district">District</label>
                                 <input type="text" class="form-control" id="district" name="District" required>
                             </div>
-
-                            <!-- Place -->
                             <div class="form-group">
                                 <label for="place">Place</label>
                                 <input type="text" class="form-control" id="place" name="Place" required>
                             </div>
-
-                            <!-- Clinic Image -->
                             <div class="form-group">
                                 <label for="clinicImage">Clinic Image</label>
                                 <input type="file" class="form-control-file" id="clinicImage" name="ClinicImage" required>
@@ -149,7 +189,6 @@
             </div>
         </div>
 
-
         <!-- Edit Clinic Modal -->
         <div class="modal fade" id="editClinicModal" tabindex="-1" role="dialog" aria-labelledby="editClinicModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -160,20 +199,28 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form method="post" asp-action="AddOrUpdateClinic">
+                    <form method="post" enctype="multipart/form-data" asp-action="AddOrUpdateClinic">
                         <div class="modal-body">
-                            <input type="hidden" id="clinicId" name="clinicId">
+                            <input type="hidden" id="editClinicId" name="ClinicId">
                             <div class="form-group">
                                 <label for="editClinicName">Clinic Name</label>
-                                <input type="text" class="form-control" id="editClinicName" name="clinicName" required>
+                                <input type="text" class="form-control" id="editClinicName" name="ClinicName" required>
                             </div>
                             <div class="form-group">
                                 <label for="editHnoAndStreetName">H.No and Street Name</label>
-                                <input type="text" class="form-control" id="editHnoAndStreetName" name="hnoAndStreetName" required>
+                                <input type="text" class="form-control" id="editHnoAndStreetName" name="HnoAndStreetName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editDistrict">District</label>
+                                <input type="text" class="form-control" id="editDistrict" name="District" required>
                             </div>
                             <div class="form-group">
                                 <label for="editPlace">Place</label>
-                                <input type="text" class="form-control" id="editPlace" name="place" required>
+                                <input type="text" class="form-control" id="editPlace" name="Place" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editClinicImage">Clinic Image</label>
+                                <input type="file" class="form-control-file" id="editClinicImage" name="ClinicImage">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -184,21 +231,87 @@
                 </div>
             </div>
         </div>
+
+        <!-- Update Availability Modal -->
+        <div class="modal fade" id="updateAvailabilityModal" tabindex="-1" role="dialog" aria-labelledby="updateAvailabilityModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateAvailabilityModalLabel">Update Availability</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" asp-action="UpdateAvailability">
+                        <div class="modal-body">
+                            <input type="hidden" id="clinicId" name="ClinicId" />
+
+                            <!-- Start Time Field -->
+                            <div class="form-group">
+                                <label for="startTime">Start Time</label>
+                                <input type="time" class="form-control" id="startTime" name="StartTime" required />
+                                @if (ViewData.ModelState["StartTime"] != null && ViewData.ModelState["StartTime"].Errors.Any())
+                                {
+                                    <div class="text-danger">
+                                        @ViewData.ModelState["StartTime"].Errors.FirstOrDefault()?.ErrorMessage
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- End Time Field -->
+                            <div class="form-group">
+                                <label for="endTime">End Time</label>
+                                <input type="time" class="form-control" id="endTime" name="EndTime" required />
+                            </div>
+
+                            <!-- Slot Duration Field -->
+                            <div class="form-group">
+                                <label for="slotDuration">Slot Duration (minutes)</label>
+                                <input type="number" class="form-control" id="slotDuration" name="SlotDuration" min="15" max="60" required />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
     <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        
-
         $('#editClinicModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
-            var clinicId = button.data('id');
-            // Fetch clinic details via AJAX or populate data directly
-            $('#clinicId').val(clinicId);
-            // Populate other fields based on clinicId
+            $('#editClinicId').val(button.data('id'));
+            $('#editClinicName').val(button.data('name'));
+            $('#editHnoAndStreetName').val(button.data('street'));
+            $('#editDistrict').val(button.data('district'));
+            $('#editPlace').val(button.data('place'));
         });
+
+        $('#updateAvailabilityModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var clinicId = button.data('id');
+            $('#clinicId').val(clinicId);
+
+            // Populate the availability slots dynamically (from server)
+            $.ajax({
+                url: '/Clinic/GetAvailabilitySlots',  // Controller action that fetches the slots
+                type: 'GET',
+                data: { clinicId: clinicId },
+                success: function (data) {
+                    $('#availabilityList').html(data);
+                }
+            });
+        });
+
     </script>
+    
 </body>
 </html>

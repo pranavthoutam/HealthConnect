@@ -1,5 +1,4 @@
-﻿
-namespace HealthConnect.Repositories
+﻿namespace HealthConnect.Repositories
 {
     public class DoctorRepository 
     {
@@ -13,14 +12,12 @@ namespace HealthConnect.Repositories
         public async Task AddDoctorAsync(Doctor doctor)
         {
             await _context.Doctors.AddAsync(doctor);
-
             await _context.SaveChangesAsync();
         }
 
         // Fetch doctors by location and specialization
         public IEnumerable<Doctor> GetDoctorsByLocationAndSpecialization(string location, string searchString, string loggedInUserId = null)
         {
-
             var query = _context.Doctors
                     .Include(d=>d.User)
                     .Include(d=>d.Clinics)
@@ -40,18 +37,15 @@ namespace HealthConnect.Repositories
             return query.ToList();
         }
 
-        // Apply filters such as gender, experience, and sorting
         public IEnumerable<Doctor> ApplyFilters(IEnumerable<Doctor> doctors, DoctorFilterViewModel filter)
         {
             var query = doctors.AsQueryable();
 
-            // Apply Gender Filter
             if (filter.Gender!=null)
             {
                 query = query.Where(d => d.User.Gender == filter.Gender);
             }
 
-            // Apply Experience Filter
             if (!string.IsNullOrEmpty(filter.Experience))
             {
                 int minExperience = 0;
@@ -63,7 +57,6 @@ namespace HealthConnect.Repositories
                 query = query.Where(d => d.Experience >= minExperience);
             }
 
-            // Sorting logic based on the selected criteria
             switch (filter.SortBy)
             {
                 case "Rating":
@@ -115,36 +108,80 @@ namespace HealthConnect.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<string>> GetAvailableSlotsAsync(int doctorId, DateTime date)
+        public async Task<IEnumerable<string>> GetAvailableSlotsAsync(int doctorId, DateTime date, int clinicId)
         {
-            var doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.Id == doctorId);
-            if (doctor == null) return Enumerable.Empty<string>();
+            var doctorAvailability = await _context.DoctorAvailability
+                .Where(d => d.DoctorId == doctorId && d.ClinicId == clinicId)
+                .FirstOrDefaultAsync();
 
-            var bookedSlots = (await GetAppointmentsForDoctorAsync(doctorId, date)).Select(a => a.Slot).ToList();
-            var availableSlots = doctor.AvailableSlots.Where(s => !bookedSlots.Contains(s));
+            if (doctorAvailability == null)
+                return Enumerable.Empty<string>();  // No availability found
+
+            // Get booked slots for the doctor on the selected date
+            var bookedSlots = (await GetAppointmentsForDoctorAsync(doctorId, date))
+                .Select(a => a.Slot)
+                .ToList();
+
+            // Get available slots from doctor availability
+            var availableSlots = doctorAvailability.AvailableSlots
+                .Where(slot => !bookedSlots.Contains(slot))
+                .ToList();
+
+            // Filter out completed slots for today
             if (date.Date == DateTime.Now.Date)
             {
                 var currentTime = DateTime.Now.TimeOfDay;
                 availableSlots = availableSlots
-                    .Where(slot =>
-                    {
-                        if (TimeSpan.TryParse(slot, out var slotTime))
-                        {
-                            return slotTime > currentTime;
-                        }
-                        return false;
-                    })
+                    .Where(slot => TimeSpan.TryParse(slot, out var slotTime) && slotTime > currentTime)
                     .ToList();
             }
+
             return availableSlots;
         }
+
+        public async Task<IEnumerable<string>> GetAvailableOnlineSlotsAsync(int doctorId, DateTime date, int slotDuration)
+        {
+            // Fetch all availability timings for the doctor for the specified date
+            var availability = await _context.DoctorAvailability
+                                .Where(a => a.DoctorId == doctorId)
+                                .ToListAsync();
+
+            if (!availability.Any()) return Enumerable.Empty<string>();
+
+            // Calculate the min start time and max end time
+            var minStartTime = availability.Min(a => a.StartTime);
+            var maxEndTime = availability.Max(a => a.EndTime);
+
+            // Generate slots incrementally
+            var allSlots = new List<string>();
+            for (var time = minStartTime; time < maxEndTime; time = time.Add(TimeSpan.FromMinutes(slotDuration)))
+            {
+                allSlots.Add(time.ToString(@"hh\:mm"));
+            }
+
+            var bookedSlots = await _context.Appointments
+                                .Where(a => a.DoctorId == doctorId && a.AppointmentDate.Date == date.Date)
+                                .Select(a => a.Slot)
+                                .ToListAsync();
+
+            var currentTime = DateTime.Now.TimeOfDay;
+            var availableSlots = allSlots
+                                .Where(slot =>
+                                    !bookedSlots.Contains(slot) &&
+                                    (date.Date > DateTime.Now.Date || TimeSpan.Parse(slot) > currentTime))
+                                .ToList();
+
+            return availableSlots;
+        }
+
 
         public async Task<IEnumerable<Appointment>> GetAppointmentsForUserAsync(string userId)
         {
             return await _context.Appointments
                 .Include(a => a.Doctor)
+                .Include(a=>a.Clinic)
                 .Where(a => a.UserId == userId)
-                .OrderBy(a => a.AppointmentDate)
+                .OrderByDescending(a => a.AppointmentDate)
                 .ToListAsync();
         }
         public async Task<Appointment> GetAppointmentByIdAsync(int appointmentId)
@@ -170,6 +207,81 @@ namespace HealthConnect.Repositories
         public int GetDoctorId(string userId)
         {
             return  _context.Doctors.FirstOrDefault(d=>d.UserId==userId).Id;
+        }
+
+        public async Task<List<Clinic>> GetClinicsByDoctorIdAsync(int doctorId)
+        {
+            return await _context.Clinics
+                .Where(c => c.DoctorId == doctorId)
+                .Include(c => c.Availabilities)
+                .ToListAsync();
+        }
+
+        public async Task<Clinic> GetClinicByIdAsync(int clinicId)
+        {
+            return await _context.Clinics
+                .Include(c => c.Availabilities)
+                .FirstOrDefaultAsync(c => c.ClinicId == clinicId);
+        }
+
+        public async Task AddOrUpdateClinicAsync(Clinic clinic)
+        {
+            if (clinic.ClinicId == 0)
+            {
+                _context.Clinics.Add(clinic);
+            }
+            else
+            {
+                var existingClinic = await _context.Clinics.FindAsync(clinic.ClinicId);
+                if (existingClinic != null)
+                {
+                    existingClinic.ClinicName = clinic.ClinicName;
+                    existingClinic.HnoAndStreetName = clinic.HnoAndStreetName;
+                    existingClinic.District = clinic.District;
+                    existingClinic.Place = clinic.Place;
+                    _context.Clinics.Update(existingClinic);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteClinicAsync(int clinicId)
+        {
+            var clinic = await GetClinicByIdAsync(clinicId);
+            if (clinic != null)
+            {
+                _context.Clinics.Remove(clinic);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task AddAvailabilityAsync(int doctorId, int clinicId, TimeSpan startTime, TimeSpan endTime, int slotDuration)
+        {
+            var doctorAvailability = await _context.DoctorAvailability
+                .Where(d => d.DoctorId == doctorId)
+                .ToListAsync();
+
+            foreach (var availability in doctorAvailability)
+            {
+                if ((startTime >= availability.StartTime && startTime < availability.EndTime) ||
+                    (endTime > availability.StartTime && endTime <= availability.EndTime))
+                {
+                    throw new Exception("The selected time slot overlaps with an existing availability for this doctor in another clinic.");
+                }
+            }
+
+            var newAvailability = new DoctorAvailability
+            {
+                ClinicId = clinicId,
+                DoctorId = doctorId,
+                StartTime = startTime,
+                EndTime = endTime,
+                SlotDuration = slotDuration
+            };
+
+            _context.Add(newAvailability);
+            await _context.SaveChangesAsync();
         }
     }
 }

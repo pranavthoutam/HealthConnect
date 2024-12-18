@@ -4,6 +4,7 @@ using HealthConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthConnect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241218060103_slotduration")]
+    partial class slotduration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,9 +178,6 @@ namespace HealthConnect.Migrations
                     b.Property<int>("ClinicId")
                         .HasColumnType("int");
 
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("int");
-
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
 
@@ -190,8 +190,6 @@ namespace HealthConnect.Migrations
                     b.HasKey("DoctorAvailabilityId");
 
                     b.HasIndex("ClinicId");
-
-                    b.HasIndex("DoctorId");
 
                     b.ToTable("DoctorAvailability");
                 });
@@ -616,15 +614,7 @@ namespace HealthConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HealthConnect.Models.Doctor", "Doctor")
-                        .WithMany()
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Clinic");
-
-                    b.Navigation("Doctor");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Feedback", b =>

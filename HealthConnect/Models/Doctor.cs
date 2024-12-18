@@ -37,29 +37,29 @@
         public ICollection<Clinic> Clinics { get; set; } = new List<Clinic>();
 
         // Slot Management
-        [NotMapped]
-        public List<string> AvailableSlots => GenerateAvailableSlots();
+        //[NotMapped]
+        //public List<string> AvailableSlots => GenerateAvailableSlots();
 
-        private List<string> GenerateAvailableSlots()
-        {
-            var slots = new List<string>();
-            var timeRanges = new[]
-            {
-                (Start: TimeSpan.Parse("10:00"), End: TimeSpan.Parse("13:00")),
-                (Start: TimeSpan.Parse("14:00"), End: TimeSpan.Parse("16:00")),
-                (Start: TimeSpan.Parse("18:00"), End: TimeSpan.Parse("20:00"))
-            };
+        //private List<string> GenerateAvailableSlots()
+        //{
+        //    var slots = new List<string>();
+        //    var timeRanges = new[]
+        //    {
+        //        (Start: TimeSpan.Parse("10:00"), End: TimeSpan.Parse("13:00")),
+        //        (Start: TimeSpan.Parse("14:00"), End: TimeSpan.Parse("16:00")),
+        //        (Start: TimeSpan.Parse("18:00"), End: TimeSpan.Parse("20:00"))
+        //    };
 
-            foreach (var range in timeRanges)
-            {
-                var current = range.Start;
-                while (current < range.End)
-                {
-                    slots.Add(current.ToString(@"hh\:mm"));
-                    current = current.Add(TimeSpan.FromMinutes(15));
-                }
-            }
-            return slots;
-        }
+        //    foreach (var range in timeRanges)
+        //    {
+        //        var current = range.Start;
+        //        while (current < range.End)
+        //        {
+        //            slots.Add(current.ToString(@"hh\:mm"));
+        //            current = current.Add(TimeSpan.FromMinutes(15));
+        //        }
+        //    }
+        //    return slots;
+        //}
     }
 }

@@ -7,16 +7,18 @@
         private readonly FeedbackService _feedbackService;
         private readonly EmailService _emailService;
         private readonly EmailScheduler _emailScheduler;
+        private readonly ClinicService _clinicService;
 
         public UserController(DoctorService doctorService, AppointmentService appointmentService,
                               FeedbackService feedbackService,EmailService emailService,
-                              EmailScheduler emailScheduler)
+                              EmailScheduler emailScheduler, ClinicService clinicService)
         {
             _doctorService = doctorService;
             _appointmentService = appointmentService;
             _feedbackService = feedbackService;
             _emailService = emailService;
             _emailScheduler = emailScheduler;
+            _clinicService = clinicService;
         }
 
         [HttpGet]
@@ -41,7 +43,7 @@
         }
 
         [HttpGet]
-        public async Task<IActionResult> BookAppointment(int doctorId, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId)
+        public async Task<IActionResult> BookAppointment(int doctorId, DateTime date, int isOnline, AppointmentStatus? status, int? appointmentId, int? selectedClinicId)
         {
             var doctor = await _doctorService.GetDoctorProfileAsync(doctorId);
             if (doctor == null)
@@ -50,7 +52,34 @@
                 return RedirectToAction("FindDoctors");
             }
 
-            var availableSlots = await _doctorService.GetAvailableSlotsAsync(doctorId, date);
+            IEnumerable<string> availableSlots;
+
+            if (isOnline == 1)
+            {
+                availableSlots = await _doctorService.GetAvailableOnlineSlotsAsync(doctorId, date);
+                selectedClinicId = null;
+            }
+            else 
+            {
+                if (selectedClinicId == null)
+                {
+                    TempData["Message"] = "Please select a clinic.";
+                    return RedirectToAction("BookAppointment", new { doctorId, date, isOnline });
+                }
+
+                availableSlots = await _doctorService.GetAvailableSlotsAsync(doctorId, date, selectedClinicId.Value);
+            }
+
+            var clinics = await _clinicService.GetClinicsAsync(doctorId);
+            var selectedClinic = clinics.FirstOrDefault(c => c.ClinicId == selectedClinicId) ?? clinics.FirstOrDefault(); // Default to first clinic if none selected
+
+            var viewModel = new BookDoctorAppointmentViewModel
+            {
+                Doctor = doctor,
+                SelectedClinicId = selectedClinic?.ClinicId,
+                Clinics = clinics,
+                SelectedClinic = selectedClinic
+            };
 
             ViewBag.Feedbacks = _feedbackService.GetDoctorFeedBacks(doctorId);
             ViewBag.AvailableSlots = availableSlots.ToList();
@@ -61,11 +90,9 @@
             ViewBag.ConsultationFee = doctor.ConsultationFee;
             ViewBag.DoctorName = doctor.FullName;
 
-            return View(doctor);
+            return View(viewModel);
         }
 
-        [Authorize]
-        [HttpPost]
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> PatientDetails(int doctorId, string doctorName, DateTime date,
