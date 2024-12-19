@@ -49,7 +49,7 @@
                             <div class="flex-grow-1">
                                 <p class="text-secondary mb-1">@appointment.AppointmentDate</p>
                                 <p class="text-secondary mb-1">@appointment.Slot</p>
-                                @if(appointment.ClinicId==null) {<p class="text-secondary mb-1">Online</p>}
+                                @if(appointment.ConsultationLink!=null) {<p class="text-secondary mb-1">Online</p>}
                                     else {<p class="text-secondary mb-1">Clinic</p>}
                                 <p class="text-secondary mb-1">@appointment.PatientName</p>
                                 <p class="text-secondary mb-1">@appointment.HealthConcern</p>

@@ -115,19 +115,16 @@
                 .FirstOrDefaultAsync();
 
             if (doctorAvailability == null)
-                return Enumerable.Empty<string>();  // No availability found
+                return Enumerable.Empty<string>();  
 
-            // Get booked slots for the doctor on the selected date
             var bookedSlots = (await GetAppointmentsForDoctorAsync(doctorId, date))
                 .Select(a => a.Slot)
                 .ToList();
 
-            // Get available slots from doctor availability
             var availableSlots = doctorAvailability.AvailableSlots
                 .Where(slot => !bookedSlots.Contains(slot))
                 .ToList();
 
-            // Filter out completed slots for today
             if (date.Date == DateTime.Now.Date)
             {
                 var currentTime = DateTime.Now.TimeOfDay;
@@ -141,18 +138,15 @@
 
         public async Task<IEnumerable<string>> GetAvailableOnlineSlotsAsync(int doctorId, DateTime date, int slotDuration)
         {
-            // Fetch all availability timings for the doctor for the specified date
             var availability = await _context.DoctorAvailability
                                 .Where(a => a.DoctorId == doctorId)
                                 .ToListAsync();
 
             if (!availability.Any()) return Enumerable.Empty<string>();
 
-            // Calculate the min start time and max end time
             var minStartTime = availability.Min(a => a.StartTime);
             var maxEndTime = availability.Max(a => a.EndTime);
 
-            // Generate slots incrementally
             var allSlots = new List<string>();
             for (var time = minStartTime; time < maxEndTime; time = time.Add(TimeSpan.FromMinutes(slotDuration)))
             {
@@ -179,7 +173,6 @@
         {
             return await _context.Appointments
                 .Include(a => a.Doctor)
-                .Include(a=>a.Clinic)
                 .Where(a => a.UserId == userId)
                 .OrderByDescending(a => a.AppointmentDate)
                 .ToListAsync();
@@ -217,7 +210,7 @@
                 .ToListAsync();
         }
 
-        public async Task<Clinic> GetClinicByIdAsync(int clinicId)
+        public async Task<Clinic> GetClinicByIdAsync(int? clinicId)
         {
             return await _context.Clinics
                 .Include(c => c.Availabilities)

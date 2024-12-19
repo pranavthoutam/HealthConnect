@@ -76,5 +76,6 @@
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<Clinic> Clinics { get; set; }
         public DbSet<DoctorAvailability> DoctorAvailability { get; set; }
+        public DbSet<Prescription> Prescriptions { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace HealthConnect.Services
+﻿using Microsoft.IdentityModel.Tokens;
+
+namespace HealthConnect.Services
 {
     public class UserProfileService : IUserProfileService
     {
@@ -30,7 +32,7 @@
                 Name = user.UserName,
                 Feedbacks = feedbacks,
                 InClinicAppointments = appointments
-                                       .Where(a => a.Clinic.ClinicId!=null)
+                                       .Where(a => a.ConsultationLink.IsNullOrEmpty())
                                        .Select(a => new AppointmentViewModel
                                        {
                                            AppointmentId = a.Id,
@@ -39,7 +41,8 @@
                                            DoctorSpecialization = a.Doctor.Specialization,
                                            AppointmentDate = a.AppointmentDate,
                                            Slot = a.Slot,
-                                           Location = a.Clinic.Place,
+                                           ClinicId= a.ClinicId,
+                                           Location = a.ClinicName+","+a.Place,
                                            CanRescheduleOrCancel = a.AppointmentDate.Add(TimeSpan.Parse(a.Slot)).Subtract(currentTime).TotalHours > 3,
                                            IsCompleted = a.AppointmentDate.Date < currentTime.Date ||
                                                         (a.AppointmentDate.Date == currentTime.Date && TimeSpan.Parse(a.Slot) < currentTime.TimeOfDay),
@@ -48,7 +51,7 @@
 
 
                 OnlineConsultations = appointments
-                                        .Where(a => a.Clinic.Place==null)
+                                        .Where(a => !a.ConsultationLink.IsNullOrEmpty())
                                         .Select(a => new AppointmentViewModel
                                         {
                                             AppointmentId = a.Id,
@@ -76,7 +79,7 @@
                                             DoctorSpecialization = a.Doctor.Specialization,
                                             AppointmentDate = a.AppointmentDate,
                                             Slot = a.Slot,
-                                            Location = a.Clinic.Place ?? "Online"
+                                            Location = a.ClinicName + "," + a.Place ?? "Online"
                                         })
                                         .ToList()
             };

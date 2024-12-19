@@ -80,14 +80,19 @@
 
             var doctorId = _doctorRepository.GetDoctorId(userId);
 
-            var appointments = (List<Appointment>) await _doctorRepository.GetAppointmentsForDoctorAsync(doctorId,DateTime.Now.Date);
+            var appointments = (List<Appointment>)await _doctorRepository.GetAppointmentsForDoctorAsync(doctorId, DateTime.Now.Date);
 
             var viewModel = new ProfileDashboardViewModel
             {
-               Appointments = appointments
+                Appointments = appointments
             };
 
-            return View(viewModel); 
+            return View(viewModel);
+        }
+
+        public IActionResult AddPrescription()
+        {
+            return View();
         }
     }
 }

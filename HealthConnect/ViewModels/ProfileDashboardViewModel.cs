@@ -29,6 +29,8 @@ namespace HealthConnect.ViewModels
         public DateTime AppointmentDate { get; set; }
         public string Slot { get; set; }
         public string Location { get; set; }
+
+        public int? ClinicId    { get; set; }
         public bool CanRescheduleOrCancel { get; set; }
         public bool IsCompleted { get; set; } = false;
 

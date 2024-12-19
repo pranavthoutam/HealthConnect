@@ -16,10 +16,11 @@
         public async Task<bool> RescheduleAppointmentAsync(int appointmentId, DateTime date, string slot, int? clinicId, string consultationLink,string userRole)
         {
             var appointment = await _doctorRepository.GetAppointmentByIdAsync(appointmentId);
+            var clinic = await _doctorRepository.GetClinicByIdAsync(clinicId);
             if (appointment != null)
             {
                 // Check if rescheduling is allowed (at least 3 hours before the appointment)
-                if (userRole!="Doctor" && (appointment.AppointmentDate - DateTime.Now).TotalHours < 3)
+                if (userRole!="Doctor" && (appointment.AppointmentDate - DateTime.Now).TotalHours > 3)
                 {
                     return false; // Cannot reschedule within 3 hours of the appointment
                 }
@@ -27,10 +28,11 @@
                 // Reschedule the appointment
                 appointment.AppointmentDate = date;
                 appointment.Slot = slot;
-                appointment.ClinicId = clinicId;
+                appointment.Place=clinic.Place;
+                appointment.ClinicName = clinic.ClinicName;
                 appointment.ConsultationLink = consultationLink;
                 appointment.Status = AppointmentStatus.ReScheduled;
-
+                appointment.ClinicId = clinicId;
                 await _doctorRepository.RescheduleAppointment(appointment);
                 return true;
             }

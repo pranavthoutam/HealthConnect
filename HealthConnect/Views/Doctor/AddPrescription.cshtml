@@ -1,0 +1,128 @@
+﻿@{
+    ViewData["Title"] = "Online Prescription";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Prescription</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container bg-white p-4 rounded shadow">
+        <div class="d-flex justify-content-between">
+            <h2 class="text fw-bold mb-4">Online Prescription for Patient Mantur Vivek</h2>
+            <button type="submit" class="btn btn-success mb-4">Add Prescription</button>
+        </div>
+
+        <form id="prescription-form">
+            <div id="medicines-container">
+                <div class="medicine-entry row g-3 mb-3">
+                    <!-- Medicine Name -->
+                    <div class="col-md-6">
+                        <label for="medicine-name" class="form-label">Medicine Name</label>
+                        <input type="text" name="medicine-name" class="form-control" placeholder="Enter medicine name" />
+                    </div>
+
+                    <!-- Timing Options -->
+                    <div class="col-md-6">
+                        <label class="form-label d-block">Timings</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="timings[]" value="all">
+                            <label class="form-check-label" for="all">All</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="timings[]" value="morning">
+                            <label class="form-check-label" for="morning">Morning</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="timings[]" value="afternoon">
+                            <label class="form-check-label" for="afternoon">Afternoon</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="timings[]" value="night">
+                            <label class="form-check-label" for="night">Night</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-3">
+                <!-- Food Instructions -->
+                <div class="col-md-6">
+                    <label class="form-label">Food Instructions</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="food" id="before-food" value="before" checked>
+                        <label class="form-check-label" for="before-food">Before Food</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="food" id="after-food" value="after">
+                        <label class="form-check-label" for="after-food">After Food</label>
+                    </div>
+                </div>
+
+                <!-- Additional Advice -->
+                <div class="col-md-6">
+                    <label for="additional-advice" class="form-label">Additional Advice</label>
+                    <textarea name="additional-advice" id="additional-advice" class="form-control" rows="3" placeholder="Enter any additional advice"></textarea>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- Add Medicines Button -->
+        <div class="text mt-4">
+            <button type="button" class="btn btn-primary" id="add-medicine">Add More Medicines</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('add-medicine').addEventListener('click', function () {
+            const medicineContainer = document.getElementById('medicines-container');
+            const newMedicineEntry = document.createElement('div');
+            newMedicineEntry.classList.add('medicine-entry', 'row', 'g-3', 'mb-3');
+
+            newMedicineEntry.innerHTML = `
+                        <div class="col-md-6">
+                            <label for="medicine-name" class="form-label">Medicine Name</label>
+                            <input type="text" name="medicine-name" class="form-control" placeholder="Enter medicine name" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label d-block">Timings</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="timings[]" value="all">
+                                <label class="form-check-label" for="all">All</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="timings[]" value="morning">
+                                <label class="form-check-label" for="morning">Morning</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="timings[]" value="afternoon">
+                                <label class="form-check-label" for="afternoon">Afternoon</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="timings[]" value="night">
+                                <label class="form-check-label" for="night">Night</label>
+                            </div>
+                        </div>
+                    `;
+
+            // Add a remove button for each added medicine
+            const removeButton = document.createElement('button');
+            removeButton.classList.add('btn', 'btn-danger', 'mt-3');
+            removeButton.innerText = 'Remove Medicine';
+            removeButton.addEventListener('click', function () {
+                medicineContainer.removeChild(newMedicineEntry);
+            });
+
+            newMedicineEntry.appendChild(removeButton);
+            medicineContainer.appendChild(newMedicineEntry);
+        });
+    </script>
+</body>
+</html>

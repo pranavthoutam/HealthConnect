@@ -97,7 +97,7 @@
         [HttpPost]
         public async Task<IActionResult> PatientDetails(int doctorId, string doctorName, DateTime date,
                                                 string selectedSlot, int isOnline, decimal consultationFee,
-                                                int? appointmentId, AppointmentStatus? status)
+                                                int? appointmentId, AppointmentStatus? status,int? clinicId)
         {
             ViewBag.DoctorId = doctorId;
             ViewBag.SelectedDate = date;
@@ -107,6 +107,7 @@
             ViewBag.AppointmentId = appointmentId;
             ViewBag.DoctorName = doctorName;
             ViewBag.ConsultationFee = consultationFee;
+            if(clinicId!=null) ViewBag.ClinicId = clinicId;
 
             if (appointmentId != null)
             {
@@ -138,7 +139,7 @@
             }
             string consultationLink = string.Empty;
             bool isOnline = false;
-            if (clinicId != null)
+            if (clinicId == null)
             {
                 isOnline = true;
                 consultationLink = $"https://meet.jit.si/healthconnect-room-{Guid.NewGuid()}#config.disableModerator=true";
@@ -162,14 +163,16 @@
                 TempData["Message"] = "You already have an appointment for this time slot.";
                 return RedirectToAction("ProfileDashboard", "UserProfile");
             }
-
+            Clinic clinic = await _clinicService.GetClinicById(clinicId);
             var newAppointment = new Appointment
             {
                 DoctorId = doctorId,
                 UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
                 Slot = selectedSlot,
                 AppointmentDate = date,
-                ClinicId = clinicId,
+                ClinicName = clinic.ClinicName,
+                Place=clinic.Place,
+                ClinicId=clinicId,
                 ConsultationLink = consultationLink,
                 Status = status ?? AppointmentStatus.Scheduled,
                 PatientName = patientName,

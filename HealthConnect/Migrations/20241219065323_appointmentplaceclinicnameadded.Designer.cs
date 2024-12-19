@@ -4,6 +4,7 @@ using HealthConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthConnect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241219065323_appointmentplaceclinicnameadded")]
+    partial class appointmentplaceclinicnameadded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,9 +35,6 @@ namespace HealthConnect.Migrations
 
                     b.Property<DateTime>("AppointmentDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("ClinicId")
-                        .HasColumnType("int");
 
                     b.Property<string>("ClinicName")
                         .HasColumnType("nvarchar(max)");
@@ -338,28 +338,6 @@ namespace HealthConnect.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MedicineCategories");
-                });
-
-            modelBuilder.Entity("HealthConnect.Models.Prescription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AppointmentId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("PrescriptionPdf")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppointmentId");
-
-                    b.ToTable("Prescriptions");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.User", b =>
@@ -706,17 +684,6 @@ namespace HealthConnect.Migrations
                     b.Navigation("Alternative");
 
                     b.Navigation("Medicine");
-                });
-
-            modelBuilder.Entity("HealthConnect.Models.Prescription", b =>
-                {
-                    b.HasOne("HealthConnect.Models.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Appointment");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

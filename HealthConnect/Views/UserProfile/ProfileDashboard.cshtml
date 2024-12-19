@@ -76,7 +76,7 @@
                                 <!-- Appointment Details -->
                                 <div class="flex-grow-1">
                                     <h5 class="mb-1">Dr. @appointment.DoctorName, @appointment.DoctorSpecialization</h5>
-                                    <p class="text-secondary mb-1">@appointment.AppointmentDate</p>
+                                    <p class="text-secondary mb-1">@appointment.AppointmentDate.ToString("yyyy-MM-dd")</p>
                                     <p class="text-secondary mb-1">@appointment.Slot</p>
                                     <p class="text-secondary mb-1">@appointment.Location</p>
 
@@ -100,15 +100,17 @@
                                     <a asp-action="BookAppointment"
                                        asp-controller="User"
                                        asp-route-doctorId="@appointment.DoctorId"
-                                       asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")"
-                                       asp-route-IsOnline="1"
-                                       asp-route-status="1"
+                                       asp-route-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                       asp-route-isOnline="0"
+                                       asp-route-status="@AppointmentStatus.ReScheduled"
+                                       asp-route-selectedClinicId ="@appointment.ClinicId"
                                        asp-route-appointmentId="@appointment.AppointmentId"
                                        class="btn btn-outline-primary ms-3 btn-reschedule"
                                        data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
                                        data-slot-time="@appointment.Slot">
                                         Reschedule
                                     </a>
+
                                     <a asp-action="CancelAppointment"
                                        asp-controller="User"
                                        asp-route-appointmentId="@appointment.AppointmentId"

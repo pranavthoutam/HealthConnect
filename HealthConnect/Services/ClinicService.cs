@@ -42,6 +42,11 @@
             await _doctorRepository.DeleteClinicAsync(clinicId);
         }
 
+        public async Task<Clinic> GetClinicById(int? clinicId)
+        {
+            return await _doctorRepository.GetClinicByIdAsync(clinicId);
+        }
+
         public async Task AddAvailabilityAsync(int doctorId, int clinicId, TimeSpan startTime, TimeSpan endTime, int slotDuration)
         {
             await _doctorRepository.AddAvailabilityAsync(doctorId, clinicId, startTime, endTime, slotDuration);

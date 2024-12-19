@@ -17,6 +17,8 @@
         [Required]
         public string PatientName { get; set; }
 
+        [ForeignKey("ClinicId")]
+        public int? ClinicId { get; set; }
         [Required]
         public string HealthConcern { get; set; }
 
@@ -27,10 +29,8 @@
         public string Slot { get; set; }
 
         //Nullable ClinicId to account for online consultations
-        public int? ClinicId { get; set; }
-        [ForeignKey("ClinicId")]
-        public Clinic Clinic { get; set; }
-
+        public string? ClinicName    { get; set; }
+        public string? Place {  get; set; }
         public AppointmentStatus Status { get; set; } = AppointmentStatus.Scheduled;
 
         public string? ConsultationLink { get; set; }
