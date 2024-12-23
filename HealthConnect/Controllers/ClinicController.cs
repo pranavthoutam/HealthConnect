@@ -61,7 +61,8 @@
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("StartTime", ex.Message);
+                    TempData["ErrorMessage"] = ex.Message;
+                    return RedirectToAction(nameof(ClinicDashboard));
                 }
             }
 

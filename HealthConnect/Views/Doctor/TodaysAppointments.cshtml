@@ -41,53 +41,57 @@
                     <div id="todays-appointments" class="content-section active">
                         @foreach (var appointment in Model.Appointments)
                         {
-                        <div class="d-flex align-items-center mb-4 border-bottom pb-3">
-                            <div class="text-center me-3" style="width: 64px;">
-                                <div class="fs-4 fw-bold text-secondary">@appointment.AppointmentDate.ToString("dd")</div>
-                                <div class="small text-secondary text-uppercase">@appointment.AppointmentDate.ToString("MMM")</div>
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="text-secondary mb-1">@appointment.AppointmentDate</p>
-                                <p class="text-secondary mb-1">@appointment.Slot</p>
-                                @if(appointment.ConsultationLink!=null) {<p class="text-secondary mb-1">Online</p>}
-                                    else {<p class="text-secondary mb-1">Clinic</p>}
-                                <p class="text-secondary mb-1">@appointment.PatientName</p>
-                                <p class="text-secondary mb-1">@appointment.HealthConcern</p>
-
-                                @* @if (!appointment.IsCompleted)
+                            <div class="d-flex align-items-center mb-4 border-bottom pb-3">
+                                <div class="text-center me-3" style="width: 64px;">
+                                    <div class="fs-4 fw-bold text-secondary">@appointment.AppointmentDate.ToString("dd")</div>
+                                    <div class="small text-secondary text-uppercase">@appointment.AppointmentDate.ToString("MMM")</div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="text-secondary mb-1">@appointment.AppointmentDate</p>
+                                    <p class="text-secondary mb-1">@appointment.Slot</p>
+                                    @if (appointment.ConsultationLink != null)
                                     {
-                                        <p class="text-danger mb-0">Upcoming</p>
+                                        <p class="text-secondary mb-1">Online</p>
                                     }
                                     else
                                     {
-                                        <p class="text-primary mb-0">Completed</p>
-                                    } *@
+                                        <p class="text-secondary mb-1">Clinic</p>
+                                    }
+                                    <p class="text-secondary mb-1">@appointment.PatientName</p>
+                                    <p class="text-secondary mb-1">@appointment.HealthConcern</p>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <a asp-action="BookAppointment"
+                                   asp-controller="User"
+                                   asp-route-doctorId="@appointment.DoctorId"
+                                   asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                   asp-route-IsOnline="1"
+                                   asp-route-status="1"
+                                   asp-route-appointmentId="@appointment.Id"
+                                   class="btn btn-outline-primary ms-3 btn-reschedule"
+                                   data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                   data-slot-time="@appointment.Slot">
+                                    Reschedule
+                                </a>
+                                <a asp-action="CancelAppointment"
+                                   asp-controller="User"
+                                   asp-route-appointmentId="@appointment.Id"
+                                   class="btn btn-danger ms-3 btn-cancel"
+                                   data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
+                                   data-slot-time="@appointment.Slot">
+                                    Cancel
+                                </a>
+
+                                <!-- Add Prescription Button -->
+                                <a asp-action="Create"
+                                   asp-controller="Prescription"
+                                   asp-route-appointmentId="@appointment.Id"
+                                   asp-route-patientName="@appointment.PatientName"
+                                   class="btn btn-success ms-3 btn-prescription">
+                                    Add Prescription
+                                </a>
                             </div>
-
-                            <!-- Action Buttons -->
-                            @* @if (!appointment.IsCompleted) *@
-
-                            <a asp-action="BookAppointment"
-                               asp-controller="User"
-                               asp-route-doctorId="@appointment.DoctorId"
-                               asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")"
-                               asp-route-IsOnline="1"
-                               asp-route-status="1"
-                               asp-route-appointmentId="@appointment.Id"
-                               class="btn btn-outline-primary ms-3 btn-reschedule"
-                               data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
-                               data-slot-time="@appointment.Slot">
-                                Reschedule
-                            </a>
-                            <a asp-action="CancelAppointment"
-                               asp-controller="User"
-                               asp-route-appointmentId="@appointment.Id"
-                               class="btn btn-danger ms-3 btn-cancel"
-                               data-appointment-date="@appointment.AppointmentDate.ToString("yyyy-MM-dd")"
-                               data-slot-time="@appointment.Slot">
-                                Cancel
-                            </a>
-                        </div>
                         }
                     </div>
                 </div>

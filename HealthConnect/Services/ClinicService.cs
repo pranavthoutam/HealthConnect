@@ -33,7 +33,7 @@
 
                 clinic.ClinicImagePath = $"/Uploads/ClinicImages/{uniqueFileName}";
             }
-
+            clinic.DoctorId= doctorId;
             await _doctorRepository.AddOrUpdateClinicAsync(clinic);
         }
 

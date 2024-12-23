@@ -15,4 +15,8 @@ global using HealthConnect.Services.Interfaces;
 global using System.Net;
 global using System.Net.Mail;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using jsreport.Binary;
+global using jsreport.Local;
+global using jsreport.Types;
+
 

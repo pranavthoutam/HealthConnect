@@ -1,0 +1,161 @@
+﻿@model PrescriptionViewModel
+@{
+    ViewData["Title"] = "Create Prescription";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Prescription</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container bg-white p-4 rounded shadow mt-5">
+        <h2 class="text fw-bold mb-4">Create Prescription for Patient</h2>
+
+        <form asp-action="Create" asp-controller="Prescription" method="post" id="prescription-form">
+            <!-- Hidden field for AppointmentId -->
+            <input type="hidden" name="AppointmentId" value="@Model.AppointmentId" />
+            <input type="hidden" name="PatientName" value="@Model.PatientName" />
+
+            <div id="medicines-container">
+                <div class="medicine-entry row g-3 mb-3">
+                    <!-- Medicine Name -->
+                    <div class="col-md-6">
+                        <label for="medicine-name" class="form-label">Medicine Name</label>
+                        <input type="text" name="MedicineList[0].Name" class="form-control" placeholder="Enter medicine name" required />
+                    </div>
+
+                    <!-- Timing Options -->
+                    <div class="col-md-6">
+                        <label class="form-label d-block">Timings</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="MedicineList[0].Timings" value="All">
+                            <label class="form-check-label">All</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="MedicineList[0].Timings" value="Morning">
+                            <label class="form-check-label">Morning</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="MedicineList[0].Timings" value="Afternoon">
+                            <label class="form-check-label">Afternoon</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="MedicineList[0].Timings" value="Night">
+                            <label class="form-check-label">Night</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Food Instructions -->
+                    <div class="col-md-6">
+                        <label class="form-label">Food Instructions</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="MedicineList[0].FoodInstruction" value="Before Food" checked>
+                            <label class="form-check-label">Before Food</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="MedicineList[0].FoodInstruction" value="After Food">
+                            <label class="form-check-label">After Food</label>
+                        </div>
+                    </div>
+
+                    <!-- Additional Advice -->
+                    <div class="col-md-6">
+                        <label for="additional-advice" class="form-label">Additional Advice</label>
+                        <textarea name="MedicineList[0].AdditionalAdvice" class="form-control" rows="3" placeholder="Enter any additional advice"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Medicines Button -->
+            <div class="text mt-4">
+                <button type="button" class="btn btn-primary" id="add-medicine">Add More Medicines</button>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success">Submit Prescription</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('add-medicine').addEventListener('click', function () {
+            const medicinesContainer = document.getElementById('medicines-container');
+            const index = medicinesContainer.childElementCount;
+
+            // Create a new medicine entry
+            const newMedicineEntry = document.createElement('div');
+            newMedicineEntry.classList.add('medicine-entry', 'row', 'g-3', 'mb-3');
+
+            newMedicineEntry.innerHTML = `
+                        <!-- Medicine Name -->
+                        <div class="col-md-6">
+                            <label for="medicine-name" class="form-label">Medicine Name</label>
+                            <input type="text" name="MedicineList[${index}].Name" class="form-control" placeholder="Enter medicine name" required />
+                        </div>
+
+                        <!-- Timing Options -->
+                        <div class="col-md-6">
+                            <label class="form-label d-block">Timings</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="MedicineList[${index}].Timings" value="All">
+                                <label class="form-check-label">All</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="MedicineList[${index}].Timings" value="Morning">
+                                <label class="form-check-label">Morning</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="MedicineList[${index}].Timings" value="Afternoon">
+                                <label class="form-check-label">Afternoon</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="MedicineList[${index}].Timings" value="Night">
+                                <label class="form-check-label">Night</label>
+                            </div>
+                        </div>
+
+                        <!-- Food Instructions -->
+                        <div class="col-md-6">
+                            <label class="form-label">Food Instructions</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="MedicineList[${index}].FoodInstruction" value="Before Food" checked>
+                                <label class="form-check-label">Before Food</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="MedicineList[${index}].FoodInstruction" value="After Food">
+                                <label class="form-check-label">After Food</label>
+                            </div>
+                        </div>
+
+                        <!-- Additional Advice -->
+                        <div class="col-md-6">
+                            <label for="additional-advice" class="form-label">Additional Advice</label>
+                            <textarea name="MedicineList[${index}].AdditionalAdvice" class="form-control" rows="3" placeholder="Enter any additional advice"></textarea>
+                        </div>
+                    `;
+
+            // Add a remove button to the new medicine entry
+            const removeButton = document.createElement('button');
+            removeButton.classList.add('btn', 'btn-danger', 'mt-3');
+            removeButton.innerText = 'Remove Medicine';
+            removeButton.addEventListener('click', function () {
+                medicinesContainer.removeChild(newMedicineEntry);
+            });
+
+            // Append the remove button to the new medicine entry
+            newMedicineEntry.appendChild(removeButton);
+
+            // Append the new medicine entry to the container
+            medicinesContainer.appendChild(newMedicineEntry);
+        });
+    </script>
+</body>
+</html>

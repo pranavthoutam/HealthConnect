@@ -281,6 +281,23 @@
 
 
     </div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div id="errorPopup" data-message="@TempData["ErrorMessage"]"></div>
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var errorPopup = document.getElementById("errorPopup");
+            if (errorPopup) {
+                var message = errorPopup.getAttribute("data-message");
+                if (message) {
+                    alert(message); // Simple popup alert
+                }
+            }
+        });
+    </script>
+
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -302,7 +319,7 @@
 
             // Populate the availability slots dynamically (from server)
             $.ajax({
-                url: '/Clinic/GetAvailabilitySlots',  // Controller action that fetches the slots
+                url: '/Clinic/GetAvailabilitySlots',
                 type: 'GET',
                 data: { clinicId: clinicId },
                 success: function (data) {

@@ -94,6 +94,8 @@
                                 @if (appointment.IsCompleted)
                                 {
                                     <a asp-action="BookAppointment" asp-controller="User" asp-route-doctorId="@appointment.DoctorId" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")" asp-route-IsOnline="0" class="btn btn-outline-primary ms-3">Book again</a>
+
+                                    <a asp-action="DownloadPrescription" asp-controller="Prescription" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-outline-success ms-3">Download Prescription</a>
                                 }
                                 else
                                 {

@@ -1,0 +1,66 @@
+﻿@model IEnumerable<HealthConnect.Models.Prescription> 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Prescription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .prescription-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .prescription-table th, .prescription-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .prescription-table th {
+            background-color: #f4f4f4;
+            text-align: left;
+        }
+        .btn-download {
+            display: inline-block;
+            padding: 8px 12px;
+            color: white;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .btn-download:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Download Prescriptions</h1>
+
+    <table class="prescription-table">
+        <thead>
+            <tr>
+                <th>Appointment ID</th>
+                <th>Patient Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var prescription in Model)
+            {
+                <tr>
+                    <td>@prescription.AppointmentId</td>
+                    <td>@prescription.Appointment.PatientName</td>
+                    <td>
+                        <a href="@Url.Action("Download", "Prescription", new { id = prescription.Id })" class="btn-download">
+                            Download PDF
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
