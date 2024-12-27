@@ -16,7 +16,7 @@
             {
                 AppointmentId = appointmentId,
                 PatientName = patientName,
-                MedicineList = new List<PrescribedMedicineDetail> { new PrescribedMedicineDetail() } // Initialize with one empty item
+                MedicineList = new List<PrescribedMedicineDetail> { new PrescribedMedicineDetail() }
             };
 
             return View(model);
@@ -29,31 +29,24 @@
         {
             if (model.MedicineList == null)
             {
-                model.MedicineList = new List<PrescribedMedicineDetail>(); // Initialize if null
+                model.MedicineList = new List<PrescribedMedicineDetail>();
             }
 
             if (ModelState.IsValid)
             {
-                // Generate PDF from the provided model using jsreport
                 byte[] pdfBytes = await GeneratePrescriptionPdf(model);
 
-                // Check if a prescription with the same AppointmentId already exists
                 var existingPrescription = await _context.Prescriptions
                                                          .FirstOrDefaultAsync(p => p.AppointmentId == model.AppointmentId);
 
                 if (existingPrescription != null)
                 {
-                    // If prescription exists, update the existing prescription
                     existingPrescription.PrescriptionPdf = pdfBytes;
-
-                    // Optionally, update other prescription details (if needed)
-                    // e.g., existingPrescription.SomeOtherProperty = model.SomeOtherProperty;
 
                     _context.Update(existingPrescription);
                 }
                 else
                 {
-                    // If prescription does not exist, create a new one
                     var prescription = new Prescription
                     {
                         AppointmentId = model.AppointmentId,
@@ -63,7 +56,6 @@
                     _context.Prescriptions.Add(prescription);
                 }
 
-                // Save changes to the database
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction("TodaysAppointments", "Doctor");
@@ -79,14 +71,13 @@
                 .Include(p => p.Appointment)
                 .ToListAsync();
 
-            return View(prescriptions); // Ensure the view name matches or use View("DownloadPrescription", prescriptions)
+            return View(prescriptions);
         }
 
 
         // GET: Prescription/Download/{id}
         public IActionResult DownloadPrescription(int appointmentId)
         {
-            // Fetch the prescription from the database using the appointmentId
             var prescription = _context.Prescriptions
                 .FirstOrDefault(p => p.AppointmentId == appointmentId);
 
@@ -95,7 +86,6 @@
                 return Json(new { success = false, message = "No prescription has been added yet." });
             }
 
-            // Return the PDF file for download
             return File(prescription.PrescriptionPdf, "application/pdf", $"Prescription_{appointmentId}.pdf");
         }
 
@@ -103,12 +93,10 @@
 
     private async Task<byte[]> GeneratePrescriptionPdf(PrescriptionViewModel model)
         {
-            // Create an instance of LocalReporting
             var rs = new LocalReporting().UseBinary(JsReportBinary.GetBinary()).AsUtility().Create();
 
             try
             {
-                // Create a template with dynamic content
                 var template = new Template
                 {
                     Content = @"
@@ -215,14 +203,14 @@
 </body>
 </html>
 ",
-                    Recipe = Recipe.ChromePdf, // Use enum instead of string
-                    Engine = Engine.Handlebars, // Use enum instead of string
+                    Recipe = Recipe.ChromePdf, 
+                    Engine = Engine.Handlebars,
                 };
 
                 var renderRequest = new RenderRequest
                 {
                     Template = template,
-                    Data = model // Pass the data here
+                    Data = model 
                 };
 
                 var result = await rs.RenderAsync(renderRequest);
@@ -235,7 +223,6 @@
             }
             catch (Exception ex)
             {
-                // Handle exceptions if needed
                 throw new Exception("Error generating PDF", ex);
             }
         }

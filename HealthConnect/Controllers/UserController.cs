@@ -191,27 +191,27 @@
                 : $"Your in-clinic appointment has been scheduled successfully for {date.ToShortDateString()} at {selectedSlot}.";
 
             _emailScheduler.ScheduleEmail(userEmail, confirmationSubject, confirmationBody, DateTime.Now.AddSeconds(1));
-            if (TimeSpan.TryParse(selectedSlot, out var slotTime))
-            {
-                var appointmentDateTime = date.Date.Add(slotTime);
+            //if (TimeSpan.TryParse(selectedSlot, out var slotTime))
+            //{
+            //    var appointmentDateTime = date.Date.Add(slotTime);
 
-                if (isOnline)
-                {
-                    string reminderSubject = "Your Online Appointment Reminder";
-                    string reminderBody = $"Your appointment starts in 10 minutes. Use this link: {consultationLink}";
-                    _emailScheduler.ScheduleEmail(userEmail, reminderSubject, reminderBody, appointmentDateTime.AddMinutes(-10));
-                }
-                else
-                {
-                    string reminderSubject = "Your In-Clinic Appointment Reminder";
-                    string reminderBody = $"Your in-clinic appointment starts in 30 minutes at {appointmentDateTime.ToString("f")}.";
-                    _emailScheduler.ScheduleEmail(userEmail, reminderSubject, reminderBody, appointmentDateTime.AddMinutes(-30));
-                }
-            }
-            else
-            {
-                TempData["Error"] = "Invalid time slot format.";
-            }
+            //    if (isOnline)
+            //    {
+            //        string reminderSubject = "Your Online Appointment Reminder";
+            //        string reminderBody = $"Your appointment starts in 10 minutes. Use this link: {consultationLink}";
+            //        _emailScheduler.ScheduleEmail(userEmail, reminderSubject, reminderBody, appointmentDateTime.AddMinutes(-10));
+            //    }
+            //    else
+            //    {
+            //        string reminderSubject = "Your In-Clinic Appointment Reminder";
+            //        string reminderBody = $"Your in-clinic appointment starts in 30 minutes at {appointmentDateTime.ToString("f")}.";
+            //        _emailScheduler.ScheduleEmail(userEmail, reminderSubject, reminderBody, appointmentDateTime.AddMinutes(-30));
+            //    }
+            //}
+            //else
+            //{
+            //    TempData["Error"] = "Invalid time slot format.";
+            //}
 
             ViewBag.AppointmentDate = date.ToShortDateString();
             ViewBag.TimeSlot = selectedSlot;
