@@ -11,8 +11,8 @@
 
         public async Task AddDoctorAsync(Doctor doctor)
         {
-            await _context.Doctors.AddAsync(doctor);
-            await _context.SaveChangesAsync();
+            _context.Doctors.AddAsync(doctor);
+            _context.SaveChangesAsync();
         }
 
         // Fetch doctors by location and specialization
